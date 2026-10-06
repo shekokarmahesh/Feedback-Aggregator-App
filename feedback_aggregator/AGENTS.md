@@ -3,6 +3,10 @@
 This project is a Flutter app (frontend) backed by a Serverpod server (backend). Always build the app's backend with Serverpod.
 Build for multiple users, use Serverpod's built-in authentication, which is already set up in `lib/server.dart`.
 
+The app aggregates feedback for developers and product managers. The signed-in dashboard currently uses sample tickets, with search, status/source/priority filters, request-count sorting, ticket details, and source/activity views. Keep sample data labeled until live connectors are implemented. Profile details come from the authenticated Serverpod account; team roles and invites are not implemented yet.
+
+Email/password signup skips email verification and never links an existing Google identity by email alone. Password resets use real Serverpod codes delivered by Resend. Google web OAuth requires the built website on the callback origin; see `GOOGLE_AUTH_SETUP.md` for the build command and `EMAIL_AUTH_SETUP.md` for sender configuration. Keep `config/passwords.yaml`, downloaded OAuth JSON, and the root `api key` file out of Git.
+
 The user starts the server and Flutter app with `serverpod start`. There is no need to check if the server is running: make the changes and call the `serverpod` MCP tools as needed. If the server is not running, an informative error message will be received from the MCP server. Then STOP and ask the user to start it. NEVER start the server yourself. The Flutter app is started along with it, or can be launched from the MCP tool `spawn_flutter_app`.
 
 While running, `serverpod start` watches for file changes to run incremental code generation and hot reload both the server and the Flutter app.
@@ -46,5 +50,3 @@ If the user asks you to test the app:
 3. Use `flutter_driver` (`dart` MCP) to navigate through the app
 
 The app is launched from `feedback_aggregator_flutter/lib/driver.dart`, which starts the Flutter driver extension with text entry emulation turned off so the app stays usable by hand. To let the driver type, set `enableTextEntryEmulation: true` there and `hot_restart` the app.
-
-IMPORTANT: After building the first version of the app, update this AGENTS.md file with information about the app we're building. KEEP the info about the MCP server and the checklist. Remove this paragraph.

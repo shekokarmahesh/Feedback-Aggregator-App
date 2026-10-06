@@ -26,4 +26,6 @@ Serverpod starts the backend and configured Flutter web app. Email/password sign
 
 The app supports email/password sign-up, sign-in, password reset, session restoration, and sign-out. Google web sign-in uses Serverpod's OAuth2 PKCE flow. Configure its free OAuth credentials following [Google authentication setup](feedback_aggregator/GOOGLE_AUTH_SETUP.md).
 
-The greeting endpoint requires an authenticated Serverpod session. Feedback sources, AI grouping, the dashboard, and team roles still need implementation.
+After sign-in, the dashboard shows a sample feedback inbox with grouped request counts, search, status/source/priority filters, sorting, and ticket details. Top navigation includes the inbox, planned sources, and sample activity. The account menu loads your real Serverpod profile and offers account-security information and sign-out.
+
+The greeting endpoint requires an authenticated Serverpod session. Tickets and activity are currently demo data. Live feedback sources, AI grouping, persisted tickets, and team roles still need implementation.
