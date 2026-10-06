@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../widgets/mascot.dart';
+
 /// Public entry point. The preview uses the same sample feedback as the inbox.
 class LandingScreen extends StatelessWidget {
   const LandingScreen({super.key});
@@ -183,6 +185,13 @@ class LandingScreen extends StatelessWidget {
   Widget _hero(BuildContext context, bool wide) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
+      const Mascot(
+        directions: 'assets/mascots/postbot-directions.webp',
+        reactions: 'assets/mascots/postbot-reactions.webp',
+        size: 128,
+        label: 'postbot',
+      ),
+      const SizedBox(height: 8),
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
