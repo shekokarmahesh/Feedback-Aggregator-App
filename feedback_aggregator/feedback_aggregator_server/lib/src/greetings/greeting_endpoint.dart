@@ -12,6 +12,9 @@ import 'package:serverpod/serverpod.dart';
 /// This is an example endpoint that returns a greeting message through
 /// its [hello] method.
 class GreetingEndpoint extends Endpoint {
+  @override
+  bool get requireLogin => true;
+
   // This method is called when the client calls the `hello` method on the
   // `greeting` endpoint.
   //

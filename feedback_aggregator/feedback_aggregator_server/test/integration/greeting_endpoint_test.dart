@@ -16,9 +16,21 @@ void main() {
         // Call the endpoint method by using the `endpoints` parameter and
         // pass `sessionBuilder` as a first argument. Refer to the docs on
         // how to use the `sessionBuilder` to set up different test scenarios.
-        final greeting = await endpoints.greeting.hello(sessionBuilder, 'Bob');
+        final signedInSession = sessionBuilder.copyWith(
+          authentication: AuthenticationOverride.authenticationInfo(
+            '00000000-0000-4000-8000-000000000001',
+            {},
+          ),
+        );
+        final greeting = await endpoints.greeting.hello(signedInSession, 'Bob');
         expect(greeting.message, 'Hello Bob');
       },
     );
+    test('rejects requests without a signed-in session', () async {
+      await expectLater(
+        endpoints.greeting.hello(sessionBuilder, 'Bob'),
+        throwsA(isA<ServerpodUnauthenticatedException>()),
+      );
+    });
   });
 }

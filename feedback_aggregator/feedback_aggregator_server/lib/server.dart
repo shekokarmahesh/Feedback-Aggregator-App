@@ -2,9 +2,11 @@ import 'dart:io';
 
 import 'package:serverpod_auth_idp_server/core.dart';
 import 'package:serverpod_auth_idp_server/providers/email.dart';
+import 'package:serverpod_auth_idp_server/providers/google.dart';
 import 'package:serverpod_cloud_storage/serverpod_cloud_storage.dart';
 
 import 'src/cache_busting.dart';
+import 'src/auth/auth_email.dart';
 import 'src/generated/serverpod.dart';
 import 'src/web/routes/app_config_route.dart';
 
@@ -13,6 +15,12 @@ void run(List<String> args) async {
   // Initialize Serverpod. The generated Serverpod class is already connected
   // with your project's generated code.
   final pod = Serverpod(args);
+  final authEmails = AuthEmailSender(
+    apiKey: pod.getPassword('resendApiKey') ?? '',
+    from:
+        pod.getPassword('resendFromEmail') ??
+        'Feedback Aggregator <onboarding@resend.dev>',
+  );
 
   // Initialize authentication services for the server.
   // Token managers will be used to validate and issue authentication keys,
@@ -29,10 +37,45 @@ void run(List<String> args) async {
       // staging and production they are sent through the Serverpod Cloud email
       // service. If you want to use a custom provider for sending emails, use
       // `EmailIdpConfigFromPasswords`.
-      ServerpodCloudEmailIdpConfig(
-        appDisplayName: 'feedback_aggregator',
+      EmailIdpConfigFromPasswords(
+        sendRegistrationVerificationCode:
+            (
+              session, {
+              required email,
+              required accountRequestId,
+              required verificationCode,
+              required transaction,
+            }) => authEmails.sendCode(
+              session,
+              email: email,
+              code: verificationCode,
+              requestId: accountRequestId.toString(),
+              passwordReset: false,
+            ),
+        sendPasswordResetVerificationCode:
+            (
+              session, {
+              required email,
+              required passwordResetRequestId,
+              required verificationCode,
+              required transaction,
+            }) => authEmails.sendCode(
+              session,
+              email: email,
+              code: verificationCode,
+              requestId: passwordResetRequestId.toString(),
+            ),
       ),
+      // Email remains available before Google OAuth credentials are configured.
+      if (pod.getPassword('googleClientSecret')?.trim().isNotEmpty ?? false)
+        GoogleIdpConfigFromPasswords(),
     ],
+  );
+
+  // Google web sign-in returns here. Serve the Flutter app on this same origin.
+  pod.webServer.addRoute(
+    FlutterWebAuth2CallbackRoute(),
+    '/auth/callback',
   );
 
   // Serve all files in the web/static relative directory under /web.

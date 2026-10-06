@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 
 import '../client.dart';
+import 'email_password_form.dart';
 
 class SignInScreen extends StatefulWidget {
   final Widget child;
@@ -40,22 +41,70 @@ class _SignInScreenState extends State<SignInScreen> {
     return _isSignedIn
         ? widget.child
         : Center(
-            child: SignInWidget(
-              client: client,
-              onAuthenticated: () {
-                context.showSnackBar(
-                  message: 'User authenticated.',
-                  backgroundColor: colors.primaryContainer,
-                  foregroundColor: colors.onPrimaryContainer,
-                );
-              },
-              onError: (error) {
-                context.showSnackBar(
-                  message: 'Authentication failed: $error',
-                  backgroundColor: colors.errorContainer,
-                  foregroundColor: colors.onErrorContainer,
-                );
-              },
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 420),
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(32),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.forum_outlined,
+                          size: 40,
+                          color: colors.primary,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Welcome to Feedback Aggregator',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Sign in or create an account to get started.',
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 24),
+                        const EmailPasswordForm(),
+                        if (googleSignInEnabled) ...[
+                          const SizedBox(height: 16),
+                          const Row(
+                            children: [
+                              Expanded(child: Divider()),
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 12),
+                                child: Text('or'),
+                              ),
+                              Expanded(child: Divider()),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          GoogleSignInWidget(
+                            client: client,
+                            onAuthenticated: () {
+                              context.showSnackBar(
+                                message: 'User authenticated.',
+                                backgroundColor: colors.primaryContainer,
+                                foregroundColor: colors.onPrimaryContainer,
+                              );
+                            },
+                            onError: (error) {
+                              context.showSnackBar(
+                                message: 'Could not sign in. Please try again.',
+                                backgroundColor: colors.errorContainer,
+                                foregroundColor: colors.onErrorContainer,
+                              );
+                            },
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
           );
   }

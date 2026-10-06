@@ -1,5 +1,4 @@
-import 'dart:async';
-
+import 'package:flutter/foundation.dart';
 import 'package:feedback_aggregator_client/feedback_aggregator_client.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
@@ -24,9 +23,20 @@ final serverUrl = getServerUrl();
 /// instead of using a global client object. This is just a simple example.
 late final Client client;
 
+// OAuth client IDs are public. The client secret belongs only on the server.
+const googleClientId = String.fromEnvironment('GOOGLE_CLIENT_ID');
+const googleSignInEnabled = kIsWeb && googleClientId != '';
+
 Future<void> initializeClient() async {
   client = Client(await serverUrl)
     ..connectivityMonitor = FlutterConnectivityMonitor()
     ..authSessionManager = FlutterAuthSessionManager();
-  unawaited(client.auth.initialize());
+  await client.auth.initialize();
+
+  if (googleSignInEnabled) {
+    await client.auth.initializeGoogleSignIn(
+      clientId: googleClientId,
+      redirectUri: Uri.base.resolve('/auth/callback').toString(),
+    );
+  }
 }

@@ -1,0 +1,3 @@
+# Downloaded Google OAuth credentials belong only on the local machine.
+client_secret*.json
+api key

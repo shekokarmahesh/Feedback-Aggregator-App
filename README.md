@@ -22,6 +22,8 @@ serverpod start
 
 The default development PostgreSQL database is managed by Serverpod using the configured `database.dataPath`. The Compose file also includes PostgreSQL services if you later choose Docker-based databases.
 
-Serverpod starts the backend and configured Flutter web app. During development, authentication verification codes are printed in the server console. Production email delivery uses Serverpod Cloud's email service by default.
+Serverpod starts the backend and configured Flutter web app. Email/password sign-up creates an account immediately without an OTP. Password resets send an expiring, single-use code through Resend; codes are not printed in server logs. See [email delivery setup](feedback_aggregator/EMAIL_AUTH_SETUP.md).
 
-The scaffold currently contains the default greeting example behind sign-in. Feedback sources, AI grouping, the dashboard, and team roles still need implementation.
+The app supports email/password sign-up, sign-in, password reset, session restoration, and sign-out. Google web sign-in uses Serverpod's OAuth2 PKCE flow. Configure its free OAuth credentials following [Google authentication setup](feedback_aggregator/GOOGLE_AUTH_SETUP.md).
+
+The greeting endpoint requires an authenticated Serverpod session. Feedback sources, AI grouping, the dashboard, and team roles still need implementation.

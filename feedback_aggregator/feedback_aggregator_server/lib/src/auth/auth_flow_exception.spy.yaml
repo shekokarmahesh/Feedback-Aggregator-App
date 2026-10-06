@@ -1,0 +1,3 @@
+exception: AuthFlowException
+fields:
+  message: String

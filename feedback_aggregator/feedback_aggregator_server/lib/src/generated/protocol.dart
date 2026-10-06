@@ -17,7 +17,9 @@ import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _iacs;
 import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _iais;
+import 'auth/auth_flow_exception.dart' as _iffl96zw;
 import 'greetings/greeting.dart' as _izw8z7ou;
+export 'auth/auth_flow_exception.dart';
 export 'greetings/greeting.dart';
 
 class Protocol extends _is.DatabaseSerializationManager {
@@ -60,8 +62,15 @@ class Protocol extends _is.DatabaseSerializationManager {
       }
     }
 
+    if (t == _iffl96zw.AuthFlowException) {
+      return _iffl96zw.AuthFlowException.fromJson(data) as T;
+    }
     if (t == _izw8z7ou.Greeting) {
       return _izw8z7ou.Greeting.fromJson(data) as T;
+    }
+    if (t == _is.getType<_iffl96zw.AuthFlowException?>()) {
+      return (data != null ? _iffl96zw.AuthFlowException.fromJson(data) : null)
+          as T;
     }
     if (t == _is.getType<_izw8z7ou.Greeting?>()) {
       return (data != null ? _izw8z7ou.Greeting.fromJson(data) : null) as T;
@@ -80,6 +89,7 @@ class Protocol extends _is.DatabaseSerializationManager {
 
   static String? getClassNameForType(Type type) {
     return switch (type) {
+      _iffl96zw.AuthFlowException => 'AuthFlowException',
       _izw8z7ou.Greeting => 'Greeting',
       _ => null,
     };
@@ -98,6 +108,8 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
 
     switch (data) {
+      case _iffl96zw.AuthFlowException():
+        return 'AuthFlowException';
       case _izw8z7ou.Greeting():
         return 'Greeting';
     }
@@ -125,6 +137,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     var dataClassName = data['className'];
     if (dataClassName is! String) {
       return super.deserializeByClassName(data);
+    }
+    if (dataClassName == 'AuthFlowException') {
+      return deserialize<_iffl96zw.AuthFlowException>(data['data']);
     }
     if (dataClassName == 'Greeting') {
       return deserialize<_izw8z7ou.Greeting>(data['data']);
