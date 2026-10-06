@@ -48,20 +48,32 @@ class MyApp extends StatelessWidget {
       theme: _buildTheme(Brightness.light),
       darkTheme: _buildTheme(Brightness.dark),
       themeMode: ThemeMode.light,
-      home: const MyHomePage(title: 'Feedback Aggregator'),
+      routes: {
+        '/': (context) => const MyHomePage(),
+        '/login': (context) => const MyHomePage(showLanding: false),
+        '/signup': (context) =>
+            const MyHomePage(showLanding: false, initialSignUp: true),
+      },
     );
   }
 }
 
 class MyHomePage extends StatelessWidget {
-  const MyHomePage({super.key, required this.title});
+  const MyHomePage({
+    super.key,
+    this.showLanding = true,
+    this.initialSignUp = false,
+  });
 
-  final String title;
+  final bool showLanding;
+  final bool initialSignUp;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SignInScreen(
+        showLanding: showLanding,
+        initialSignUp: initialSignUp,
         child: DashboardScreen(
           onSignOut: () async {
             await client.auth.signOutDevice();

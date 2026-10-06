@@ -3,10 +3,18 @@ import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 
 import '../client.dart';
 import 'email_password_form.dart';
+import 'landing_screen.dart';
 
 class SignInScreen extends StatefulWidget {
   final Widget child;
-  const SignInScreen({super.key, required this.child});
+  final bool showLanding;
+  final bool initialSignUp;
+  const SignInScreen({
+    super.key,
+    required this.child,
+    this.showLanding = true,
+    this.initialSignUp = false,
+  });
 
   @override
   State<SignInScreen> createState() => _SignInScreenState();
@@ -40,6 +48,8 @@ class _SignInScreenState extends State<SignInScreen> {
 
     return _isSignedIn
         ? widget.child
+        : widget.showLanding
+        ? const LandingScreen()
         : Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
@@ -51,6 +61,14 @@ class _SignInScreenState extends State<SignInScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        TextButton.icon(
+                          onPressed: () => Navigator.of(
+                            context,
+                          ).pushNamedAndRemoveUntil('/', (route) => false),
+                          icon: const Icon(Icons.arrow_back, size: 16),
+                          label: const Text('Back to home'),
+                        ),
+                        const SizedBox(height: 16),
                         Icon(
                           Icons.forum_outlined,
                           size: 40,
@@ -68,7 +86,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 24),
-                        const EmailPasswordForm(),
+                        EmailPasswordForm(initialSignUp: widget.initialSignUp),
                         if (googleSignInEnabled) ...[
                           const SizedBox(height: 16),
                           const Row(

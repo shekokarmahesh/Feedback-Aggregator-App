@@ -7,7 +7,8 @@ import '../client.dart';
 enum _Step { signIn, signUp, requestReset, verifyReset, newPassword }
 
 class EmailPasswordForm extends StatefulWidget {
-  const EmailPasswordForm({super.key});
+  const EmailPasswordForm({super.key, this.initialSignUp = false});
+  final bool initialSignUp;
   @override
   State<EmailPasswordForm> createState() => _EmailPasswordFormState();
 }
@@ -24,6 +25,12 @@ class _EmailPasswordFormState extends State<EmailPasswordForm> {
   String? _error;
   bool _busy = false;
   bool _hidePassword = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _step = widget.initialSignUp ? _Step.signUp : _Step.signIn;
+  }
 
   @override
   void dispose() {
