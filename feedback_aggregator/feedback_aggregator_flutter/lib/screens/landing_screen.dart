@@ -153,7 +153,7 @@ class LandingScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 12),
                           const Text(
-                            'Create an account and explore the sample workspace.',
+                            "Create an account and bring your team's feedback together.",
                             textAlign: TextAlign.center,
                             style: TextStyle(color: _muted, height: 1.5),
                           ),
@@ -245,7 +245,7 @@ class LandingScreen extends StatelessWidget {
       ),
       const SizedBox(height: 16),
       const Text(
-        'Email or Google sign-in. Start with a sample inbox.',
+        'Email or Google sign-in. Create your workspace.',
         style: TextStyle(fontSize: 12, color: _muted),
       ),
     ],

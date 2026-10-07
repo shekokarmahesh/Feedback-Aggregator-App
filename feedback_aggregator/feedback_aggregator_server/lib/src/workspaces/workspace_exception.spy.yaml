@@ -1,0 +1,3 @@
+exception: WorkspaceException
+fields:
+  message: String

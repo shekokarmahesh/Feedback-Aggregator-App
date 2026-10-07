@@ -46,6 +46,50 @@ void main() {
     });
 
     test(
+      'sends the invitation link with HTML, plain text, and an idempotency key',
+      () async {
+        final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+        addTearDown(() => server.close(force: true));
+        final received = server.first.then((request) async {
+          expect(
+            request.headers.value('Idempotency-Key'),
+            'workspace-invite/123',
+          );
+          final body =
+              jsonDecode(await utf8.decoder.bind(request).join()) as Map;
+          expect(body['to'], ['teammate@example.com']);
+          expect(body['html'], contains('Join Alpha'));
+          expect(
+            body['html'],
+            contains(
+              const HtmlEscape().convert(
+                'https://app.example/#/invite?token=link',
+              ),
+            ),
+          );
+          expect(body['text'], contains('teammate@example.com'));
+          request.response.statusCode = 200;
+          await request.response.close();
+        });
+        final session = sessions.build();
+        addTearDown(session.close);
+        await AuthEmailSender(
+          apiKey: 'test-key',
+          from: 'App <auth@example.com>',
+          endpoint: Uri.parse('http://127.0.0.1:${server.port}/emails'),
+        ).sendInvitation(
+          session,
+          email: 'teammate@example.com',
+          workspaceName: 'Alpha',
+          role: 'editor',
+          url: 'https://app.example/#/invite?token=link',
+          invitationId: 123,
+        );
+        await received;
+      },
+    );
+
+    test(
       'surfaces delivery errors rather than claiming an email was sent',
       () async {
         final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);

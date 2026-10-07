@@ -3,7 +3,7 @@
 This project is a Flutter app (frontend) backed by a Serverpod server (backend). Always build the app's backend with Serverpod.
 Build for multiple users, use Serverpod's built-in authentication, which is already set up in `lib/server.dart`.
 
-The app aggregates feedback for developers and product managers. The signed-in dashboard currently uses sample tickets, with search, status/source/priority filters, request-count sorting, ticket details, and source/activity views. Keep sample data labeled until live connectors are implemented. Profile details come from the authenticated Serverpod account; team roles and invites are not implemented yet.
+The app aggregates feedback for developers and product managers. The signed-in dashboard reads workspace-scoped tickets from PostgreSQL; the public landing preview uses labeled sample data. Workspaces are organization tenants with Admin, Editor, and Viewer roles, Resend invitations, and membership checks in `WorkspaceService`. Every future tenant endpoint, job, cache, and storage operation must check membership/role and include the workspace ID. See `WORKSPACES.md` for the isolation boundary and invitation setup. Profile details come from the authenticated Serverpod account; live source connectors are not implemented yet.
 
 Email/password signup skips email verification and never links an existing Google identity by email alone. Password resets use real Serverpod codes delivered by Resend. Google web OAuth requires the built website on the callback origin; see `GOOGLE_AUTH_SETUP.md` for the build command and `EMAIL_AUTH_SETUP.md` for sender configuration. Keep `config/passwords.yaml`, downloaded OAuth JSON, and the root `api key` file out of Git.
 

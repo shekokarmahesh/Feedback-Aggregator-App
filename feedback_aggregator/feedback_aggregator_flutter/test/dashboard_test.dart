@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:feedback_aggregator_client/feedback_aggregator_client.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:feedback_aggregator_flutter/models/demo_ticket.dart';
 import 'package:feedback_aggregator_flutter/screens/dashboard_screen.dart';
@@ -23,11 +24,19 @@ void main() {
   Future<void> showDashboard(
     WidgetTester tester, {
     VoidCallback? signedOut,
+    WorkspaceSummary? workspace,
+    List<DemoTicket> tickets = demoTickets,
+    VoidCallback? onCreateTicket,
+    Future<void> Function(DemoTicket, String)? onUpdateStatus,
   }) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
           body: DashboardScreen(
+            workspace: workspace,
+            tickets: tickets,
+            onCreateTicket: onCreateTicket,
+            onUpdateStatus: onUpdateStatus,
             onSignOut: () async {
               signedOut?.call();
             },
@@ -94,4 +103,68 @@ void main() {
     expect(find.text('Feedback sources'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+  testWidgets('workspace inbox does not show global sample data', (
+    tester,
+  ) async {
+    await showDashboard(
+      tester,
+      workspace: WorkspaceSummary(
+        id: 1,
+        name: 'Alpha',
+        role: WorkspaceRole.viewer,
+      ),
+      tickets: [],
+    );
+    expect(find.text('ALPHA'), findsOneWidget);
+    expect(find.text('No feedback yet'), findsOneWidget);
+    expect(find.text('Add dark mode to the dashboard'), findsNothing);
+    expect(find.text('Sample data'), findsNothing);
+    expect(find.text('Add feedback'), findsNothing);
+  });
+
+  testWidgets(
+    'Editor controls create and update only the active workspace ticket',
+    (tester) async {
+      var created = false;
+      String? updated;
+      const ticket = DemoTicket(
+        'FB-1',
+        'Tenant feedback',
+        'Private detail',
+        'Forms',
+        'Open',
+        'High',
+        1,
+        0,
+        'Test',
+      );
+      await showDashboard(
+        tester,
+        workspace: WorkspaceSummary(
+          id: 1,
+          name: 'Alpha',
+          role: WorkspaceRole.editor,
+        ),
+        tickets: [ticket],
+        onCreateTicket: () => created = true,
+        onUpdateStatus: (row, status) async {
+          expect(row.id, 'FB-1');
+          updated = status;
+        },
+      );
+      await tester.tap(find.text('Add feedback'));
+      expect(created, isTrue);
+      await tester.ensureVisible(find.text('Tenant feedback'));
+      await tester.tap(find.text('Tenant feedback'));
+      await tester.pumpAndSettle();
+      expect(find.text('Update status'), findsOneWidget);
+      await tester.ensureVisible(
+        find.widgetWithText(OutlinedButton, 'Planned'),
+      );
+      await tester.tap(find.widgetWithText(OutlinedButton, 'Planned'));
+      await tester.pumpAndSettle();
+      expect(updated, 'Planned');
+      expect(tester.takeException(), isNull);
+    },
+  );
 }

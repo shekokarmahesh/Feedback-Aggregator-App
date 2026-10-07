@@ -1,0 +1,19 @@
+class: WorkspaceInvitation
+table: app_workspace_invitation
+serverOnly: true
+fields:
+  workspace: Workspace?, relation(onDelete=Cascade)
+  email: String
+  role: WorkspaceRole
+  tokenHash: String
+  createdBy: UuidValue
+  createdAt: DateTime, default=now
+  expiresAt: DateTime
+  acceptedAt: DateTime?
+  revokedAt: DateTime?
+indexes:
+  workspace_invite_token_unique:
+    fields: tokenHash
+    unique: true
+  workspace_invites_lookup:
+    fields: workspaceId

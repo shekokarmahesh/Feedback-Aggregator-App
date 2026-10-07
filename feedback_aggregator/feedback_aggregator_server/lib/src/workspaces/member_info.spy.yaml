@@ -1,0 +1,7 @@
+class: MemberInfo
+fields:
+  id: int
+  name: String
+  email: String
+  role: WorkspaceRole
+  isCurrentUser: bool

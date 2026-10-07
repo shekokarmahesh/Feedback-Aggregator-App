@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 
 import 'client.dart';
-import 'screens/dashboard_screen.dart';
+import 'screens/workspace_shell.dart';
+import 'screens/invitation_screen.dart';
 import 'screens/sign_in_screen.dart';
 
 void main() async {
@@ -48,8 +48,24 @@ class MyApp extends StatelessWidget {
       theme: _buildTheme(Brightness.light),
       darkTheme: _buildTheme(Brightness.dark),
       themeMode: ThemeMode.light,
+      onGenerateRoute: (settings) {
+        final uri = Uri.parse(settings.name ?? '/');
+        if (uri.path == '/invite') {
+          return MaterialPageRoute<void>(
+            settings: settings,
+            builder: (_) => MyHomePage(
+              showLanding: false,
+              invitationToken: uri.queryParameters['token'] ?? '',
+            ),
+          );
+        }
+        return null;
+      },
       routes: {
-        '/': (context) => const MyHomePage(),
+        '/': (context) => MyHomePage(
+          initialWorkspaceId:
+              ModalRoute.of(context)?.settings.arguments as int?,
+        ),
         '/login': (context) => const MyHomePage(showLanding: false),
         '/signup': (context) =>
             const MyHomePage(showLanding: false, initialSignUp: true),
@@ -63,10 +79,14 @@ class MyHomePage extends StatelessWidget {
     super.key,
     this.showLanding = true,
     this.initialSignUp = false,
+    this.invitationToken,
+    this.initialWorkspaceId,
   });
 
   final bool showLanding;
   final bool initialSignUp;
+  final String? invitationToken;
+  final int? initialWorkspaceId;
 
   @override
   Widget build(BuildContext context) {
@@ -74,11 +94,10 @@ class MyHomePage extends StatelessWidget {
       body: SignInScreen(
         showLanding: showLanding,
         initialSignUp: initialSignUp,
-        child: DashboardScreen(
-          onSignOut: () async {
-            await client.auth.signOutDevice();
-          },
-        ),
+        invitation: invitationToken != null,
+        child: invitationToken != null
+            ? InvitationScreen(token: invitationToken!)
+            : WorkspaceShell(initialWorkspaceId: initialWorkspaceId),
       ),
     );
   }

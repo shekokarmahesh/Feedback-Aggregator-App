@@ -39,6 +39,45 @@ class AuthEmailSender {
     required String requestId,
     bool passwordReset = true,
   }) async {
+    final purpose = passwordReset ? 'password reset' : 'email verification';
+    await sendEmail(
+      session,
+      email: email,
+      subject: passwordReset
+          ? 'Reset your Feedback Aggregator password'
+          : 'Verify your Feedback Aggregator email',
+      html: authCodeHtml(code, passwordReset: passwordReset),
+      text:
+          'Your Feedback Aggregator $purpose code is: $code\n\nIt expires in 15 minutes and can only be used once. Never share it. If you did not request this, ignore this email.',
+      idempotencyKey: '${passwordReset ? 'reset' : 'verify'}/$requestId',
+    );
+  }
+
+  Future<void> sendInvitation(
+    Session session, {
+    required String email,
+    required String workspaceName,
+    required String role,
+    required String url,
+    required int invitationId,
+  }) => sendEmail(
+    session,
+    email: email,
+    subject: 'Join $workspaceName on Feedback Aggregator',
+    html: invitationHtml(workspaceName, role, url),
+    text:
+        'You are invited to join $workspaceName with $role access.\n\nJoin: $url\n\nSign in using $email. This link expires in 7 days and can be used once. If you did not expect this invitation, ignore it.',
+    idempotencyKey: 'workspace-invite/$invitationId',
+  );
+
+  Future<void> sendEmail(
+    Session session, {
+    required String email,
+    required String subject,
+    required String html,
+    required String text,
+    required String idempotencyKey,
+  }) async {
     if (apiKey.isEmpty) {
       session.log('Resend API key is not configured.', level: LogLevel.error);
       throw StateError('Email delivery is unavailable.');
@@ -52,26 +91,22 @@ class AuthEmailSender {
         request.headers.contentType = ContentType.json;
         request.headers.set(
           'Idempotency-Key',
-          '${passwordReset ? 'reset' : 'verify'}/$requestId',
+          idempotencyKey,
         );
-        final purpose = passwordReset ? 'password reset' : 'email verification';
         request.write(
           jsonEncode({
             'from': from,
             'to': [email],
-            'subject': passwordReset
-                ? 'Reset your Feedback Aggregator password'
-                : 'Verify your Feedback Aggregator email',
-            'html': authCodeHtml(code, passwordReset: passwordReset),
-            'text':
-                'Your Feedback Aggregator $purpose code is: $code\n\nIt expires in 15 minutes and can only be used once. Never share it. If you did not request this, ignore this email.',
+            'subject': subject,
+            'html': html,
+            'text': text,
           }),
         );
         final response = await request.close();
         await response.drain<void>();
         if (response.statusCode < 200 || response.statusCode >= 300) {
           session.log(
-            'Resend rejected auth email (HTTP ${response.statusCode}).',
+            'Resend rejected email (HTTP ${response.statusCode}).',
             level: LogLevel.error,
           );
           throw StateError('Email delivery failed.');
@@ -81,4 +116,24 @@ class AuthEmailSender {
       client.close(force: true);
     }
   }
+}
+
+/// Inline styles and tables work across common mail clients; escape all inputs.
+String invitationHtml(String name, String role, String url) {
+  const escape = HtmlEscape();
+  name = escape.convert(name);
+  role = escape.convert(role);
+  url = escape.convert(url);
+  return '''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;background:#f3f4f8;font-family:Arial,Helvetica,sans-serif;color:#172033">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td align="center" style="padding:40px 16px">
+<table role="presentation" width="100%" style="max-width:520px;background:white;border:1px solid #e5e7eb;border-radius:16px" cellspacing="0" cellpadding="0">
+<tr><td style="padding:28px 32px;background:#4f46e5;color:white;font-size:18px;font-weight:bold;border-radius:16px 16px 0 0">Feedback Aggregator</td></tr>
+<tr><td style="padding:32px"><p style="font-size:12px;letter-spacing:2px;color:#6366f1;font-weight:bold">YOU'RE INVITED</p><h1 style="font-size:28px;line-height:1.3">Join $name</h1>
+<p style="font-size:16px;line-height:1.6;color:#536079">Your team has invited you to their workspace with <strong>$role</strong> access.</p>
+<table role="presentation" cellspacing="0" cellpadding="0"><tr><td style="border-radius:8px;background:#4f46e5"><a href="$url" style="display:inline-block;padding:16px 24px;color:white;text-decoration:none;font-weight:bold">Join workspace &rarr;</a></td></tr></table>
+<p style="font-size:14px;line-height:1.6;color:#536079">Sign in with the email address this invitation was sent to. The link expires in <strong>7 days</strong> and works once.</p>
+<p style="font-size:12px;line-height:1.6;color:#6b7280">If the button doesn't work, copy this address into your browser:<br><a href="$url" style="color:#4f46e5;word-break:break-all">$url</a></p>
+<p style="font-size:14px;line-height:1.6;color:#536079">If you weren't expecting this invitation, you can ignore it.</p></td></tr>
+<tr><td style="padding:20px 32px;border-top:1px solid #e5e7eb;font-size:12px;color:#6b7280">One workspace. A clearer picture of your users.</td></tr></table></td></tr></table></body></html>''';
 }
