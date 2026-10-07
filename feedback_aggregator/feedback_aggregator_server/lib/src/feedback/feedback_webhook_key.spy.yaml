@@ -1,0 +1,16 @@
+### Server-only mapping from a hashed ingestion key to a team.
+class: FeedbackWebhookKey
+table: feedback_webhook_key
+serverOnly: true
+fields:
+  teamId: int, relation(parent=feedback_team), column=team_id
+  keyHash: String
+  createdByUserId: String
+  createdAt: DateTime, default=now
+  revokedAt: DateTime?
+indexes:
+  feedback_webhook_key_hash_idx:
+    fields: keyHash
+    unique: true
+  feedback_webhook_key_team_idx:
+    fields: teamId

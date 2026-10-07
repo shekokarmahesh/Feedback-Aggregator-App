@@ -9,12 +9,17 @@ import 'src/cache_busting.dart';
 import 'src/auth/auth_email.dart';
 import 'src/generated/serverpod.dart';
 import 'src/web/routes/app_config_route.dart';
+import 'src/web/routes/feedback_webhook_route.dart';
 
 /// The starting point of the Serverpod server.
 void run(List<String> args) async {
   // Initialize Serverpod. The generated Serverpod class is already connected
   // with your project's generated code.
   final pod = Serverpod(args);
+  pod.webServer.addRoute(
+    FeedbackWebhookRoute(),
+    '/webhooks/feedback',
+  );
   final authEmails = AuthEmailSender(
     apiKey: pod.getPassword('resendApiKey') ?? '',
     from:

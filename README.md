@@ -29,3 +29,7 @@ The app supports email/password sign-up, sign-in, password reset, session restor
 After sign-in, the dashboard shows a sample feedback inbox with grouped request counts, search, status/source/priority filters, sorting, and ticket details. Top navigation includes the inbox, planned sources, and sample activity. The account menu loads your real Serverpod profile and offers account-security information and sign-out.
 
 The greeting endpoint requires an authenticated Serverpod session. Tickets and activity are currently demo data. Live feedback sources, AI grouping, persisted tickets, and team roles still need implementation.
+
+A feedback model and `POST /webhooks/feedback` ingestion route are now defined.
+Code generation and the database migration are required before enabling ingestion.
+See [feedback webhook setup](feedback_aggregator/FEEDBACK_WEBHOOK_SETUP.md).
