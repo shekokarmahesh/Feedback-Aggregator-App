@@ -5,25 +5,24 @@ Flutter web frontend and Serverpod backend for aggregating and grouping user fee
 The project lives in `feedback_aggregator/` and includes:
 
 - `feedback_aggregator_flutter`: Flutter frontend with Serverpod email/password sign-in.
-- `feedback_aggregator_server`: Serverpod backend, PostgreSQL, Redis, and authentication.
+- `feedback_aggregator_server`: Serverpod backend, PostgreSQL, built-in memory caching, and authentication.
 - `feedback_aggregator_client`: generated Dart client.
 
 ## Local development
 
 Open `feedback_aggregator/` as the project folder in Codex to load its `AGENTS.md`, MCP configuration, and agent skills.
 
-For a fresh clone, follow [collaborator setup](feedback_aggregator/COLLABORATOR_SETUP.md) to generate local secrets and configure Google/Resend. With an ignored `.env` configured, load it before starting Redis and the development stack:
+For a fresh clone, follow [collaborator setup](feedback_aggregator/COLLABORATOR_SETUP.md) to generate local secrets and configure Google/Resend. With an ignored `.env` configured, load it before starting the development stack:
 
 ```sh
 cd feedback_aggregator/feedback_aggregator_server
 set -a
 . ./.env
 set +a
-docker compose --env-file .env up -d --no-deps --pull never redis
 serverpod start
 ```
 
-The default development PostgreSQL database is managed by Serverpod using the configured `database.dataPath`. The Compose file also includes PostgreSQL services if you later choose Docker-based databases.
+Serverpod manages the development and test PostgreSQL databases using `database.dataPath`. Docker and Redis are not required. Caching uses Serverpod's built-in process memory; see [storage setup](feedback_aggregator/STORAGE_RESEARCH.md) for persistence and production considerations.
 
 Serverpod starts the backend and configured Flutter web app. Email/password sign-up creates an account immediately without an OTP. Password resets send an expiring, single-use code through Resend; codes are not printed in server logs. See [email delivery setup](feedback_aggregator/EMAIL_AUTH_SETUP.md).
 

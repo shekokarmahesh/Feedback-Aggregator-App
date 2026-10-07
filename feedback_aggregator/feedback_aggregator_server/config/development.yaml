@@ -38,14 +38,6 @@ database:
   dataPath: .serverpod/development/pgdata
   #maxConnectionCount: 10 # Defaults to 10, a negative or null value removes the limit
 
-# This is the setup for Redis.
-redis:
-  enabled: true
-  host: localhost
-  port: 8091
-  #user: # defaults to empty
-  #requireSsl: true # defaults to false
-
 maxRequestSize: 524288 # The maximum size of requests allowed in bytes
 
 sessionLogs:

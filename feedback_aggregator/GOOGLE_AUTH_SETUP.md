@@ -30,14 +30,13 @@ The backend enables Google only when this secret is configured. Email/password c
 
 ## 3. Build and run the website
 
-First configure the ignored `.env` using [collaborator setup](COLLABORATOR_SETUP.md). From the `feedback_aggregator` directory, with Docker Desktop running:
+First configure the ignored `.env` using [collaborator setup](COLLABORATOR_SETUP.md). From the `feedback_aggregator` directory:
 
 ```sh
 cd feedback_aggregator_server
 set -a
 . ./.env
 set +a
-docker compose --env-file .env up -d --no-deps --pull never redis
 cd ../feedback_aggregator_flutter
 flutter build web --base-href / --output ../feedback_aggregator_server/web/app \
   --dart-define=GOOGLE_CLIENT_ID=YOUR_CLIENT_ID.apps.googleusercontent.com
