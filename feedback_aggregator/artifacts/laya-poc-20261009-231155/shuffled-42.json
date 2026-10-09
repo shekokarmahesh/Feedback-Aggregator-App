@@ -1,0 +1,1197 @@
+{
+  "recordedAt": "2026-10-09T17:43:31.698740Z",
+  "seed": 42,
+  "threshold": 0.8,
+  "triageThreshold": 0.6,
+  "newIssueDuplicateCeiling": 0.5,
+  "fixture": "34 synthetic English reports; fixed development fixture",
+  "reports": [
+    {
+      "id": "SAMPLE-11",
+      "source": "Slack",
+      "reporterId": "sample-person-17",
+      "title": "Our large workspace overview is painfully slow to load",
+      "text": "Our large workspace overview is painfully slow to load. Waiting on initial feedback table.",
+      "hoursAgo": 6,
+      "expectedIssue": "slow-dashboard"
+    },
+    {
+      "id": "SAMPLE-24",
+      "source": "Forms",
+      "reporterId": "sample-person-23",
+      "title": "Please offer a dark appearance option for the dashboard",
+      "text": "Please offer a dark appearance option for the dashboard.",
+      "hoursAgo": 36,
+      "expectedIssue": "dark-mode"
+    },
+    {
+      "id": "SAMPLE-31",
+      "source": "Discord",
+      "reporterId": "sample-person-25",
+      "title": "Thanks team!",
+      "text": "Thanks for the great demo today. Looking forward to the next update!",
+      "hoursAgo": 3,
+      "expectedIssue": "noise-31"
+    },
+    {
+      "id": "SAMPLE-1",
+      "source": "Discord",
+      "reporterId": "sample-person-0",
+      "title": "Google sign-in loops back to login",
+      "text": "Google sign in succeeds then sends me right back to the login screen. Cannot reach my dashboard.",
+      "hoursAgo": 2,
+      "expectedIssue": "google-login"
+    },
+    {
+      "id": "SAMPLE-20",
+      "source": "Forms",
+      "reporterId": "sample-person-7",
+      "title": "Reset password cannot be completed because the email with the code is never delivered",
+      "text": "Reset password cannot be completed because the email with the code is never delivered.",
+      "hoursAgo": 36,
+      "expectedIssue": "reset-email"
+    },
+    {
+      "id": "SAMPLE-22",
+      "source": "Forms",
+      "reporterId": "sample-person-15",
+      "title": "Downloaded CSV contains headers only when a source filter is active",
+      "text": "Downloaded CSV contains headers only when a source filter is active. No timeout, just missing data.",
+      "hoursAgo": 36,
+      "expectedIssue": "csv-empty"
+    },
+    {
+      "id": "SAMPLE-6",
+      "source": "Discord",
+      "reporterId": "sample-person-20",
+      "title": "Add a dark theme",
+      "text": "Could you add a dark mode? Reviewing feedback late at night hurts my eyes.",
+      "hoursAgo": 2,
+      "expectedIssue": "dark-mode"
+    },
+    {
+      "id": "SAMPLE-7",
+      "source": "Slack",
+      "reporterId": "sample-person-1",
+      "title": "Stuck in a loop after Google OAuth",
+      "text": "Stuck in a loop after Google OAuth. Approve account, land on sign-in again. Email login works.",
+      "hoursAgo": 6,
+      "expectedIssue": "google-login"
+    },
+    {
+      "id": "SAMPLE-15",
+      "source": "Email",
+      "reporterId": "sample-person-10",
+      "title": "Cannot export a big workspace: CSV request ends in 504",
+      "text": "Cannot export a big workspace: CSV request ends in 504. A hundred rows downloads normally.",
+      "hoursAgo": 18,
+      "expectedIssue": "csv-timeout"
+    },
+    {
+      "id": "SAMPLE-25",
+      "source": "Support",
+      "reporterId": "sample-person-0",
+      "title": "Google authentication redirects back to login every time",
+      "text": "Google authentication redirects back to login every time. My team cannot enter using Google.",
+      "hoursAgo": 90,
+      "expectedIssue": "google-login"
+    },
+    {
+      "id": "SAMPLE-18",
+      "source": "Email",
+      "reporterId": "sample-person-22",
+      "title": "Would love a night theme across the application, especially during evening support shifts",
+      "text": "Would love a night theme across the application, especially during evening support shifts.",
+      "hoursAgo": 18,
+      "expectedIssue": "dark-mode"
+    },
+    {
+      "id": "SAMPLE-21",
+      "source": "Forms",
+      "reporterId": "sample-person-11",
+      "title": "Please fix timeout on CSV export with thousands of rows; we cannot send weekly reports",
+      "text": "Please fix timeout on CSV export with thousands of rows; we cannot send weekly reports.",
+      "hoursAgo": 36,
+      "expectedIssue": "csv-timeout"
+    },
+    {
+      "id": "SAMPLE-27",
+      "source": "Support",
+      "reporterId": "sample-person-8",
+      "title": "CSV export for a large date range fails after a minute",
+      "text": "CSV export for a large date range fails after a minute. There is no file to download.",
+      "hoursAgo": 90,
+      "expectedIssue": "csv-timeout"
+    },
+    {
+      "id": "SAMPLE-13",
+      "source": "Email",
+      "reporterId": "sample-person-2",
+      "title": "After selecting my Google account I never get into the app",
+      "text": "After selecting my Google account I never get into the app. It just opens login again.",
+      "hoursAgo": 18,
+      "expectedIssue": "google-login"
+    },
+    {
+      "id": "SAMPLE-17",
+      "source": "Email",
+      "reporterId": "sample-person-18",
+      "title": "First dashboard load takes around half a minute with 8,000 tickets; exports are fine",
+      "text": "First dashboard load takes around half a minute with 8,000 tickets; exports are fine.",
+      "hoursAgo": 18,
+      "expectedIssue": "slow-dashboard"
+    },
+    {
+      "id": "SAMPLE-19",
+      "source": "Forms",
+      "reporterId": "sample-person-3",
+      "title": "Using Continue with Google returns to sign in repeatedly instead of the workspace",
+      "text": "Using Continue with Google returns to sign in repeatedly instead of the workspace.",
+      "hoursAgo": 36,
+      "expectedIssue": "google-login"
+    },
+    {
+      "id": "SAMPLE-26",
+      "source": "Support",
+      "reporterId": "sample-person-4",
+      "title": "Support case: email-password recovery code not received",
+      "text": "Support case: email-password recovery code not received. Google sign-in is fine.",
+      "hoursAgo": 90,
+      "expectedIssue": "reset-email"
+    },
+    {
+      "id": "SAMPLE-4",
+      "source": "Discord",
+      "reporterId": "sample-person-12",
+      "title": "Filtered CSV downloads contain no rows",
+      "text": "CSV export downloads immediately but has only headers after filtering by Slack. There are 20 rows on screen.",
+      "hoursAgo": 2,
+      "expectedIssue": "csv-empty"
+    },
+    {
+      "id": "SAMPLE-34",
+      "source": "Forms",
+      "reporterId": "sample-person-28",
+      "title": "Export is broken",
+      "text": "My export is not working. Not sure what happened.",
+      "hoursAgo": 7,
+      "expectedIssue": null
+    },
+    {
+      "id": "SAMPLE-14",
+      "source": "Email",
+      "reporterId": "sample-person-6",
+      "title": "I forgot my email account password",
+      "text": "I forgot my email account password. The reset message never reaches my inbox.",
+      "hoursAgo": 18,
+      "expectedIssue": "reset-email"
+    },
+    {
+      "id": "SAMPLE-23",
+      "source": "Forms",
+      "reporterId": "sample-person-19",
+      "title": "Please speed up the initial workspace dashboard",
+      "text": "Please speed up the initial workspace dashboard. It eventually loads but delays every meeting.",
+      "hoursAgo": 36,
+      "expectedIssue": "slow-dashboard"
+    },
+    {
+      "id": "SAMPLE-10",
+      "source": "Slack",
+      "reporterId": "sample-person-13",
+      "title": "Filtered feedback export is an empty CSV, just column names",
+      "text": "Filtered feedback export is an empty CSV, just column names. Unfiltered download is okay.",
+      "hoursAgo": 6,
+      "expectedIssue": "csv-empty"
+    },
+    {
+      "id": "SAMPLE-12",
+      "source": "Slack",
+      "reporterId": "sample-person-21",
+      "title": "Feature request: dark theme for the feedback dashboard and ticket details",
+      "text": "Feature request: dark theme for the feedback dashboard and ticket details.",
+      "hoursAgo": 6,
+      "expectedIssue": "dark-mode"
+    },
+    {
+      "id": "SAMPLE-30",
+      "source": "Support",
+      "reporterId": "sample-person-20",
+      "title": "Can the team ship dark mode? The white background is too bright at night",
+      "text": "Can the team ship dark mode? The white background is too bright at night.",
+      "hoursAgo": 90,
+      "expectedIssue": "dark-mode"
+    },
+    {
+      "id": "SAMPLE-9",
+      "source": "Slack",
+      "reporterId": "sample-person-9",
+      "title": "Large feedback CSV download fails with a timeout",
+      "text": "Large feedback CSV download fails with a timeout. Need the full dataset for our review.",
+      "hoursAgo": 6,
+      "expectedIssue": "csv-timeout"
+    },
+    {
+      "id": "SAMPLE-3",
+      "source": "Discord",
+      "reporterId": "sample-person-8",
+      "title": "Large CSV exports time out",
+      "text": "Exporting 10,000 feedback rows as CSV times out after 60 seconds. Small exports work.",
+      "hoursAgo": 2,
+      "expectedIssue": "csv-timeout"
+    },
+    {
+      "id": "SAMPLE-2",
+      "source": "Discord",
+      "reporterId": "sample-person-4",
+      "title": "Password-reset email never arrives",
+      "text": "Forgot password says code sent but no reset email arrives, even in spam. I use email/password.",
+      "hoursAgo": 2,
+      "expectedIssue": "reset-email"
+    },
+    {
+      "id": "SAMPLE-16",
+      "source": "Email",
+      "reporterId": "sample-person-14",
+      "title": "Export with the Open status filter returns zero rows although the table shows matching feedback",
+      "text": "Export with the Open status filter returns zero rows although the table shows matching feedback.",
+      "hoursAgo": 18,
+      "expectedIssue": "csv-empty"
+    },
+    {
+      "id": "SAMPLE-32",
+      "source": "Slack",
+      "reporterId": "sample-person-26",
+      "title": "Meeting reminder",
+      "text": "Reminder: our internal planning meeting starts at 3 pm.",
+      "hoursAgo": 4,
+      "expectedIssue": "noise-32"
+    },
+    {
+      "id": "SAMPLE-33",
+      "source": "Email",
+      "reporterId": "sample-person-27",
+      "title": "Login problem",
+      "text": "Login is broken for me. Can someone help?",
+      "hoursAgo": 1,
+      "expectedIssue": null
+    },
+    {
+      "id": "SAMPLE-29",
+      "source": "Support",
+      "reporterId": "sample-person-16",
+      "title": "The feedback list takes 20 to 30 seconds to appear for our biggest workspace",
+      "text": "The feedback list takes 20 to 30 seconds to appear for our biggest workspace.",
+      "hoursAgo": 90,
+      "expectedIssue": "slow-dashboard"
+    },
+    {
+      "id": "SAMPLE-5",
+      "source": "Discord",
+      "reporterId": "sample-person-16",
+      "title": "Workspace dashboard loads slowly",
+      "text": "Opening the dashboard takes 25 seconds in a workspace with lots of tickets. Then it works.",
+      "hoursAgo": 2,
+      "expectedIssue": "slow-dashboard"
+    },
+    {
+      "id": "SAMPLE-28",
+      "source": "Support",
+      "reporterId": "sample-person-12",
+      "title": "A filtered CSV downloads successfully but the actual feedback rows are absent",
+      "text": "A filtered CSV downloads successfully but the actual feedback rows are absent.",
+      "hoursAgo": 90,
+      "expectedIssue": "csv-empty"
+    },
+    {
+      "id": "SAMPLE-8",
+      "source": "Slack",
+      "reporterId": "sample-person-5",
+      "title": "Password recovery emails are missing",
+      "text": "Password recovery emails are missing. Tried resending the reset code three times.",
+      "hoursAgo": 6,
+      "expectedIssue": "reset-email"
+    }
+  ],
+  "run": {
+    "id": "shuffled-42",
+    "createdAt": "2026-10-09T17:43:26.272444Z",
+    "processed": 34,
+    "total": 34,
+    "complete": true,
+    "busy": false,
+    "sources": [
+      "Slack",
+      "Forms",
+      "Discord",
+      "Email",
+      "Support"
+    ],
+    "issues": [
+      {
+        "id": "POC-4",
+        "title": "Reset password cannot be completed because the email with the code is never delivered",
+        "description": "Reset password cannot be completed because the email with the code is never delivered.",
+        "reportIds": [
+          "SAMPLE-20",
+          "SAMPLE-26",
+          "SAMPLE-14",
+          "SAMPLE-2",
+          "SAMPLE-8"
+        ],
+        "reportCount": 5,
+        "uniqueReporters": 4,
+        "sources": [
+          "Forms",
+          "Support",
+          "Email",
+          "Discord",
+          "Slack"
+        ],
+        "confidence": 0.8335,
+        "severity": 2.284,
+        "severityNeedsReview": true,
+        "score": 57,
+        "scoreBreakdown": {
+          "severity": 23,
+          "reach": 12,
+          "recentReports": 12,
+          "channels": 10
+        },
+        "status": "Open"
+      },
+      {
+        "id": "POC-8",
+        "title": "Cannot export a big workspace: CSV request ends in 504",
+        "description": "Cannot export a big workspace: CSV request ends in 504. A hundred rows downloads normally.",
+        "reportIds": [
+          "SAMPLE-15",
+          "SAMPLE-21",
+          "SAMPLE-3"
+        ],
+        "reportCount": 3,
+        "uniqueReporters": 3,
+        "sources": [
+          "Email",
+          "Forms",
+          "Discord"
+        ],
+        "confidence": 0.8064,
+        "severity": 1.7427,
+        "severityNeedsReview": true,
+        "score": 40,
+        "scoreBreakdown": {
+          "severity": 17,
+          "reach": 9,
+          "recentReports": 8,
+          "channels": 6
+        },
+        "status": "Open"
+      },
+      {
+        "id": "POC-1",
+        "title": "Our large workspace overview is painfully slow to load",
+        "description": "Our large workspace overview is painfully slow to load. Waiting on initial feedback table.",
+        "reportIds": [
+          "SAMPLE-11",
+          "SAMPLE-23"
+        ],
+        "reportCount": 2,
+        "uniqueReporters": 2,
+        "sources": [
+          "Slack",
+          "Forms"
+        ],
+        "confidence": 0.7496,
+        "severity": 1.7457,
+        "severityNeedsReview": true,
+        "score": 31,
+        "scoreBreakdown": {
+          "severity": 17,
+          "reach": 6,
+          "recentReports": 4,
+          "channels": 4
+        },
+        "status": "Open"
+      },
+      {
+        "id": "POC-7",
+        "title": "Stuck in a loop after Google OAuth",
+        "description": "Stuck in a loop after Google OAuth. Approve account, land on sign-in again. Email login works.",
+        "reportIds": [
+          "SAMPLE-7",
+          "SAMPLE-19"
+        ],
+        "reportCount": 2,
+        "uniqueReporters": 2,
+        "sources": [
+          "Slack",
+          "Forms"
+        ],
+        "confidence": 0.8354,
+        "severity": 1.7154,
+        "severityNeedsReview": true,
+        "score": 31,
+        "scoreBreakdown": {
+          "severity": 17,
+          "reach": 6,
+          "recentReports": 4,
+          "channels": 4
+        },
+        "status": "Open"
+      },
+      {
+        "id": "POC-5",
+        "title": "Downloaded CSV contains headers only when a source filter is active",
+        "description": "Downloaded CSV contains headers only when a source filter is active. No timeout, just missing data.",
+        "reportIds": [
+          "SAMPLE-22",
+          "SAMPLE-4",
+          "SAMPLE-28"
+        ],
+        "reportCount": 3,
+        "uniqueReporters": 2,
+        "sources": [
+          "Forms",
+          "Discord",
+          "Support"
+        ],
+        "confidence": 0.7778,
+        "severity": 1.3193,
+        "severityNeedsReview": true,
+        "score": 29,
+        "scoreBreakdown": {
+          "severity": 13,
+          "reach": 6,
+          "recentReports": 4,
+          "channels": 6
+        },
+        "status": "Open"
+      },
+      {
+        "id": "POC-3",
+        "title": "Google sign-in loops back to login",
+        "description": "Google sign in succeeds then sends me right back to the login screen. Cannot reach my dashboard.",
+        "reportIds": [
+          "SAMPLE-1"
+        ],
+        "reportCount": 1,
+        "uniqueReporters": 1,
+        "sources": [
+          "Discord"
+        ],
+        "confidence": 0.8644,
+        "severity": 1.7153,
+        "severityNeedsReview": true,
+        "score": 26,
+        "scoreBreakdown": {
+          "severity": 17,
+          "reach": 3,
+          "recentReports": 4,
+          "channels": 2
+        },
+        "status": "Open"
+      },
+      {
+        "id": "POC-2",
+        "title": "Please offer a dark appearance option for the dashboard",
+        "description": "Please offer a dark appearance option for the dashboard.",
+        "reportIds": [
+          "SAMPLE-24",
+          "SAMPLE-12"
+        ],
+        "reportCount": 2,
+        "uniqueReporters": 2,
+        "sources": [
+          "Forms",
+          "Slack"
+        ],
+        "confidence": 0.8075,
+        "severity": 0.9653,
+        "severityNeedsReview": true,
+        "score": 24,
+        "scoreBreakdown": {
+          "severity": 10,
+          "reach": 6,
+          "recentReports": 4,
+          "channels": 4
+        },
+        "status": "Open"
+      },
+      {
+        "id": "POC-10",
+        "title": "First dashboard load takes around half a minute with 8,000 tickets; exports are fine",
+        "description": "First dashboard load takes around half a minute with 8,000 tickets; exports are fine.",
+        "reportIds": [
+          "SAMPLE-17"
+        ],
+        "reportCount": 1,
+        "uniqueReporters": 1,
+        "sources": [
+          "Email"
+        ],
+        "confidence": 0.8203,
+        "severity": 1.4921,
+        "severityNeedsReview": true,
+        "score": 24,
+        "scoreBreakdown": {
+          "severity": 15,
+          "reach": 3,
+          "recentReports": 4,
+          "channels": 2
+        },
+        "status": "Open"
+      },
+      {
+        "id": "POC-9",
+        "title": "CSV export for a large date range fails after a minute",
+        "description": "CSV export for a large date range fails after a minute. There is no file to download.",
+        "reportIds": [
+          "SAMPLE-27"
+        ],
+        "reportCount": 1,
+        "uniqueReporters": 1,
+        "sources": [
+          "Support"
+        ],
+        "confidence": 0.9151,
+        "severity": 1.7236,
+        "severityNeedsReview": true,
+        "score": 22,
+        "scoreBreakdown": {
+          "severity": 17,
+          "reach": 3,
+          "recentReports": 0,
+          "channels": 2
+        },
+        "status": "Open"
+      },
+      {
+        "id": "POC-6",
+        "title": "Add a dark theme",
+        "description": "Could you add a dark mode? Reviewing feedback late at night hurts my eyes.",
+        "reportIds": [
+          "SAMPLE-6"
+        ],
+        "reportCount": 1,
+        "uniqueReporters": 1,
+        "sources": [
+          "Discord"
+        ],
+        "confidence": 0.6343,
+        "severity": 0.8992,
+        "severityNeedsReview": true,
+        "score": 18,
+        "scoreBreakdown": {
+          "severity": 9,
+          "reach": 3,
+          "recentReports": 4,
+          "channels": 2
+        },
+        "status": "Open"
+      }
+    ],
+    "decisions": [
+      {
+        "reportId": "SAMPLE-11",
+        "outcome": "new",
+        "issueId": "POC-1",
+        "choice": "new_issue",
+        "confidence": 0.7496,
+        "probabilities": {},
+        "severity": 1.7457,
+        "severityConfidence": 0.469,
+        "triage": "bug",
+        "triageConfidence": 0.7496
+      },
+      {
+        "reportId": "SAMPLE-24",
+        "outcome": "new",
+        "issueId": "POC-2",
+        "choice": "new_issue",
+        "confidence": 0.8075,
+        "probabilities": {
+          "POC-1": 0.1318
+        },
+        "severity": 0.6874,
+        "severityConfidence": 0.5213,
+        "triage": "feature",
+        "triageConfidence": 0.8075
+      },
+      {
+        "reportId": "SAMPLE-31",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "noise",
+        "confidence": 0.4461,
+        "probabilities": {},
+        "severity": 1.8097,
+        "severityConfidence": 0.383,
+        "triage": "noise",
+        "triageConfidence": 0.4461
+      },
+      {
+        "reportId": "SAMPLE-1",
+        "outcome": "new",
+        "issueId": "POC-3",
+        "choice": "new_issue",
+        "confidence": 0.8644,
+        "probabilities": {
+          "POC-2": 0.03,
+          "POC-1": 0.2279
+        },
+        "severity": 1.7153,
+        "severityConfidence": 0.4986,
+        "triage": "bug",
+        "triageConfidence": 0.8644
+      },
+      {
+        "reportId": "SAMPLE-20",
+        "outcome": "new",
+        "issueId": "POC-4",
+        "choice": "new_issue",
+        "confidence": 0.8335,
+        "probabilities": {
+          "POC-3": 0.3681,
+          "POC-1": 0.1813,
+          "POC-2": 0.0043
+        },
+        "severity": 1.8128,
+        "severityConfidence": 0.4337,
+        "triage": "bug",
+        "triageConfidence": 0.8335
+      },
+      {
+        "reportId": "SAMPLE-22",
+        "outcome": "new",
+        "issueId": "POC-5",
+        "choice": "new_issue",
+        "confidence": 0.7778,
+        "probabilities": {
+          "POC-1": 0.317,
+          "POC-2": 0.0117,
+          "POC-3": 0.0654,
+          "POC-4": 0.063
+        },
+        "severity": 1.3124,
+        "severityConfidence": 0.6264,
+        "triage": "bug",
+        "triageConfidence": 0.7778
+      },
+      {
+        "reportId": "SAMPLE-6",
+        "outcome": "new",
+        "issueId": "POC-6",
+        "choice": "new_issue",
+        "confidence": 0.6343,
+        "probabilities": {
+          "POC-2": 0.1447,
+          "POC-1": 0.2392,
+          "POC-3": 0.0567,
+          "POC-4": 0.0001,
+          "POC-5": 0.0315
+        },
+        "severity": 0.8992,
+        "severityConfidence": 0.4084,
+        "triage": "feature",
+        "triageConfidence": 0.6343
+      },
+      {
+        "reportId": "SAMPLE-7",
+        "outcome": "new",
+        "issueId": "POC-7",
+        "choice": "new_issue",
+        "confidence": 0.8978,
+        "probabilities": {
+          "POC-3": 0.4595,
+          "POC-4": 0.4926,
+          "POC-1": 0.2163,
+          "POC-2": 0.0047,
+          "POC-5": 0.0802,
+          "POC-6": 0.1967
+        },
+        "severity": 1.6138,
+        "severityConfidence": 0.5581,
+        "triage": "bug",
+        "triageConfidence": 0.8978
+      },
+      {
+        "reportId": "SAMPLE-15",
+        "outcome": "new",
+        "issueId": "POC-8",
+        "choice": "new_issue",
+        "confidence": 0.8754,
+        "probabilities": {
+          "POC-4": 0.2261,
+          "POC-1": 0.2159,
+          "POC-3": 0.0644,
+          "POC-5": 0.2018,
+          "POC-2": 0.0314,
+          "POC-6": 0.1123,
+          "POC-7": 0.1068
+        },
+        "severity": 1.4407,
+        "severityConfidence": 0.6692,
+        "triage": "bug",
+        "triageConfidence": 0.8754
+      },
+      {
+        "reportId": "SAMPLE-25",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "uncertain",
+        "confidence": 0.9709,
+        "probabilities": {
+          "POC-3": 0.8891,
+          "POC-7": 0.9709,
+          "POC-4": 0.7904,
+          "POC-8": 0.3459,
+          "POC-1": 0.344,
+          "POC-2": 0.0649,
+          "POC-5": 0.134
+        },
+        "severity": 1.7679,
+        "severityConfidence": 0.4571,
+        "triage": "bug",
+        "triageConfidence": 0.7063
+      },
+      {
+        "reportId": "SAMPLE-18",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "uncertain",
+        "confidence": 0.6299,
+        "probabilities": {
+          "POC-6": 0.6299,
+          "POC-1": 0.1485,
+          "POC-2": 0.0982,
+          "POC-3": 0.1152,
+          "POC-4": 0.0855,
+          "POC-5": 0.0015,
+          "POC-7": 0.1444
+        },
+        "severity": 1.1785,
+        "severityConfidence": 0.4757,
+        "triage": "feature",
+        "triageConfidence": 0.8844
+      },
+      {
+        "reportId": "SAMPLE-21",
+        "outcome": "merged",
+        "issueId": "POC-8",
+        "choice": "POC-8",
+        "confidence": 0.8064,
+        "probabilities": {
+          "POC-8": 0.8064,
+          "POC-5": 0.2128,
+          "POC-2": 0.0373,
+          "POC-4": 0.0267,
+          "POC-3": 0.0311,
+          "POC-1": 0.3401,
+          "POC-6": 0.0551
+        },
+        "severity": 1.7427,
+        "severityConfidence": 0.4125,
+        "triage": "bug",
+        "triageConfidence": 0.6913
+      },
+      {
+        "reportId": "SAMPLE-27",
+        "outcome": "new",
+        "issueId": "POC-9",
+        "choice": "new_issue",
+        "confidence": 0.9151,
+        "probabilities": {
+          "POC-8": 0.3228,
+          "POC-1": 0.4445,
+          "POC-5": 0.2327,
+          "POC-7": 0.0915,
+          "POC-2": 0.0284,
+          "POC-3": 0.0765,
+          "POC-4": 0.1031
+        },
+        "severity": 1.7236,
+        "severityConfidence": 0.4978,
+        "triage": "bug",
+        "triageConfidence": 0.9151
+      },
+      {
+        "reportId": "SAMPLE-13",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "uncertain",
+        "confidence": 0.942,
+        "probabilities": {
+          "POC-7": 0.942,
+          "POC-3": 0.8349,
+          "POC-4": 0.7686,
+          "POC-9": 0.1168,
+          "POC-5": 0.1482,
+          "POC-1": 0.5006,
+          "POC-2": 0.0278
+        },
+        "severity": 1.6272,
+        "severityConfidence": 0.4375,
+        "triage": "bug",
+        "triageConfidence": 0.9248
+      },
+      {
+        "reportId": "SAMPLE-17",
+        "outcome": "new",
+        "issueId": "POC-10",
+        "choice": "new_issue",
+        "confidence": 0.8203,
+        "probabilities": {
+          "POC-2": 0.0688,
+          "POC-1": 0.4217,
+          "POC-9": 0.1662,
+          "POC-3": 0.2246,
+          "POC-4": 0.1011,
+          "POC-5": 0.1553,
+          "POC-6": 0.0524
+        },
+        "severity": 1.4921,
+        "severityConfidence": 0.5728,
+        "triage": "bug",
+        "triageConfidence": 0.8203
+      },
+      {
+        "reportId": "SAMPLE-19",
+        "outcome": "merged",
+        "issueId": "POC-7",
+        "choice": "POC-7",
+        "confidence": 0.8354,
+        "probabilities": {
+          "POC-3": 0.544,
+          "POC-7": 0.8354,
+          "POC-1": 0.2187,
+          "POC-8": 0.7021,
+          "POC-2": 0.0267,
+          "POC-4": 0.3522,
+          "POC-5": 0.2007
+        },
+        "severity": 1.7154,
+        "severityConfidence": 0.4364,
+        "triage": "bug",
+        "triageConfidence": 0.8137
+      },
+      {
+        "reportId": "SAMPLE-26",
+        "outcome": "merged",
+        "issueId": "POC-4",
+        "choice": "POC-4",
+        "confidence": 0.8553,
+        "probabilities": {
+          "POC-4": 0.8553,
+          "POC-7": 0.4376,
+          "POC-3": 0.2655,
+          "POC-10": 0.1095,
+          "POC-1": 0.1805,
+          "POC-2": 0.0619,
+          "POC-5": 0.0887
+        },
+        "severity": 1.2898,
+        "severityConfidence": 0.6959,
+        "triage": "bug",
+        "triageConfidence": 0.8396
+      },
+      {
+        "reportId": "SAMPLE-4",
+        "outcome": "merged",
+        "issueId": "POC-5",
+        "choice": "POC-5",
+        "confidence": 0.8513,
+        "probabilities": {
+          "POC-9": 0.295,
+          "POC-8": 0.7293,
+          "POC-5": 0.8513,
+          "POC-3": 0.0842,
+          "POC-7": 0.0998,
+          "POC-1": 0.2234,
+          "POC-2": 0.0001
+        },
+        "severity": 1.2435,
+        "severityConfidence": 0.7172,
+        "triage": "bug",
+        "triageConfidence": 0.7552
+      },
+      {
+        "reportId": "SAMPLE-34",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "uncertain",
+        "confidence": 0.6316,
+        "probabilities": {},
+        "severity": 1.7113,
+        "severityConfidence": 0.5052,
+        "triage": "uncertain",
+        "triageConfidence": 0.6316
+      },
+      {
+        "reportId": "SAMPLE-14",
+        "outcome": "merged",
+        "issueId": "POC-4",
+        "choice": "POC-4",
+        "confidence": 0.8369,
+        "probabilities": {
+          "POC-4": 0.8369,
+          "POC-7": 0.2212,
+          "POC-1": 0.2132,
+          "POC-2": 0.0029,
+          "POC-3": 0.1797,
+          "POC-5": 0.0311,
+          "POC-6": 0.05
+        },
+        "severity": 1.9952,
+        "severityConfidence": 0.3999,
+        "triage": "bug",
+        "triageConfidence": 0.9001
+      },
+      {
+        "reportId": "SAMPLE-23",
+        "outcome": "merged",
+        "issueId": "POC-1",
+        "choice": "POC-1",
+        "confidence": 0.8344,
+        "probabilities": {
+          "POC-2": 0.1014,
+          "POC-1": 0.8344,
+          "POC-8": 0.3484,
+          "POC-10": 0.2395,
+          "POC-3": 0.6274,
+          "POC-7": 0.2614,
+          "POC-4": 0.4911
+        },
+        "severity": 1.6298,
+        "severityConfidence": 0.4721,
+        "triage": "bug",
+        "triageConfidence": 0.8023
+      },
+      {
+        "reportId": "SAMPLE-10",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "uncertain",
+        "confidence": 0.3448,
+        "probabilities": {},
+        "severity": 1.4603,
+        "severityConfidence": 0.5172,
+        "triage": "feature",
+        "triageConfidence": 0.3448
+      },
+      {
+        "reportId": "SAMPLE-12",
+        "outcome": "merged",
+        "issueId": "POC-2",
+        "choice": "POC-2",
+        "confidence": 0.9553,
+        "probabilities": {
+          "POC-2": 0.9553,
+          "POC-6": 0.6559,
+          "POC-1": 0.2141,
+          "POC-10": 0.0978,
+          "POC-3": 0.5951,
+          "POC-8": 0.1527,
+          "POC-4": 0.1336
+        },
+        "severity": 0.9653,
+        "severityConfidence": 0.3765,
+        "triage": "feature",
+        "triageConfidence": 0.9112
+      },
+      {
+        "reportId": "SAMPLE-30",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "uncertain",
+        "confidence": 0.5718,
+        "probabilities": {},
+        "severity": 0.7303,
+        "severityConfidence": 0.4845,
+        "triage": "feature",
+        "triageConfidence": 0.5718
+      },
+      {
+        "reportId": "SAMPLE-9",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "uncertain",
+        "confidence": 0.7253,
+        "probabilities": {
+          "POC-9": 0.175,
+          "POC-1": 0.379,
+          "POC-8": 0.4999,
+          "POC-5": 0.7253,
+          "POC-6": 0.1064,
+          "POC-2": 0.0303,
+          "POC-3": 0.0721
+        },
+        "severity": 1.7448,
+        "severityConfidence": 0.4326,
+        "triage": "bug",
+        "triageConfidence": 0.7071
+      },
+      {
+        "reportId": "SAMPLE-3",
+        "outcome": "merged",
+        "issueId": "POC-8",
+        "choice": "POC-8",
+        "confidence": 0.8387,
+        "probabilities": {
+          "POC-9": 0.2839,
+          "POC-10": 0.0917,
+          "POC-5": 0.3095,
+          "POC-8": 0.8387,
+          "POC-6": 0.0653,
+          "POC-2": 0.0302,
+          "POC-1": 0.2136
+        },
+        "severity": 1.4091,
+        "severityConfidence": 0.6407,
+        "triage": "bug",
+        "triageConfidence": 0.7024
+      },
+      {
+        "reportId": "SAMPLE-2",
+        "outcome": "merged",
+        "issueId": "POC-4",
+        "choice": "POC-4",
+        "confidence": 0.9184,
+        "probabilities": {
+          "POC-4": 0.9184,
+          "POC-7": 0.7193,
+          "POC-1": 0.1702,
+          "POC-2": 0.0347,
+          "POC-3": 0.5789,
+          "POC-5": 0.0498,
+          "POC-6": 0.1267
+        },
+        "severity": 2.0424,
+        "severityConfidence": 0.3711,
+        "triage": "bug",
+        "triageConfidence": 0.8988
+      },
+      {
+        "reportId": "SAMPLE-16",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "uncertain",
+        "confidence": 0.5696,
+        "probabilities": {},
+        "severity": 1.7319,
+        "severityConfidence": 0.4916,
+        "triage": "bug",
+        "triageConfidence": 0.5696
+      },
+      {
+        "reportId": "SAMPLE-32",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "noise",
+        "confidence": 0.3207,
+        "probabilities": {},
+        "severity": 1.8117,
+        "severityConfidence": 0.3812,
+        "triage": "noise",
+        "triageConfidence": 0.3207
+      },
+      {
+        "reportId": "SAMPLE-33",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "uncertain",
+        "confidence": 0.7956,
+        "probabilities": {
+          "POC-3": 0.7254,
+          "POC-7": 0.5025,
+          "POC-1": 0.2433,
+          "POC-2": 0.0846,
+          "POC-4": 0.7956,
+          "POC-5": 0.0829,
+          "POC-6": 0.1975
+        },
+        "severity": 1.9518,
+        "severityConfidence": 0.3707,
+        "triage": "bug",
+        "triageConfidence": 0.7583
+      },
+      {
+        "reportId": "SAMPLE-29",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "uncertain",
+        "confidence": 0.4354,
+        "probabilities": {},
+        "severity": 1.7162,
+        "severityConfidence": 0.4338,
+        "triage": "feature",
+        "triageConfidence": 0.4354
+      },
+      {
+        "reportId": "SAMPLE-5",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "uncertain",
+        "confidence": 0.4423,
+        "probabilities": {},
+        "severity": 1.385,
+        "severityConfidence": 0.6639,
+        "triage": "bug",
+        "triageConfidence": 0.4423
+      },
+      {
+        "reportId": "SAMPLE-28",
+        "outcome": "merged",
+        "issueId": "POC-5",
+        "choice": "POC-5",
+        "confidence": 0.8353,
+        "probabilities": {
+          "POC-8": 0.4993,
+          "POC-5": 0.8353,
+          "POC-6": 0.1939,
+          "POC-9": 0.2529,
+          "POC-2": 0.0304,
+          "POC-1": 0.5122,
+          "POC-3": 0.1156
+        },
+        "severity": 1.3193,
+        "severityConfidence": 0.6381,
+        "triage": "bug",
+        "triageConfidence": 0.7778
+      },
+      {
+        "reportId": "SAMPLE-8",
+        "outcome": "merged",
+        "issueId": "POC-4",
+        "choice": "POC-4",
+        "confidence": 0.8433,
+        "probabilities": {
+          "POC-4": 0.8433,
+          "POC-5": 0.0891,
+          "POC-8": 0.1632,
+          "POC-1": 0.1823,
+          "POC-2": 0.0002,
+          "POC-3": 0.1146,
+          "POC-6": 0.097
+        },
+        "severity": 2.284,
+        "severityConfidence": 0.3018,
+        "triage": "bug",
+        "triageConfidence": 0.9454
+      }
+    ],
+    "metrics": {
+      "precision": 1.0,
+      "recall": 0.31666666666666665,
+      "falseMergePairs": 0,
+      "missedDuplicatePairs": 41,
+      "reviewCount": 13,
+      "noiseCount": 0,
+      "mergedCount": 11
+    },
+    "inputTokens": 19790,
+    "costUsd": 0.0,
+    "latencyMs": 5408,
+    "actualModel": "Laya / english"
+  }
+}

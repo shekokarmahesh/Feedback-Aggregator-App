@@ -1,0 +1,20 @@
+{
+  "status": "ok",
+  "loaded": [
+    "english"
+  ],
+  "revisions": {
+    "english": "7b928d828b7b0e022f929d9bd2e44165aa270148"
+  },
+  "device": "mps",
+  "device_is_preference": false,
+  "checkpoint_devices": {
+    "english": "mps"
+  },
+  "cpu_fallbacks": {
+    "english": {
+      "count": 0,
+      "last_reason": null
+    }
+  }
+}

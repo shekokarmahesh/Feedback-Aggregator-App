@@ -21,6 +21,7 @@ import '../auth/email_idp_endpoint.dart' as _iuc1hd5t;
 import '../auth/google_idp_endpoint.dart' as _i71axiz0;
 import '../auth/jwt_refresh_endpoint.dart' as _inwq3ztq;
 import '../greetings/greeting_endpoint.dart' as _il624ik7;
+import '../laya_poc/laya_poc_endpoint.dart' as _ilph5eyz;
 import '../workspaces/workspace_endpoint.dart' as _iannd3dw;
 
 class Endpoints extends _is.EndpointDispatch {
@@ -49,6 +50,12 @@ class Endpoints extends _is.EndpointDispatch {
         ..initialize(
           server,
           'greeting',
+          null,
+        ),
+      'layaPoc': _ilph5eyz.LayaPocEndpoint()
+        ..initialize(
+          server,
+          'layaPoc',
           null,
         ),
       'workspace': _iannd3dw.WorkspaceEndpoint()
@@ -382,6 +389,124 @@ class Endpoints extends _is.EndpointDispatch {
                   (endpoints['greeting'] as _il624ik7.GreetingEndpoint).hello(
                     session,
                     params['name'],
+                  ),
+        ),
+      },
+    );
+    connectors['layaPoc'] = _is.EndpointConnector(
+      name: 'layaPoc',
+      endpoint: endpoints['layaPoc']!,
+      methodConnectors: {
+        'read': _is.MethodConnector(
+          name: 'read',
+          params: {
+            'workspaceId': _is.ParameterDescription(
+              name: 'workspaceId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['layaPoc'] as _ilph5eyz.LayaPocEndpoint).read(
+                    session,
+                    params['workspaceId'],
+                  ),
+        ),
+        'start': _is.MethodConnector(
+          name: 'start',
+          params: {
+            'workspaceId': _is.ParameterDescription(
+              name: 'workspaceId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'sources': _is.ParameterDescription(
+              name: 'sources',
+              type: _is.getType<List<String>>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['layaPoc'] as _ilph5eyz.LayaPocEndpoint).start(
+                    session,
+                    params['workspaceId'],
+                    params['sources'],
+                  ),
+        ),
+        'step': _is.MethodConnector(
+          name: 'step',
+          params: {
+            'workspaceId': _is.ParameterDescription(
+              name: 'workspaceId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'runId': _is.ParameterDescription(
+              name: 'runId',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'expectedIndex': _is.ParameterDescription(
+              name: 'expectedIndex',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['layaPoc'] as _ilph5eyz.LayaPocEndpoint).step(
+                    session,
+                    params['workspaceId'],
+                    params['runId'],
+                    params['expectedIndex'],
+                  ),
+        ),
+        'updateStatus': _is.MethodConnector(
+          name: 'updateStatus',
+          params: {
+            'workspaceId': _is.ParameterDescription(
+              name: 'workspaceId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'runId': _is.ParameterDescription(
+              name: 'runId',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'issueId': _is.ParameterDescription(
+              name: 'issueId',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'status': _is.ParameterDescription(
+              name: 'status',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['layaPoc'] as _ilph5eyz.LayaPocEndpoint)
+                  .updateStatus(
+                    session,
+                    params['workspaceId'],
+                    params['runId'],
+                    params['issueId'],
+                    params['status'],
                   ),
         ),
       },

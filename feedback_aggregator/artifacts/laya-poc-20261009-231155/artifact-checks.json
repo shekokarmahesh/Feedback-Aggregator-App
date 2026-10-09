@@ -1,0 +1,21 @@
+{
+  "browser": "Bundled Chromium (headless, local artifact only)",
+  "scriptErrors": [],
+  "embeddedArchitecture": 1,
+  "mergedRowsByRun": {
+    "ordered-1": 5,
+    "ordered-2": 5,
+    "shuffled-7": 11,
+    "shuffled-42": 11
+  },
+  "desktopViewport": [
+    1440,
+    1000
+  ],
+  "desktopOverflow": false,
+  "mobileViewport": [
+    390,
+    844
+  ],
+  "mobileOverflow": false
+}

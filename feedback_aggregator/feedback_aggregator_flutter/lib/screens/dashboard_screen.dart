@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:feedback_aggregator_client/feedback_aggregator_client.dart';
 import '../client.dart';
 import '../models/demo_ticket.dart';
+import 'laya_poc_panel.dart';
 
 class AccountProfile {
   final String name;
@@ -223,6 +224,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       for (final entry in [
         ('Inbox', Icons.inbox_outlined),
         ('Sources', Icons.hub_outlined),
+        if (widget.workspace != null) ('Laya POC', Icons.auto_awesome),
         ('Activity', Icons.history_outlined),
       ])
         Padding(
@@ -393,7 +395,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (context, constraints) {
-      final wide = constraints.maxWidth >= 850;
+      final wide = constraints.maxWidth >= 1100;
       return Column(
         children: [
           _topBar(wide),
@@ -435,6 +437,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ? _inbox(wide)
                             : _tab == 'Sources'
                             ? _sources(wide)
+                            : _tab == 'Laya POC'
+                            ? LayaPocPanel(
+                                key: ValueKey(widget.workspace!.id),
+                                workspace: widget.workspace!,
+                              )
                             : _activity(),
                         const SizedBox(height: 28),
                         Text(

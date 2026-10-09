@@ -510,6 +510,9 @@ class Protocol extends _is.DatabaseSerializationManager {
       return (data != null ? _ir8cxu8v.WorkspaceTicket.fromJson(data) : null)
           as T;
     }
+    if (t == List<String>) {
+      return (data as List).map((e) => deserialize<String>(e)).toList() as T;
+    }
     if (t == List<_i9st2zmz.WorkspaceSummary>) {
       return (data as List)
               .map((e) => deserialize<_i9st2zmz.WorkspaceSummary>(e))

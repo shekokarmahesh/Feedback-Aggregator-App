@@ -139,6 +139,9 @@ class Protocol extends _isc.SerializationManager {
       return (data != null ? _ir8cxu8v.WorkspaceTicket.fromJson(data) : null)
           as T;
     }
+    if (t == List<String>) {
+      return (data as List).map((e) => deserialize<String>(e)).toList() as T;
+    }
     if (t == List<_in30w5p5.WorkspaceSummary>) {
       return (data as List)
               .map((e) => deserialize<_in30w5p5.WorkspaceSummary>(e))

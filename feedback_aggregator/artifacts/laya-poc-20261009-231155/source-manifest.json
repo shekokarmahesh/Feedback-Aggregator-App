@@ -1,0 +1,14 @@
+{
+  "baseCommit": "93bd29310c6bd797eb715751e946f09dcb96091e",
+  "sourceState": "uncommitted working tree, hashed at evaluation time",
+  "sha256": {
+    "feedback_aggregator/feedback_aggregator_server/lib/src/laya_poc/laya_client.dart": "63675f4aafcd6c277629747414479e72c0be1da7b242eb5c97814be4fc6fb194",
+    "feedback_aggregator/feedback_aggregator_server/lib/src/laya_poc/poc_run.dart": "4d04a91d0880a8939139208cddc6a2f002d1203a48cebd1dd4efe6ae7a8cebb4",
+    "feedback_aggregator/feedback_aggregator_server/lib/src/laya_poc/sample_feedback.dart": "952f8950d0827d583751c37a53b975757cc4fabd66d6a78bcfaa73666f844bc3",
+    "feedback_aggregator/feedback_aggregator_server/lib/src/laya_poc/laya_poc_endpoint.dart": "132e480cf272886c44627269cb4354962c43703253f8912857d3c96449c83c43",
+    "feedback_aggregator/feedback_aggregator_flutter/lib/screens/laya_poc_panel.dart": "cb5dd3718e322be83e216aa39c3cdc6a489bc21f15b9ebd45e4e46c416094316",
+    "feedback_aggregator/feedback_aggregator_server/lib/src/workspaces/workspace_service.dart": "a29b5767bc3000e559b8f66758be12e4b91835c7e5b94df4be7f9a50705b2c00",
+    "feedback_aggregator/tools/laya/run.sh": "0e8f8590aad17b2731674030f380fd7ef352d4baa9eb6db715590dbcc195da69",
+    "feedback_aggregator/tools/laya/requirements.lock": "ae9603472467115dcd82feedd78e18d42deba82081fd5562b5c6a512ece5e5d7"
+  }
+}

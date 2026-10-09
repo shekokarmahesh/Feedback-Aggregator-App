@@ -1,0 +1,9 @@
+{
+  "backendTests": 33,
+  "flutterTests": 18,
+  "backendStatus": "passed",
+  "flutterStatus": "passed",
+  "liveUi": "Not end-to-end verified. Serverpod and Flutter were running; Dart tooling could inspect the dashboard, but POC navigation was not confirmed. Native browser fallback was blocked by pending macOS Accessibility/Screen Recording permissions. The four model/engine runs completed independently.",
+  "goldLabelsSentToModel": false,
+  "modelOrThresholdsChangedDuringRetest": false
+}

@@ -1,0 +1,873 @@
+{
+  "recordedAt": "2026-10-09T12:16:08.183833Z",
+  "threshold": 0.8,
+  "fixture": "34 English synthetic reports; development fixture, not a holdout",
+  "run": {
+    "id": "benchmark-1791548161811",
+    "createdAt": "2026-10-09T12:16:01.811945Z",
+    "processed": 34,
+    "total": 34,
+    "complete": true,
+    "busy": false,
+    "sources": [
+      "Discord",
+      "Slack",
+      "Email",
+      "Forms",
+      "Support"
+    ],
+    "issues": [
+      {
+        "id": "POC-6",
+        "title": "Password recovery emails are missing",
+        "description": "Password recovery emails are missing. Tried resending the reset code three times.",
+        "reportIds": [
+          "SAMPLE-8",
+          "SAMPLE-20",
+          "SAMPLE-26"
+        ],
+        "reportCount": 3,
+        "uniqueReporters": 3,
+        "sources": [
+          "Slack",
+          "Forms",
+          "Support"
+        ],
+        "confidence": 0.8355,
+        "severity": 2.284,
+        "severityNeedsReview": true,
+        "score": 42,
+        "scoreBreakdown": {
+          "severity": 23,
+          "reach": 9,
+          "recentReports": 4,
+          "channels": 6
+        },
+        "status": "Open"
+      },
+      {
+        "id": "POC-5",
+        "title": "Stuck in a loop after Google OAuth",
+        "description": "Stuck in a loop after Google OAuth. Approve account, land on sign-in again. Email login works.",
+        "reportIds": [
+          "SAMPLE-7",
+          "SAMPLE-19"
+        ],
+        "reportCount": 2,
+        "uniqueReporters": 2,
+        "sources": [
+          "Slack",
+          "Forms"
+        ],
+        "confidence": 0.8354,
+        "severity": 1.7154,
+        "severityNeedsReview": true,
+        "score": 31,
+        "scoreBreakdown": {
+          "severity": 17,
+          "reach": 6,
+          "recentReports": 4,
+          "channels": 4
+        },
+        "status": "Open"
+      },
+      {
+        "id": "POC-7",
+        "title": "Our large workspace overview is painfully slow to load",
+        "description": "Our large workspace overview is painfully slow to load. Waiting on initial feedback table.",
+        "reportIds": [
+          "SAMPLE-11",
+          "SAMPLE-23"
+        ],
+        "reportCount": 2,
+        "uniqueReporters": 2,
+        "sources": [
+          "Slack",
+          "Forms"
+        ],
+        "confidence": 0.7496,
+        "severity": 1.7457,
+        "severityNeedsReview": true,
+        "score": 31,
+        "scoreBreakdown": {
+          "severity": 17,
+          "reach": 6,
+          "recentReports": 4,
+          "channels": 4
+        },
+        "status": "Open"
+      },
+      {
+        "id": "POC-1",
+        "title": "Google sign-in loops back to login",
+        "description": "Google sign in succeeds then sends me right back to the login screen. Cannot reach my dashboard.",
+        "reportIds": [
+          "SAMPLE-1"
+        ],
+        "reportCount": 1,
+        "uniqueReporters": 1,
+        "sources": [
+          "Discord"
+        ],
+        "confidence": 0.8644,
+        "severity": 1.7153,
+        "severityNeedsReview": true,
+        "score": 26,
+        "scoreBreakdown": {
+          "severity": 17,
+          "reach": 3,
+          "recentReports": 4,
+          "channels": 2
+        },
+        "status": "Open"
+      },
+      {
+        "id": "POC-3",
+        "title": "Filtered CSV downloads contain no rows",
+        "description": "CSV export downloads immediately but has only headers after filtering by Slack. There are 20 rows on screen.",
+        "reportIds": [
+          "SAMPLE-4",
+          "SAMPLE-24"
+        ],
+        "reportCount": 2,
+        "uniqueReporters": 2,
+        "sources": [
+          "Discord",
+          "Forms"
+        ],
+        "confidence": 0.7552,
+        "severity": 1.2435,
+        "severityNeedsReview": true,
+        "score": 26,
+        "scoreBreakdown": {
+          "severity": 12,
+          "reach": 6,
+          "recentReports": 4,
+          "channels": 4
+        },
+        "status": "Open"
+      },
+      {
+        "id": "POC-8",
+        "title": "First dashboard load takes around half a minute with 8,000 tickets; exports are fine",
+        "description": "First dashboard load takes around half a minute with 8,000 tickets; exports are fine.",
+        "reportIds": [
+          "SAMPLE-17"
+        ],
+        "reportCount": 1,
+        "uniqueReporters": 1,
+        "sources": [
+          "Email"
+        ],
+        "confidence": 0.8203,
+        "severity": 1.4921,
+        "severityNeedsReview": true,
+        "score": 24,
+        "scoreBreakdown": {
+          "severity": 15,
+          "reach": 3,
+          "recentReports": 4,
+          "channels": 2
+        },
+        "status": "Open"
+      },
+      {
+        "id": "POC-2",
+        "title": "Large CSV exports time out",
+        "description": "Exporting 10,000 feedback rows as CSV times out after 60 seconds. Small exports work.",
+        "reportIds": [
+          "SAMPLE-3"
+        ],
+        "reportCount": 1,
+        "uniqueReporters": 1,
+        "sources": [
+          "Discord"
+        ],
+        "confidence": 0.7024,
+        "severity": 1.4091,
+        "severityNeedsReview": true,
+        "score": 23,
+        "scoreBreakdown": {
+          "severity": 14,
+          "reach": 3,
+          "recentReports": 4,
+          "channels": 2
+        },
+        "status": "Open"
+      },
+      {
+        "id": "POC-10",
+        "title": "CSV export for a large date range fails after a minute",
+        "description": "CSV export for a large date range fails after a minute. There is no file to download.",
+        "reportIds": [
+          "SAMPLE-27"
+        ],
+        "reportCount": 1,
+        "uniqueReporters": 1,
+        "sources": [
+          "Support"
+        ],
+        "confidence": 0.9151,
+        "severity": 1.7236,
+        "severityNeedsReview": true,
+        "score": 22,
+        "scoreBreakdown": {
+          "severity": 17,
+          "reach": 3,
+          "recentReports": 0,
+          "channels": 2
+        },
+        "status": "Open"
+      },
+      {
+        "id": "POC-4",
+        "title": "Add a dark theme",
+        "description": "Could you add a dark mode? Reviewing feedback late at night hurts my eyes.",
+        "reportIds": [
+          "SAMPLE-6"
+        ],
+        "reportCount": 1,
+        "uniqueReporters": 1,
+        "sources": [
+          "Discord"
+        ],
+        "confidence": 0.6343,
+        "severity": 0.8992,
+        "severityNeedsReview": true,
+        "score": 18,
+        "scoreBreakdown": {
+          "severity": 9,
+          "reach": 3,
+          "recentReports": 4,
+          "channels": 2
+        },
+        "status": "Open"
+      },
+      {
+        "id": "POC-9",
+        "title": "Downloaded CSV contains headers only when a source filter is active",
+        "description": "Downloaded CSV contains headers only when a source filter is active. No timeout, just missing data.",
+        "reportIds": [
+          "SAMPLE-22"
+        ],
+        "reportCount": 1,
+        "uniqueReporters": 1,
+        "sources": [
+          "Forms"
+        ],
+        "confidence": 0.7778,
+        "severity": 1.3124,
+        "severityNeedsReview": true,
+        "score": 18,
+        "scoreBreakdown": {
+          "severity": 13,
+          "reach": 3,
+          "recentReports": 0,
+          "channels": 2
+        },
+        "status": "Open"
+      }
+    ],
+    "decisions": [
+      {
+        "reportId": "SAMPLE-1",
+        "outcome": "new",
+        "issueId": "POC-1",
+        "choice": "new_issue",
+        "confidence": 0.8644,
+        "probabilities": {},
+        "severity": 1.7153,
+        "severityConfidence": 0.4986,
+        "triage": "bug",
+        "triageConfidence": 0.8644
+      },
+      {
+        "reportId": "SAMPLE-2",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "uncertain",
+        "confidence": 0.5805,
+        "probabilities": {
+          "POC-1": 0.5805
+        },
+        "severity": 2.0424,
+        "severityConfidence": 0.3711,
+        "triage": "bug",
+        "triageConfidence": 0.8988
+      },
+      {
+        "reportId": "SAMPLE-3",
+        "outcome": "new",
+        "issueId": "POC-2",
+        "choice": "new_issue",
+        "confidence": 0.7024,
+        "probabilities": {
+          "POC-1": 0.078
+        },
+        "severity": 1.4091,
+        "severityConfidence": 0.6407,
+        "triage": "bug",
+        "triageConfidence": 0.7024
+      },
+      {
+        "reportId": "SAMPLE-4",
+        "outcome": "new",
+        "issueId": "POC-3",
+        "choice": "new_issue",
+        "confidence": 0.7552,
+        "probabilities": {
+          "POC-2": 0.1809,
+          "POC-1": 0.0842
+        },
+        "severity": 1.2435,
+        "severityConfidence": 0.7172,
+        "triage": "bug",
+        "triageConfidence": 0.7552
+      },
+      {
+        "reportId": "SAMPLE-5",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "uncertain",
+        "confidence": 0.4423,
+        "probabilities": {},
+        "severity": 1.385,
+        "severityConfidence": 0.6639,
+        "triage": "bug",
+        "triageConfidence": 0.4423
+      },
+      {
+        "reportId": "SAMPLE-6",
+        "outcome": "new",
+        "issueId": "POC-4",
+        "choice": "new_issue",
+        "confidence": 0.6343,
+        "probabilities": {
+          "POC-2": 0.0485,
+          "POC-1": 0.0572,
+          "POC-3": 0.0379
+        },
+        "severity": 0.8992,
+        "severityConfidence": 0.4084,
+        "triage": "feature",
+        "triageConfidence": 0.6343
+      },
+      {
+        "reportId": "SAMPLE-7",
+        "outcome": "new",
+        "issueId": "POC-5",
+        "choice": "new_issue",
+        "confidence": 0.8978,
+        "probabilities": {
+          "POC-1": 0.4589,
+          "POC-2": 0.0803,
+          "POC-3": 0.098,
+          "POC-4": 0.1975
+        },
+        "severity": 1.6138,
+        "severityConfidence": 0.5581,
+        "triage": "bug",
+        "triageConfidence": 0.8978
+      },
+      {
+        "reportId": "SAMPLE-8",
+        "outcome": "new",
+        "issueId": "POC-6",
+        "choice": "new_issue",
+        "confidence": 0.9454,
+        "probabilities": {
+          "POC-2": 0.1047,
+          "POC-1": 0.1146,
+          "POC-3": 0.0332,
+          "POC-4": 0.097,
+          "POC-5": 0.3284
+        },
+        "severity": 2.284,
+        "severityConfidence": 0.3018,
+        "triage": "bug",
+        "triageConfidence": 0.9454
+      },
+      {
+        "reportId": "SAMPLE-9",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "uncertain",
+        "confidence": 0.7833,
+        "probabilities": {
+          "POC-2": 0.7833,
+          "POC-4": 0.1064,
+          "POC-3": 0.354,
+          "POC-1": 0.0721,
+          "POC-5": 0.1087,
+          "POC-6": 0.0824
+        },
+        "severity": 1.7448,
+        "severityConfidence": 0.4326,
+        "triage": "bug",
+        "triageConfidence": 0.7071
+      },
+      {
+        "reportId": "SAMPLE-10",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "uncertain",
+        "confidence": 0.3448,
+        "probabilities": {},
+        "severity": 1.4603,
+        "severityConfidence": 0.5172,
+        "triage": "feature",
+        "triageConfidence": 0.3448
+      },
+      {
+        "reportId": "SAMPLE-11",
+        "outcome": "new",
+        "issueId": "POC-7",
+        "choice": "new_issue",
+        "confidence": 0.7496,
+        "probabilities": {
+          "POC-4": 0.1345,
+          "POC-2": 0.2883,
+          "POC-1": 0.1815,
+          "POC-3": 0.1592,
+          "POC-5": 0.1812,
+          "POC-6": 0.1082
+        },
+        "severity": 1.7457,
+        "severityConfidence": 0.469,
+        "triage": "bug",
+        "triageConfidence": 0.7496
+      },
+      {
+        "reportId": "SAMPLE-12",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "uncertain",
+        "confidence": 0.6559,
+        "probabilities": {
+          "POC-4": 0.6559,
+          "POC-7": 0.2141,
+          "POC-1": 0.5951,
+          "POC-2": 0.1197,
+          "POC-3": 0.0683,
+          "POC-5": 0.2287,
+          "POC-6": 0.1426
+        },
+        "severity": 0.9653,
+        "severityConfidence": 0.3765,
+        "triage": "feature",
+        "triageConfidence": 0.9112
+      },
+      {
+        "reportId": "SAMPLE-13",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "uncertain",
+        "confidence": 0.942,
+        "probabilities": {
+          "POC-5": 0.942,
+          "POC-1": 0.8349,
+          "POC-2": 0.1811,
+          "POC-3": 0.0855,
+          "POC-4": 0.1531,
+          "POC-6": 0.636,
+          "POC-7": 0.5006
+        },
+        "severity": 1.6272,
+        "severityConfidence": 0.4375,
+        "triage": "bug",
+        "triageConfidence": 0.9248
+      },
+      {
+        "reportId": "SAMPLE-14",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "uncertain",
+        "confidence": 0.7144,
+        "probabilities": {
+          "POC-6": 0.7144,
+          "POC-5": 0.2212,
+          "POC-1": 0.1797,
+          "POC-2": 0.0655,
+          "POC-3": 0.0409,
+          "POC-4": 0.05,
+          "POC-7": 0.2132
+        },
+        "severity": 1.9952,
+        "severityConfidence": 0.3999,
+        "triage": "bug",
+        "triageConfidence": 0.9001
+      },
+      {
+        "reportId": "SAMPLE-15",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "uncertain",
+        "confidence": 0.6931,
+        "probabilities": {
+          "POC-3": 0.2547,
+          "POC-2": 0.6931,
+          "POC-7": 0.2159,
+          "POC-1": 0.0644,
+          "POC-4": 0.1123,
+          "POC-5": 0.1068,
+          "POC-6": 0.0461
+        },
+        "severity": 1.4407,
+        "severityConfidence": 0.6692,
+        "triage": "bug",
+        "triageConfidence": 0.8754
+      },
+      {
+        "reportId": "SAMPLE-16",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "uncertain",
+        "confidence": 0.5696,
+        "probabilities": {},
+        "severity": 1.7319,
+        "severityConfidence": 0.4916,
+        "triage": "bug",
+        "triageConfidence": 0.5696
+      },
+      {
+        "reportId": "SAMPLE-17",
+        "outcome": "new",
+        "issueId": "POC-8",
+        "choice": "new_issue",
+        "confidence": 0.8203,
+        "probabilities": {
+          "POC-2": 0.0674,
+          "POC-7": 0.4217,
+          "POC-1": 0.2246,
+          "POC-3": 0.0782,
+          "POC-4": 0.0524,
+          "POC-5": 0.1195,
+          "POC-6": 0.1543
+        },
+        "severity": 1.4921,
+        "severityConfidence": 0.5728,
+        "triage": "bug",
+        "triageConfidence": 0.8203
+      },
+      {
+        "reportId": "SAMPLE-18",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "uncertain",
+        "confidence": 0.6299,
+        "probabilities": {
+          "POC-4": 0.6299,
+          "POC-1": 0.1152,
+          "POC-2": 0.0606,
+          "POC-3": 0.0256,
+          "POC-5": 0.1444,
+          "POC-6": 0.1176,
+          "POC-7": 0.1485
+        },
+        "severity": 1.1785,
+        "severityConfidence": 0.4757,
+        "triage": "feature",
+        "triageConfidence": 0.8844
+      },
+      {
+        "reportId": "SAMPLE-19",
+        "outcome": "merged",
+        "issueId": "POC-5",
+        "choice": "POC-5",
+        "confidence": 0.8354,
+        "probabilities": {
+          "POC-1": 0.544,
+          "POC-5": 0.8354,
+          "POC-7": 0.2187,
+          "POC-2": 0.0974,
+          "POC-3": 0.0953,
+          "POC-4": 0.0527,
+          "POC-6": 0.7674
+        },
+        "severity": 1.7154,
+        "severityConfidence": 0.4364,
+        "triage": "bug",
+        "triageConfidence": 0.8137
+      },
+      {
+        "reportId": "SAMPLE-20",
+        "outcome": "merged",
+        "issueId": "POC-6",
+        "choice": "POC-6",
+        "confidence": 0.8817,
+        "probabilities": {
+          "POC-6": 0.8817,
+          "POC-1": 0.3704,
+          "POC-5": 0.2491,
+          "POC-2": 0.1148,
+          "POC-3": 0.0039,
+          "POC-4": 0.0507,
+          "POC-7": 0.1817
+        },
+        "severity": 1.8128,
+        "severityConfidence": 0.4337,
+        "triage": "bug",
+        "triageConfidence": 0.8335
+      },
+      {
+        "reportId": "SAMPLE-21",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "uncertain",
+        "confidence": 0.6949,
+        "probabilities": {
+          "POC-3": 0.1417,
+          "POC-2": 0.6949,
+          "POC-1": 0.0311,
+          "POC-6": 0.0004,
+          "POC-4": 0.0551,
+          "POC-5": 0.0656,
+          "POC-7": 0.3401
+        },
+        "severity": 1.7427,
+        "severityConfidence": 0.4125,
+        "triage": "bug",
+        "triageConfidence": 0.6913
+      },
+      {
+        "reportId": "SAMPLE-22",
+        "outcome": "new",
+        "issueId": "POC-9",
+        "choice": "new_issue",
+        "confidence": 0.7778,
+        "probabilities": {
+          "POC-3": 0.333,
+          "POC-2": 0.2392,
+          "POC-6": 0.0284,
+          "POC-1": 0.0654,
+          "POC-4": 0.0719,
+          "POC-5": 0.0724,
+          "POC-7": 0.3167
+        },
+        "severity": 1.3124,
+        "severityConfidence": 0.6264,
+        "triage": "bug",
+        "triageConfidence": 0.7778
+      },
+      {
+        "reportId": "SAMPLE-23",
+        "outcome": "merged",
+        "issueId": "POC-7",
+        "choice": "POC-7",
+        "confidence": 0.8344,
+        "probabilities": {
+          "POC-7": 0.8344,
+          "POC-8": 0.2395,
+          "POC-1": 0.6274,
+          "POC-5": 0.2614,
+          "POC-2": 0.2264,
+          "POC-3": 0.168,
+          "POC-4": 0.1707
+        },
+        "severity": 1.6298,
+        "severityConfidence": 0.4721,
+        "triage": "bug",
+        "triageConfidence": 0.8023
+      },
+      {
+        "reportId": "SAMPLE-24",
+        "outcome": "merged",
+        "issueId": "POC-3",
+        "choice": "POC-3",
+        "confidence": 0.8141,
+        "probabilities": {
+          "POC-7": 0.1319,
+          "POC-4": 0.5692,
+          "POC-8": 0.0886,
+          "POC-1": 0.1127,
+          "POC-2": 0.0404,
+          "POC-3": 0.8141,
+          "POC-5": 0.109
+        },
+        "severity": 0.6874,
+        "severityConfidence": 0.5213,
+        "triage": "feature",
+        "triageConfidence": 0.8075
+      },
+      {
+        "reportId": "SAMPLE-25",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "uncertain",
+        "confidence": 0.9709,
+        "probabilities": {
+          "POC-1": 0.8891,
+          "POC-5": 0.9709,
+          "POC-6": 0.7095,
+          "POC-7": 0.344,
+          "POC-2": 0.0795,
+          "POC-3": 0.0917,
+          "POC-4": 0.1201
+        },
+        "severity": 1.7679,
+        "severityConfidence": 0.4571,
+        "triage": "bug",
+        "triageConfidence": 0.7063
+      },
+      {
+        "reportId": "SAMPLE-26",
+        "outcome": "merged",
+        "issueId": "POC-6",
+        "choice": "POC-6",
+        "confidence": 0.8355,
+        "probabilities": {
+          "POC-6": 0.8355,
+          "POC-5": 0.4376,
+          "POC-1": 0.2655,
+          "POC-8": 0.1095,
+          "POC-2": 0.1269,
+          "POC-3": 0.087,
+          "POC-4": 0.1138
+        },
+        "severity": 1.2898,
+        "severityConfidence": 0.6959,
+        "triage": "bug",
+        "triageConfidence": 0.8396
+      },
+      {
+        "reportId": "SAMPLE-27",
+        "outcome": "new",
+        "issueId": "POC-10",
+        "choice": "new_issue",
+        "confidence": 0.9151,
+        "probabilities": {
+          "POC-3": 0.1672,
+          "POC-2": 0.3119,
+          "POC-8": 0.1541,
+          "POC-9": 0.2327,
+          "POC-7": 0.4445,
+          "POC-5": 0.0915,
+          "POC-1": 0.0765
+        },
+        "severity": 1.7236,
+        "severityConfidence": 0.4978,
+        "triage": "bug",
+        "triageConfidence": 0.9151
+      },
+      {
+        "reportId": "SAMPLE-28",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "uncertain",
+        "confidence": 0.8479,
+        "probabilities": {
+          "POC-2": 0.3714,
+          "POC-3": 0.8479,
+          "POC-4": 0.1939,
+          "POC-10": 0.2529,
+          "POC-9": 0.8353,
+          "POC-7": 0.5122,
+          "POC-1": 0.1156
+        },
+        "severity": 1.3193,
+        "severityConfidence": 0.6381,
+        "triage": "bug",
+        "triageConfidence": 0.7778
+      },
+      {
+        "reportId": "SAMPLE-29",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "uncertain",
+        "confidence": 0.4354,
+        "probabilities": {},
+        "severity": 1.7162,
+        "severityConfidence": 0.4338,
+        "triage": "feature",
+        "triageConfidence": 0.4354
+      },
+      {
+        "reportId": "SAMPLE-30",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "uncertain",
+        "confidence": 0.5718,
+        "probabilities": {},
+        "severity": 0.7303,
+        "severityConfidence": 0.4845,
+        "triage": "feature",
+        "triageConfidence": 0.5718
+      },
+      {
+        "reportId": "SAMPLE-31",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "noise",
+        "confidence": 0.4461,
+        "probabilities": {},
+        "severity": 1.8097,
+        "severityConfidence": 0.383,
+        "triage": "noise",
+        "triageConfidence": 0.4461
+      },
+      {
+        "reportId": "SAMPLE-32",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "noise",
+        "confidence": 0.3207,
+        "probabilities": {},
+        "severity": 1.8117,
+        "severityConfidence": 0.3812,
+        "triage": "noise",
+        "triageConfidence": 0.3207
+      },
+      {
+        "reportId": "SAMPLE-33",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "uncertain",
+        "confidence": 0.7378,
+        "probabilities": {
+          "POC-1": 0.7254,
+          "POC-5": 0.5025,
+          "POC-2": 0.1171,
+          "POC-3": 0.0516,
+          "POC-4": 0.1975,
+          "POC-6": 0.7378,
+          "POC-7": 0.2433
+        },
+        "severity": 1.9518,
+        "severityConfidence": 0.3707,
+        "triage": "bug",
+        "triageConfidence": 0.7583
+      },
+      {
+        "reportId": "SAMPLE-34",
+        "outcome": "review",
+        "issueId": null,
+        "choice": "uncertain",
+        "confidence": 0.6316,
+        "probabilities": {},
+        "severity": 1.7113,
+        "severityConfidence": 0.5052,
+        "triage": "uncertain",
+        "triageConfidence": 0.6316
+      }
+    ],
+    "metrics": {
+      "precision": 0.8333333333333334,
+      "recall": 0.08333333333333333,
+      "falseMergePairs": 1,
+      "missedDuplicatePairs": 55,
+      "reviewCount": 19,
+      "noiseCount": 0,
+      "mergedCount": 5
+    },
+    "inputTokens": 19350,
+    "costUsd": 0.0,
+    "latencyMs": 6350,
+    "actualModel": "Laya / english"
+  },
+  "layaVersion": "0.4.1",
+  "checkpoint": "convaiinnovations/laya",
+  "revision": "7b928d828b7b0e022f929d9bd2e44165aa270148",
+  "device": "Apple MPS",
+  "triageThreshold": 0.6,
+  "newIssueDuplicateCeiling": 0.5
+}

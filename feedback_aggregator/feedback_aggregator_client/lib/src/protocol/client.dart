@@ -346,6 +346,63 @@ class EndpointGreeting extends _isc.EndpointRef {
 }
 
 /// {@category Endpoint}
+class EndpointLayaPoc extends _isc.EndpointRef {
+  EndpointLayaPoc(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'layaPoc';
+
+  _ida.Future<String> read(int workspaceId) =>
+      caller.callServerEndpoint<String>(
+        'layaPoc',
+        'read',
+        {'workspaceId': workspaceId},
+      );
+
+  _ida.Future<String> start(
+    int workspaceId,
+    List<String> sources,
+  ) => caller.callServerEndpoint<String>(
+    'layaPoc',
+    'start',
+    {
+      'workspaceId': workspaceId,
+      'sources': sources,
+    },
+  );
+
+  _ida.Future<String> step(
+    int workspaceId,
+    String runId,
+    int expectedIndex,
+  ) => caller.callServerEndpoint<String>(
+    'layaPoc',
+    'step',
+    {
+      'workspaceId': workspaceId,
+      'runId': runId,
+      'expectedIndex': expectedIndex,
+    },
+  );
+
+  _ida.Future<String> updateStatus(
+    int workspaceId,
+    String runId,
+    String issueId,
+    String status,
+  ) => caller.callServerEndpoint<String>(
+    'layaPoc',
+    'updateStatus',
+    {
+      'workspaceId': workspaceId,
+      'runId': runId,
+      'issueId': issueId,
+      'status': status,
+    },
+  );
+}
+
+/// {@category Endpoint}
 class EndpointWorkspace extends _isc.EndpointRef {
   EndpointWorkspace(_isc.EndpointCaller caller) : super(caller);
 
@@ -542,6 +599,7 @@ class Client extends _isc.ServerpodClientShared {
     googleIdp = EndpointGoogleIdp(this);
     jwtRefresh = EndpointJwtRefresh(this);
     greeting = EndpointGreeting(this);
+    layaPoc = EndpointLayaPoc(this);
     workspace = EndpointWorkspace(this);
     modules = Modules(this);
   }
@@ -554,6 +612,8 @@ class Client extends _isc.ServerpodClientShared {
 
   late final EndpointGreeting greeting;
 
+  late final EndpointLayaPoc layaPoc;
+
   late final EndpointWorkspace workspace;
 
   late final Modules modules;
@@ -564,6 +624,7 @@ class Client extends _isc.ServerpodClientShared {
     'googleIdp': googleIdp,
     'jwtRefresh': jwtRefresh,
     'greeting': greeting,
+    'layaPoc': layaPoc,
     'workspace': workspace,
   };
 

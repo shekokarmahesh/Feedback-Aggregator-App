@@ -63,6 +63,11 @@ void main() {
         final org = await service.create(admin, 'Alpha');
         final outsider = await account('outsider@example.com');
         final beta = await service.create(outsider, 'Beta');
+        await service.requireAccess(admin, org.id, write: true);
+        await expectLater(
+          service.requireAccess(outsider, org.id),
+          throwsA(isA<WorkspaceException>()),
+        );
         final ticket = await service.createTicket(
           admin,
           org.id,
@@ -129,6 +134,11 @@ void main() {
         expect(preview.workspaceName, 'Alpha');
         final joined = await service.accept(recipient, linkToken);
         expect(joined.role, WorkspaceRole.viewer);
+        await service.requireAccess(recipient, org.id);
+        await expectLater(
+          service.requireAccess(recipient, org.id, write: true),
+          throwsA(isA<WorkspaceException>()),
+        );
         await expectLater(
           service.accept(recipient, linkToken),
           throwsA(isA<WorkspaceException>()),
@@ -168,6 +178,7 @@ void main() {
           WorkspaceRole.editor,
         );
         await service.accept(editor, token(sentUrl));
+        await service.requireAccess(editor, org.id, write: true);
         final ticket = await service.createTicket(
           editor,
           org.id,
@@ -200,10 +211,18 @@ void main() {
           WorkspaceRole.viewer,
         );
         await expectLater(
+          service.requireAccess(editor, org.id, write: true),
+          throwsA(isA<WorkspaceException>()),
+        );
+        await expectLater(
           service.updateTicketStatus(editor, org.id, ticket.id!, 'Resolved'),
           throwsA(isA<WorkspaceException>()),
         );
         await service.removeMember(admin, org.id, member.id);
+        await expectLater(
+          service.requireAccess(editor, org.id),
+          throwsA(isA<WorkspaceException>()),
+        );
         await expectLater(
           service.tickets(editor, org.id),
           throwsA(isA<WorkspaceException>()),

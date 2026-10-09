@@ -50,6 +50,19 @@ class WorkspaceService {
     return UuidValue.fromString(auth.userIdentifier);
   }
 
+  Future<void> requireAccess(
+    Session session,
+    int workspaceId, {
+    bool write = false,
+  }) async {
+    final member = await _member(session, workspaceId);
+    if (write && member.role == WorkspaceRole.viewer) {
+      throw WorkspaceException(
+        message: 'Only an Admin or Editor can change workspace feedback.',
+      );
+    }
+  }
+
   Future<WorkspaceMember> _member(Session s, int id, {Transaction? tx}) async {
     final member = await WorkspaceMember.db.findFirstRow(
       s,
