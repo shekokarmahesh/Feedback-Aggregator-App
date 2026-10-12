@@ -3,9 +3,11 @@
 This project is a Flutter app (frontend) backed by a Serverpod server (backend). Always build the app's backend with Serverpod.
 Build for multiple users, use Serverpod's built-in authentication, which is already set up in `lib/server.dart`.
 
-The app aggregates feedback for developers and product managers. The signed-in dashboard currently uses sample tickets, with search, status/source/priority filters, request-count sorting, ticket details, and source/activity views. Keep sample data labeled until live connectors are implemented. Profile details come from the authenticated Serverpod account; team roles and invites are not implemented yet.
+The app aggregates feedback for developers and product managers. The signed-in dashboard reads workspace-scoped tickets from PostgreSQL; the public landing preview uses labeled sample data. Workspaces are organization tenants with Admin, Editor, and Viewer roles, Resend invitations, and membership checks in `WorkspaceService`. Every future tenant endpoint, job, cache, and storage operation must check membership/role and include the workspace ID. See `WORKSPACES.md` for the isolation boundary and invitation setup. Profile details come from the authenticated Serverpod account; live source connectors are not implemented yet.
 
 Email/password signup skips email verification and never links an existing Google identity by email alone. Password resets use real Serverpod codes delivered by Resend. Google web OAuth requires the built website on the callback origin; see `GOOGLE_AUTH_SETUP.md` for the build command and `EMAIL_AUTH_SETUP.md` for sender configuration. Keep `config/passwords.yaml`, downloaded OAuth JSON, and the root `api key` file out of Git.
+
+Local development and tests use Serverpod-managed PostgreSQL through `database.dataPath`. Caching uses `session.caches.local` or `localPrio`; check membership before reading cached tenant data, include the workspace ID in keys, and invalidate affected entries after writes. Keep `.serverpod/` data and existing authentication secrets intact. See `COLLABORATOR_SETUP.md` for startup and `STORAGE_RESEARCH.md` for storage and production constraints.
 
 The user starts the server and Flutter app with `serverpod start`. There is no need to check if the server is running: make the changes and call the `serverpod` MCP tools as needed. If the server is not running, an informative error message will be received from the MCP server. Then STOP and ask the user to start it. NEVER start the server yourself. The Flutter app is started along with it, or can be launched from the MCP tool `spawn_flutter_app`.
 
@@ -32,7 +34,7 @@ Only when the server cannot be started at all, fall back to the CLI in the serve
 - `serverpod generate` to regenerate the client and the generated server code.
 - `serverpod create-migration` after changing a model with a `table` (add `--force` for destructive changes). It only writes the migration; `serverpod start` applies pending migrations when it boots the server.
 
-Tests need no Docker. `config/test.yaml` sets `database.dataPath`, so Serverpod starts and manages the test database (an embedded PostgreSQL) itself, and the project's `docker-compose.yaml` is not used for it. Just run `dart test` in the server package.
+`config/test.yaml` sets `database.dataPath`, so Serverpod starts and manages the embedded test PostgreSQL itself. Run `dart test` in the server package; no external database or cache service needs to be started.
 
 Checklist after doing changes, in this order:
 

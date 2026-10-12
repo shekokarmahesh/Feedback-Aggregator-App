@@ -16,3 +16,18 @@ jwtRefresh:
   - refreshAccessToken:
 greeting:
   - hello:
+workspace:
+  - list:
+  - create:
+  - members:
+  - invitations:
+  - invite:
+  - createInvitationLink:
+  - revokeInvitation:
+  - changeRole:
+  - removeMember:
+  - previewInvitation:
+  - acceptInvitation:
+  - tickets:
+  - createTicket:
+  - updateTicketStatus:

@@ -1,0 +1,5 @@
+class: InvitationDelivery
+fields:
+  invitation: InvitationInfo
+  url: String
+  emailSent: bool

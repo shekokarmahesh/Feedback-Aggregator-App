@@ -1,3 +1,8 @@
 # Downloaded Google OAuth credentials belong only on the local machine.
 client_secret*.json
 api key
+
+# Local credentials. Only placeholder examples belong in Git.
+.env
+.env.*
+!.env.example

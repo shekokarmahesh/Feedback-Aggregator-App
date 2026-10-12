@@ -1,0 +1,16 @@
+class: WorkspaceMember
+table: app_workspace_member
+serverOnly: true
+fields:
+  workspace: Workspace?, relation(onDelete=Cascade)
+  authUserId: UuidValue
+  email: String
+  name: String
+  role: WorkspaceRole
+  joinedAt: DateTime, default=now
+indexes:
+  workspace_user_unique:
+    fields: workspaceId, authUserId
+    unique: true
+  workspace_user_lookup:
+    fields: authUserId

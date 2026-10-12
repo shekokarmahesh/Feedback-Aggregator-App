@@ -11,8 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       VERSION: '4.0.3'
-      SERVERPOD_PASSWORD_database: 'dnbawfgzaqBZit9aZ4ffk1WzLwuopoHM'
-      SERVERPOD_PASSWORD_redis: 'IG2YQW8vcfn67JgDFwYTX-9wuZdRZijt'
 
     steps:
       - uses: actions/checkout@v4
@@ -32,6 +30,7 @@ jobs:
           key: serverpod-pg-binaries-${{runner.os}}-${{env.VERSION}}
 
       - name: Install dependencies
+        working-directory: feedback_aggregator
         run: flutter pub get
 
       - name: Install Serverpod CLI
@@ -42,9 +41,14 @@ jobs:
           echo "${XDG_STATE_HOME:-$HOME/.local/state}/Dart/install/bin" >> "$GITHUB_PATH"
 
       - name: Run Serverpod generator
-        working-directory: feedback_aggregator_server
+        working-directory: feedback_aggregator/feedback_aggregator_server
         run: serverpod generate
 
       - name: Run tests
-        working-directory: feedback_aggregator_server
-        run: dart test
+        working-directory: feedback_aggregator/feedback_aggregator_server
+        run: |
+          python3 scripts/create_local_env.py
+          set -a
+          . ./.env
+          set +a
+          dart test

@@ -1,0 +1,8 @@
+class: InvitationInfo
+fields:
+  id: int
+  workspaceName: String
+  email: String
+  role: WorkspaceRole
+  expiresAt: DateTime
+  status: String

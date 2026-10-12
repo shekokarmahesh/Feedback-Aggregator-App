@@ -13,6 +13,18 @@
 import 'dart:async' as _ida;
 import 'package:feedback_aggregator_client/src/protocol/greetings/greeting.dart'
     as _iqu387d1;
+import 'package:feedback_aggregator_client/src/protocol/workspaces/invitation_delivery.dart'
+    as _iwdqf0nn;
+import 'package:feedback_aggregator_client/src/protocol/workspaces/invitation_info.dart'
+    as _ib0gvgdq;
+import 'package:feedback_aggregator_client/src/protocol/workspaces/member_info.dart'
+    as _irkpghaa;
+import 'package:feedback_aggregator_client/src/protocol/workspaces/workspace_role.dart'
+    as _i983omfg;
+import 'package:feedback_aggregator_client/src/protocol/workspaces/workspace_summary.dart'
+    as _in30w5p5;
+import 'package:feedback_aggregator_client/src/protocol/workspaces/workspace_ticket.dart'
+    as _ikphcpie;
 import 'package:http/http.dart' as _i85jenna;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _iacc;
@@ -333,6 +345,161 @@ class EndpointGreeting extends _isc.EndpointRef {
       );
 }
 
+/// {@category Endpoint}
+class EndpointWorkspace extends _isc.EndpointRef {
+  EndpointWorkspace(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'workspace';
+
+  _ida.Future<List<_in30w5p5.WorkspaceSummary>> list() =>
+      caller.callServerEndpoint<List<_in30w5p5.WorkspaceSummary>>(
+        'workspace',
+        'list',
+        {},
+      );
+
+  _ida.Future<_in30w5p5.WorkspaceSummary> create(String name) =>
+      caller.callServerEndpoint<_in30w5p5.WorkspaceSummary>(
+        'workspace',
+        'create',
+        {'name': name},
+      );
+
+  _ida.Future<List<_irkpghaa.MemberInfo>> members(int workspaceId) =>
+      caller.callServerEndpoint<List<_irkpghaa.MemberInfo>>(
+        'workspace',
+        'members',
+        {'workspaceId': workspaceId},
+      );
+
+  _ida.Future<List<_ib0gvgdq.InvitationInfo>> invitations(int workspaceId) =>
+      caller.callServerEndpoint<List<_ib0gvgdq.InvitationInfo>>(
+        'workspace',
+        'invitations',
+        {'workspaceId': workspaceId},
+      );
+
+  _ida.Future<_iwdqf0nn.InvitationDelivery> invite(
+    int workspaceId,
+    String email,
+    _i983omfg.WorkspaceRole role,
+  ) => caller.callServerEndpoint<_iwdqf0nn.InvitationDelivery>(
+    'workspace',
+    'invite',
+    {
+      'workspaceId': workspaceId,
+      'email': email,
+      'role': role,
+    },
+  );
+
+  _ida.Future<_iwdqf0nn.InvitationDelivery> createInvitationLink(
+    int workspaceId,
+    String email,
+    _i983omfg.WorkspaceRole role,
+  ) => caller.callServerEndpoint<_iwdqf0nn.InvitationDelivery>(
+    'workspace',
+    'createInvitationLink',
+    {
+      'workspaceId': workspaceId,
+      'email': email,
+      'role': role,
+    },
+  );
+
+  _ida.Future<void> revokeInvitation(
+    int workspaceId,
+    int invitationId,
+  ) => caller.callServerEndpoint<void>(
+    'workspace',
+    'revokeInvitation',
+    {
+      'workspaceId': workspaceId,
+      'invitationId': invitationId,
+    },
+  );
+
+  _ida.Future<void> changeRole(
+    int workspaceId,
+    int memberId,
+    _i983omfg.WorkspaceRole role,
+  ) => caller.callServerEndpoint<void>(
+    'workspace',
+    'changeRole',
+    {
+      'workspaceId': workspaceId,
+      'memberId': memberId,
+      'role': role,
+    },
+  );
+
+  _ida.Future<void> removeMember(
+    int workspaceId,
+    int memberId,
+  ) => caller.callServerEndpoint<void>(
+    'workspace',
+    'removeMember',
+    {
+      'workspaceId': workspaceId,
+      'memberId': memberId,
+    },
+  );
+
+  _ida.Future<_ib0gvgdq.InvitationInfo> previewInvitation(String token) =>
+      caller.callServerEndpoint<_ib0gvgdq.InvitationInfo>(
+        'workspace',
+        'previewInvitation',
+        {'token': token},
+      );
+
+  _ida.Future<_in30w5p5.WorkspaceSummary> acceptInvitation(String token) =>
+      caller.callServerEndpoint<_in30w5p5.WorkspaceSummary>(
+        'workspace',
+        'acceptInvitation',
+        {'token': token},
+      );
+
+  _ida.Future<List<_ikphcpie.WorkspaceTicket>> tickets(int workspaceId) =>
+      caller.callServerEndpoint<List<_ikphcpie.WorkspaceTicket>>(
+        'workspace',
+        'tickets',
+        {'workspaceId': workspaceId},
+      );
+
+  _ida.Future<_ikphcpie.WorkspaceTicket> createTicket(
+    int workspaceId,
+    String title,
+    String description,
+    String source,
+    String priority,
+  ) => caller.callServerEndpoint<_ikphcpie.WorkspaceTicket>(
+    'workspace',
+    'createTicket',
+    {
+      'workspaceId': workspaceId,
+      'title': title,
+      'description': description,
+      'source': source,
+      'priority': priority,
+    },
+  );
+
+  _ida.Future<_ikphcpie.WorkspaceTicket> updateTicketStatus(
+    int workspaceId,
+    int ticketId,
+    String status,
+  ) => caller.callServerEndpoint<_ikphcpie.WorkspaceTicket>(
+    'workspace',
+    'updateTicketStatus',
+    {
+      'workspaceId': workspaceId,
+      'ticketId': ticketId,
+      'status': status,
+    },
+  );
+}
+
 class Modules {
   Modules(Client client) {
     serverpod_auth_idp = _iaic.Caller(client);
@@ -375,6 +542,7 @@ class Client extends _isc.ServerpodClientShared {
     googleIdp = EndpointGoogleIdp(this);
     jwtRefresh = EndpointJwtRefresh(this);
     greeting = EndpointGreeting(this);
+    workspace = EndpointWorkspace(this);
     modules = Modules(this);
   }
 
@@ -386,6 +554,8 @@ class Client extends _isc.ServerpodClientShared {
 
   late final EndpointGreeting greeting;
 
+  late final EndpointWorkspace workspace;
+
   late final Modules modules;
 
   @override
@@ -394,6 +564,7 @@ class Client extends _isc.ServerpodClientShared {
     'googleIdp': googleIdp,
     'jwtRefresh': jwtRefresh,
     'greeting': greeting,
+    'workspace': workspace,
   };
 
   @override

@@ -5,31 +5,36 @@ Flutter web frontend and Serverpod backend for aggregating and grouping user fee
 The project lives in `feedback_aggregator/` and includes:
 
 - `feedback_aggregator_flutter`: Flutter frontend with Serverpod email/password sign-in.
-- `feedback_aggregator_server`: Serverpod backend, PostgreSQL, Redis, and authentication.
+- `feedback_aggregator_server`: Serverpod backend, PostgreSQL, built-in memory caching, and authentication.
 - `feedback_aggregator_client`: generated Dart client.
 
 ## Local development
 
 Open `feedback_aggregator/` as the project folder in Codex to load its `AGENTS.md`, MCP configuration, and agent skills.
 
-With Docker Desktop running, start Redis and then the development stack:
+For a fresh clone, follow [collaborator setup](feedback_aggregator/COLLABORATOR_SETUP.md) to generate local secrets and configure Google/Resend. With an ignored `.env` configured, load it before starting the development stack:
 
 ```sh
-cd feedback_aggregator
-docker compose -f feedback_aggregator_server/docker-compose.yaml up -d redis
+cd feedback_aggregator/feedback_aggregator_server
+set -a
+. ./.env
+set +a
 serverpod start
 ```
 
-The default development PostgreSQL database is managed by Serverpod using the configured `database.dataPath`. The Compose file also includes PostgreSQL services if you later choose Docker-based databases.
+Serverpod manages the development and test PostgreSQL databases using `database.dataPath`. Docker and Redis are not required. Caching uses Serverpod's built-in process memory; see [storage setup](feedback_aggregator/STORAGE_RESEARCH.md) for persistence and production considerations.
 
 Serverpod starts the backend and configured Flutter web app. Email/password sign-up creates an account immediately without an OTP. Password resets send an expiring, single-use code through Resend; codes are not printed in server logs. See [email delivery setup](feedback_aggregator/EMAIL_AUTH_SETUP.md).
 
 The app supports email/password sign-up, sign-in, password reset, session restoration, and sign-out. Google web sign-in uses Serverpod's OAuth2 PKCE flow. Configure its free OAuth credentials following [Google authentication setup](feedback_aggregator/GOOGLE_AUTH_SETUP.md).
 
-After sign-in, the dashboard shows a sample feedback inbox with grouped request counts, search, status/source/priority filters, sorting, and ticket details. Top navigation includes the inbox, planned sources, and sample activity. The account menu loads your real Serverpod profile and offers account-security information and sign-out.
+After sign-in, the dashboard shows the selected workspace's persisted feedback with search, status/source/priority filters, sorting, and ticket details. New workspaces start empty; Admins and Editors can add feedback and change its status. The account menu loads your real Serverpod profile and offers account-security information and sign-out.
 
 The greeting endpoint requires an authenticated Serverpod session. Tickets and activity are currently demo data. Live feedback sources, AI grouping, persisted tickets, and team roles still need implementation.
 
 A feedback model and `POST /webhooks/feedback` ingestion route are now defined.
 Code generation and the database migration are required before enabling ingestion.
 See [feedback webhook setup](feedback_aggregator/FEEDBACK_WEBHOOK_SETUP.md).
+The public landing preview uses sample data. Live feedback connectors and AI grouping still need implementation.
+
+Workspaces isolate each organization's feedback and team. Create a workspace after signing in, invite teammates through **Team**, and assign **Admin**, **Editor**, or **Viewer** access. **Create share link** works without an email provider or purchased domain. See [workspace setup and permissions](feedback_aggregator/WORKSPACES.md) for Resend delivery and access rules.

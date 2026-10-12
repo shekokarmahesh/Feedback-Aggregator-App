@@ -37,14 +37,6 @@ database:
   dataPath: .serverpod/test/pgdata
   #maxConnectionCount: 10 # Defaults to 10, a negative or null value removes the limit
 
-# This is the setup for your Redis test instance.
-redis:
-  enabled: false
-  host: localhost
-  port: 9091
-  #user: # defaults to empty
-  #requireSsl: true # defaults to false
-
 sessionLogs:
   persistentEnabled: true
   consoleEnabled: true

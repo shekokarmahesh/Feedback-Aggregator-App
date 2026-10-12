@@ -9,11 +9,13 @@ class SignInScreen extends StatefulWidget {
   final Widget child;
   final bool showLanding;
   final bool initialSignUp;
+  final bool invitation;
   const SignInScreen({
     super.key,
     required this.child,
     this.showLanding = true,
     this.initialSignUp = false,
+    this.invitation = false,
   });
 
   @override
@@ -81,8 +83,10 @@ class _SignInScreenState extends State<SignInScreen> {
                           style: Theme.of(context).textTheme.headlineSmall,
                         ),
                         const SizedBox(height: 8),
-                        const Text(
-                          'Sign in or create an account to get started.',
+                        Text(
+                          widget.invitation
+                              ? 'Sign in or create an account using the email address your workspace invitation was sent to.'
+                              : 'Sign in or create an account to get started.',
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 24),

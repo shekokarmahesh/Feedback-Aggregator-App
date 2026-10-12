@@ -118,6 +118,7 @@ const ticketSources = ['Forms', 'Email', 'Slack', 'Support', 'App reviews'];
 const ticketPriorities = ['High', 'Medium', 'Low'];
 
 List<DemoTicket> filterTickets({
+  List<DemoTicket> tickets = demoTickets,
   String query = '',
   String status = 'All',
   String source = 'All',
@@ -126,7 +127,7 @@ List<DemoTicket> filterTickets({
 }) {
   final search = query.trim().toLowerCase();
   // All criteria combine; text search also includes the sample requester's name.
-  final filtered = demoTickets
+  final filtered = tickets
       .where(
         (ticket) =>
             (status == 'All' || ticket.status == status) &&

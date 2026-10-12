@@ -10,6 +10,8 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:feedback_aggregator_server/src/generated/workspaces/workspace_role.dart'
+    as _ixvotuht;
 import 'package:serverpod/serverpod.dart' as _is;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _iacs;
@@ -19,6 +21,7 @@ import '../auth/email_idp_endpoint.dart' as _iuc1hd5t;
 import '../auth/google_idp_endpoint.dart' as _i71axiz0;
 import '../auth/jwt_refresh_endpoint.dart' as _inwq3ztq;
 import '../greetings/greeting_endpoint.dart' as _il624ik7;
+import '../workspaces/workspace_endpoint.dart' as _iannd3dw;
 
 class Endpoints extends _is.EndpointDispatch {
   @override
@@ -46,6 +49,12 @@ class Endpoints extends _is.EndpointDispatch {
         ..initialize(
           server,
           'greeting',
+          null,
+        ),
+      'workspace': _iannd3dw.WorkspaceEndpoint()
+        ..initialize(
+          server,
+          'workspace',
           null,
         ),
     };
@@ -373,6 +382,353 @@ class Endpoints extends _is.EndpointDispatch {
                   (endpoints['greeting'] as _il624ik7.GreetingEndpoint).hello(
                     session,
                     params['name'],
+                  ),
+        ),
+      },
+    );
+    connectors['workspace'] = _is.EndpointConnector(
+      name: 'workspace',
+      endpoint: endpoints['workspace']!,
+      methodConnectors: {
+        'list': _is.MethodConnector(
+          name: 'list',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['workspace'] as _iannd3dw.WorkspaceEndpoint)
+                  .list(session),
+        ),
+        'create': _is.MethodConnector(
+          name: 'create',
+          params: {
+            'name': _is.ParameterDescription(
+              name: 'name',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['workspace'] as _iannd3dw.WorkspaceEndpoint)
+                  .create(
+                    session,
+                    params['name'],
+                  ),
+        ),
+        'members': _is.MethodConnector(
+          name: 'members',
+          params: {
+            'workspaceId': _is.ParameterDescription(
+              name: 'workspaceId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['workspace'] as _iannd3dw.WorkspaceEndpoint)
+                  .members(
+                    session,
+                    params['workspaceId'],
+                  ),
+        ),
+        'invitations': _is.MethodConnector(
+          name: 'invitations',
+          params: {
+            'workspaceId': _is.ParameterDescription(
+              name: 'workspaceId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['workspace'] as _iannd3dw.WorkspaceEndpoint)
+                  .invitations(
+                    session,
+                    params['workspaceId'],
+                  ),
+        ),
+        'invite': _is.MethodConnector(
+          name: 'invite',
+          params: {
+            'workspaceId': _is.ParameterDescription(
+              name: 'workspaceId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'email': _is.ParameterDescription(
+              name: 'email',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'role': _is.ParameterDescription(
+              name: 'role',
+              type: _is.getType<_ixvotuht.WorkspaceRole>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['workspace'] as _iannd3dw.WorkspaceEndpoint)
+                  .invite(
+                    session,
+                    params['workspaceId'],
+                    params['email'],
+                    params['role'],
+                  ),
+        ),
+        'createInvitationLink': _is.MethodConnector(
+          name: 'createInvitationLink',
+          params: {
+            'workspaceId': _is.ParameterDescription(
+              name: 'workspaceId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'email': _is.ParameterDescription(
+              name: 'email',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'role': _is.ParameterDescription(
+              name: 'role',
+              type: _is.getType<_ixvotuht.WorkspaceRole>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['workspace'] as _iannd3dw.WorkspaceEndpoint)
+                  .createInvitationLink(
+                    session,
+                    params['workspaceId'],
+                    params['email'],
+                    params['role'],
+                  ),
+        ),
+        'revokeInvitation': _is.MethodConnector(
+          name: 'revokeInvitation',
+          params: {
+            'workspaceId': _is.ParameterDescription(
+              name: 'workspaceId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'invitationId': _is.ParameterDescription(
+              name: 'invitationId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['workspace'] as _iannd3dw.WorkspaceEndpoint)
+                  .revokeInvitation(
+                    session,
+                    params['workspaceId'],
+                    params['invitationId'],
+                  ),
+        ),
+        'changeRole': _is.MethodConnector(
+          name: 'changeRole',
+          params: {
+            'workspaceId': _is.ParameterDescription(
+              name: 'workspaceId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'memberId': _is.ParameterDescription(
+              name: 'memberId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'role': _is.ParameterDescription(
+              name: 'role',
+              type: _is.getType<_ixvotuht.WorkspaceRole>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['workspace'] as _iannd3dw.WorkspaceEndpoint)
+                  .changeRole(
+                    session,
+                    params['workspaceId'],
+                    params['memberId'],
+                    params['role'],
+                  ),
+        ),
+        'removeMember': _is.MethodConnector(
+          name: 'removeMember',
+          params: {
+            'workspaceId': _is.ParameterDescription(
+              name: 'workspaceId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'memberId': _is.ParameterDescription(
+              name: 'memberId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['workspace'] as _iannd3dw.WorkspaceEndpoint)
+                  .removeMember(
+                    session,
+                    params['workspaceId'],
+                    params['memberId'],
+                  ),
+        ),
+        'previewInvitation': _is.MethodConnector(
+          name: 'previewInvitation',
+          params: {
+            'token': _is.ParameterDescription(
+              name: 'token',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['workspace'] as _iannd3dw.WorkspaceEndpoint)
+                  .previewInvitation(
+                    session,
+                    params['token'],
+                  ),
+        ),
+        'acceptInvitation': _is.MethodConnector(
+          name: 'acceptInvitation',
+          params: {
+            'token': _is.ParameterDescription(
+              name: 'token',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['workspace'] as _iannd3dw.WorkspaceEndpoint)
+                  .acceptInvitation(
+                    session,
+                    params['token'],
+                  ),
+        ),
+        'tickets': _is.MethodConnector(
+          name: 'tickets',
+          params: {
+            'workspaceId': _is.ParameterDescription(
+              name: 'workspaceId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['workspace'] as _iannd3dw.WorkspaceEndpoint)
+                  .tickets(
+                    session,
+                    params['workspaceId'],
+                  ),
+        ),
+        'createTicket': _is.MethodConnector(
+          name: 'createTicket',
+          params: {
+            'workspaceId': _is.ParameterDescription(
+              name: 'workspaceId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'title': _is.ParameterDescription(
+              name: 'title',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'description': _is.ParameterDescription(
+              name: 'description',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'source': _is.ParameterDescription(
+              name: 'source',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'priority': _is.ParameterDescription(
+              name: 'priority',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['workspace'] as _iannd3dw.WorkspaceEndpoint)
+                  .createTicket(
+                    session,
+                    params['workspaceId'],
+                    params['title'],
+                    params['description'],
+                    params['source'],
+                    params['priority'],
+                  ),
+        ),
+        'updateTicketStatus': _is.MethodConnector(
+          name: 'updateTicketStatus',
+          params: {
+            'workspaceId': _is.ParameterDescription(
+              name: 'workspaceId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'ticketId': _is.ParameterDescription(
+              name: 'ticketId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'status': _is.ParameterDescription(
+              name: 'status',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['workspace'] as _iannd3dw.WorkspaceEndpoint)
+                  .updateTicketStatus(
+                    session,
+                    params['workspaceId'],
+                    params['ticketId'],
+                    params['status'],
                   ),
         ),
       },

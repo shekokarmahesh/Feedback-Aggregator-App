@@ -1,0 +1,15 @@
+class: WorkspaceTicket
+table: app_workspace_ticket
+fields:
+  workspaceId: int, relation(parent=app_workspace, onDelete=Cascade)
+  title: String
+  description: String
+  source: String
+  status: String
+  priority: String
+  supporters: int
+  requester: String
+  createdAt: DateTime, default=now
+indexes:
+  workspace_ticket_lookup:
+    fields: workspaceId

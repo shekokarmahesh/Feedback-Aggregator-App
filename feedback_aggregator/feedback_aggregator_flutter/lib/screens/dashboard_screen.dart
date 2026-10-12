@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:feedback_aggregator_client/feedback_aggregator_client.dart';
 import '../client.dart';
 import '../models/demo_ticket.dart';
 
@@ -29,10 +30,18 @@ Future<AccountProfile> loadAccountProfile() async {
 
 class DashboardScreen extends StatefulWidget {
   final Future<void> Function() onSignOut;
+  final WorkspaceSummary? workspace;
+  final List<DemoTicket> tickets;
+  final VoidCallback? onCreateTicket;
+  final Future<void> Function(DemoTicket, String)? onUpdateStatus;
   final Future<AccountProfile> Function() loadProfile;
   const DashboardScreen({
     super.key,
     required this.onSignOut,
+    this.workspace,
+    this.tickets = demoTickets,
+    this.onCreateTicket,
+    this.onUpdateStatus,
     this.loadProfile = loadAccountProfile,
   });
   @override
@@ -404,7 +413,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
                             Text(
-                              'PERSONAL WORKSPACE',
+                              widget.workspace?.name.toUpperCase() ??
+                                  'PERSONAL WORKSPACE',
                               style: Theme.of(context).textTheme.labelSmall
                                   ?.copyWith(
                                     letterSpacing: 1.4,
@@ -412,7 +422,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     fontWeight: FontWeight.w700,
                                   ),
                             ),
-                            _pill('Sample data', const Color(0xFF7C3AED)),
+                            _pill(
+                              widget.workspace == null
+                                  ? 'Sample data'
+                                  : 'Workspace data',
+                              const Color(0xFF7C3AED),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 16),
@@ -422,8 +437,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ? _sources(wide)
                             : _activity(),
                         const SizedBox(height: 28),
-                        const Text(
-                          'Built for better product decisions. All tickets shown are sample data.',
+                        Text(
+                          widget.workspace == null
+                              ? 'Built for better product decisions. All tickets shown are sample data.'
+                              : 'Only members of this workspace can access its feedback.',
                           style: TextStyle(
                             color: Color(0xFF94A3B8),
                             fontSize: 12,
@@ -466,13 +483,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _inbox(bool wide) {
     final tickets = filterTickets(
+      tickets: widget.tickets,
       query: _query,
       status: _status,
       source: _source,
       priority: _priority,
       sort: _sort,
     );
-    final open = demoTickets.where((t) => t.status != 'Resolved').length;
+    final open = widget.tickets.where((t) => t.status != 'Resolved').length;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -486,6 +504,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
               'Feedback inbox',
               'Turn scattered support conversations into a clear product roadmap.',
             ),
+            if (widget.onCreateTicket != null)
+              FilledButton.icon(
+                onPressed: widget.onCreateTicket,
+                icon: const Icon(Icons.add),
+                label: const Text('Add feedback'),
+              ),
             OutlinedButton.icon(
               onPressed: () => setState(() => _tab = 'Sources'),
               icon: const Icon(Icons.hub_outlined, size: 18),
@@ -508,7 +532,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               children: [
                 _metric(
                   'Feedback groups',
-                  '${demoTickets.length}',
+                  '${widget.tickets.length}',
                   'Similar requests, brought together',
                   Icons.layers_outlined,
                   const Color(0xFF4F46E5),
@@ -516,7 +540,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 _metric(
                   'Customer requests',
-                  '${demoTickets.fold<int>(0, (sum, t) => sum + t.supporters)}',
+                  '${widget.tickets.fold<int>(0, (sum, t) => sum + t.supporters)}',
                   'People behind the feedback',
                   Icons.people_outline,
                   const Color(0xFF0891B2),
@@ -654,7 +678,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                       SizedBox(
                         width: 85,
-                        child: Text('UPDATED', style: _columnStyle),
+                        child: Text('ADDED', style: _columnStyle),
                       ),
                       SizedBox(width: 20),
                     ],
@@ -672,23 +696,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           color: Color(0xFF94A3B8),
                         ),
                         const SizedBox(height: 16),
-                        const Text(
-                          'No feedback matches',
+                        Text(
+                          widget.tickets.isEmpty
+                              ? 'No feedback yet'
+                              : 'No feedback matches',
                           style: TextStyle(
                             fontWeight: FontWeight.w700,
                             fontSize: 18,
                           ),
                         ),
                         const SizedBox(height: 8),
-                        const Text(
-                          'Try a different search or clear your filters.',
+                        Text(
+                          widget.tickets.isEmpty
+                              ? 'Admins and Editors can add the first feedback for this workspace.'
+                              : 'Try a different search or clear your filters.',
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 16),
-                        OutlinedButton(
-                          onPressed: _resetFilters,
-                          child: const Text('Reset filters'),
-                        ),
+                        if (widget.tickets.isNotEmpty)
+                          OutlinedButton(
+                            onPressed: _resetFilters,
+                            child: const Text('Reset filters'),
+                          ),
                       ],
                     ),
                   ),
@@ -698,7 +727,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: Text(
-                  'Showing ${tickets.length} of ${demoTickets.length} feedback groups',
+                  'Showing ${tickets.length} of ${widget.tickets.length} feedback groups',
                   style: const TextStyle(
                     color: Color(0xFF64748B),
                     fontSize: 12,
@@ -990,7 +1019,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     style: const TextStyle(color: Color(0xFF64748B)),
                   ),
                   const Spacer(),
-                  _pill('Sample ticket', const Color(0xFF7C3AED)),
+                  _pill(
+                    widget.workspace == null
+                        ? 'Sample ticket'
+                        : 'Workspace ticket',
+                    const Color(0xFF7C3AED),
+                  ),
                   IconButton(
                     tooltip: 'Close ticket',
                     onPressed: () => Navigator.pop(context),
@@ -1035,15 +1069,45 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 'Requests grouped together',
                 '${ticket.supporters} customer requests',
               ),
-              _detail('Last updated', _updated(ticket)),
-              const Text(
-                'This is a preview of a grouped support ticket. Live feedback ingestion and status changes will be connected later.',
+              _detail('Added', _updated(ticket)),
+              Text(
+                widget.workspace == null
+                    ? 'This is a preview of a grouped support ticket. Live feedback ingestion and status changes will be connected later.'
+                    : 'This feedback is saved in your workspace. Admins and Editors can update its status.',
                 style: TextStyle(
                   color: Color(0xFF94A3B8),
                   fontSize: 12,
                   height: 1.5,
                 ),
               ),
+              if (widget.onUpdateStatus != null) ...[
+                const SizedBox(height: 24),
+                const Text(
+                  'Update status',
+                  style: TextStyle(fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final status in ticketStatuses)
+                      OutlinedButton(
+                        onPressed: status == ticket.status
+                            ? null
+                            : () async {
+                                Navigator.pop(context);
+                                try {
+                                  await widget.onUpdateStatus!(ticket, status);
+                                } catch (_) {
+                                  /* The workspace shell displays the server error. */
+                                }
+                              },
+                        child: Text(status),
+                      ),
+                  ],
+                ),
+              ],
             ],
           ),
         ),
@@ -1068,7 +1132,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               const SizedBox(width: 12),
               const Expanded(
                 child: Text(
-                  'These are planned integrations. Sample tickets show how each source will appear once connected.',
+                  'These integrations are planned. You can add feedback manually and label its source.',
                   style: TextStyle(height: 1.5),
                 ),
               ),
@@ -1107,7 +1171,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          '${demoTickets.where((t) => t.source == source).length} sample feedback groups',
+                          '${widget.tickets.where((t) => t.source == source).length} ${widget.workspace == null ? 'sample ' : ''}feedback groups',
                           style: const TextStyle(
                             color: Color(0xFF64748B),
                             fontSize: 12,
@@ -1130,13 +1194,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
     children: [
       _heading(
         'Workspace activity',
-        'A preview of how feedback moves from a request to a release.',
+        widget.workspace == null
+            ? 'A preview of how feedback moves from a request to a release.'
+            : 'The current status of feedback your team is working on.',
       ),
       const SizedBox(height: 24),
       _surface(
         Column(
           children: [
-            for (final ticket in demoTickets.where((t) => t.status != 'Open'))
+            for (final ticket in widget.tickets.where(
+              (t) => t.status != 'Open',
+            ))
               ListTile(
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 24,
@@ -1158,17 +1226,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 subtitle: Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: Text(
-                    '${ticket.id} moved to ${ticket.status.toLowerCase()} · Sample activity',
+                    widget.workspace == null
+                        ? '${ticket.id} moved to ${ticket.status.toLowerCase()} · Sample activity'
+                        : '${ticket.id} · Currently ${ticket.status.toLowerCase()}',
                     style: const TextStyle(fontSize: 12),
                   ),
                 ),
-                trailing: Text(
-                  _updated(ticket),
-                  style: const TextStyle(
-                    color: Color(0xFF94A3B8),
-                    fontSize: 12,
-                  ),
-                ),
+                trailing: widget.workspace == null
+                    ? Text(
+                        _updated(ticket),
+                        style: const TextStyle(
+                          color: Color(0xFF94A3B8),
+                          fontSize: 12,
+                        ),
+                      )
+                    : null,
               ),
           ],
         ),

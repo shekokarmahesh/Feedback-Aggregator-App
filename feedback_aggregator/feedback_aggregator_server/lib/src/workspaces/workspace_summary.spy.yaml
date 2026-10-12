@@ -1,0 +1,5 @@
+class: WorkspaceSummary
+fields:
+  id: int
+  name: String
+  role: WorkspaceRole

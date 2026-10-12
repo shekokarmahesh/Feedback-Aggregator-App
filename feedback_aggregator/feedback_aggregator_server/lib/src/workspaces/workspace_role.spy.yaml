@@ -1,0 +1,6 @@
+enum: WorkspaceRole
+serialized: byName
+values:
+  - admin
+  - editor
+  - viewer
