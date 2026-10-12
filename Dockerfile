@@ -14,7 +14,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN git clone --depth 1 --branch "$FLUTTER_VERSION" https://github.com/flutter/flutter.git /opt/flutter \
     && test "$(git -C /opt/flutter rev-parse HEAD)" = "$FLUTTER_REVISION"
 ENV PATH="/opt/flutter/bin:/opt/flutter/bin/cache/dart-sdk/bin:${PATH}" \
-    CI=true FLUTTER_SUPPRESS_ANALYTICS=true
+    CI=true FLUTTER_SUPPRESS_ANALYTICS=true \
+    TAR_OPTIONS=--no-same-owner
 RUN flutter config --no-analytics && flutter precache --web
 WORKDIR /src
 COPY feedback_aggregator/pubspec.yaml feedback_aggregator/pubspec.lock ./
