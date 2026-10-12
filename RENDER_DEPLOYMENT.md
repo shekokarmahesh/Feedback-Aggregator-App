@@ -2,6 +2,35 @@
 
 The deployment packages the Flutter website, compiled Serverpod backend, and Caddy proxy in one Linux AMD64 image. PostgreSQL runs as a separate managed database. The Laya POC runs in a second CPU-only container with bearer authentication. Redis and Docker Compose are unnecessary. Local development continues using Serverpod-managed PostgreSQL.
 
+## Live deployment — 12 October 2026
+
+Open **[Feedback Aggregator](https://feedback-aggregator-ak6p.onrender.com)**. The Flutter website and Serverpod backend, Laya, and PostgreSQL are running in Singapore in **Feedback Aggregator's workspace**.
+
+| Resource | Dashboard | Plan | Base/month |
+| --- | --- | --- | --- |
+| Flutter + Serverpod | [feedback-aggregator](https://dashboard.render.com/web/srv-db6gtvvf3r2c73c7ufj0) | `0.5c-512mb` | $7 |
+| Laya CPU inference | [feedback-laya](https://dashboard.render.com/web/srv-db6ecc7avr4c73b61lpg) | `1c-2g` | $25 |
+| PostgreSQL 16 | [feedback-aggregator-db](https://dashboard.render.com/d/dpg-db6ea1nlk1mc73cusfl0-a) | `0.1c-256mb`, 1 GB | $6 |
+
+Both web services deployed commit `9c5c1f0f82164c2fbbedd90db20db8f2a23491d5` from `add-postbot-mascot`. The main app's HTTP health check is `/healthz`. Database migrations applied successfully with SSL required. PostgreSQL's external IP allowlist remains empty; public database access has not been enabled. The backend reaches Laya privately at `feedback-laya:8093` with bearer authentication.
+
+Hosted password registration/login without OTP, tenant isolation, Viewer write restrictions, copyable invitation acceptance, website assets, runtime API configuration, and authenticated Laya RPC all passed. Browser checks also passed for password login, the persisted workspace ticket, and Google login after the user updated the existing OAuth client's allowed URLs. Google's consent request initially encountered a browser transport error; retrying completed the callback and showed the authenticated workspace screen. See the [Google login proof](deploy/render-google-login.jpg) and [hosted dashboard](deploy/render-live-dashboard.jpg). The synthetic test session was signed out afterward.
+
+All **34 synthetic reports** completed through deployed Serverpod RPC and the private Laya connection in **211.74 seconds**; the slowest report took **12.99 seconds**. The results were 5 merged reports, 19 reports for review, 83.3% pairwise precision, 8.3% recall, 1 false merge pair, and 55 missed duplicate pairs. Low recall means most repeated issues still need review.
+
+An earlier direct authenticated HTTPS test against hosted Laya completed the same 34 reports in **210.46 seconds**, with a slowest report of **9.23 seconds** and the same grouping metrics. Its public health route returned 200, unauthenticated inference returned 401, and authenticated health confirmed the pinned English checkpoint on CPU.
+
+During the app RPC run, Render's 30-second samples reached **81,309,700 bytes (77.5 MiB)** for the app and **2,075,230,200 bytes (1.93 GiB)** for Laya, with no recorded failure/restart events during verification. Laya is close to the 2 GiB limit; sampled metrics are not an exact peak, and these sequential runs do not establish capacity for concurrent use. See [the cloud evidence](deploy/render-verification.json).
+
+To try the deployment:
+
+1. Open the app and use **Sign up** for email/password or **Continue with Google** from the login page. Local accounts were not copied to Render.
+2. Create a workspace, then use **Add feedback** to add a ticket and test the inbox filters.
+3. Open **Team**, create a Viewer or Editor invitation link, and share it with a teammate who signs in using the invited email address. Email invitations remain subject to the sender restriction below.
+4. Open **Laya POC**, select the mock sources, and run the demo. The source cards represent synthetic integrations, not live Slack/Discord/email connectors. Allow several minutes for all 34 reports.
+
+The new app stack costs about **$38/month** in base compute. An existing Discord bot worker adds about $7/month, bringing workspace base compute to about **$45/month**, plus storage and usage. The existing worker was left unchanged and was not functionally tested.
+
 ## Traffic and storage
 
 ```
@@ -33,13 +62,15 @@ docker build --platform linux/amd64 \
 python3 deploy/smoke_test.py --laya-image feedback-laya:render-test
 ```
 
-The smoke test creates its own randomly named network, disposable PostgreSQL, and two app containers. It uses newly generated test secrets and synthetic accounts, makes no email requests, and removes only its own containers, anonymous database volume, and network. It checks HTTP routes, password signup/login, tenant isolation, Viewer restrictions, invitation URLs, real model inference, restart persistence, and missing bundled credential files. By default, Laya gets a 2 GiB/1 CPU limit; the app gets 512 MiB/0.5 CPU. For slow AMD64 emulation on Apple Silicon, add `--laya-cpus 4`. This changes only local test allocation; native Render inference must be verified on the actual 1 CPU instance before claiming that plan is sufficient.
+The smoke test creates its own randomly named network, disposable PostgreSQL, and app/model containers. It uses newly generated test secrets and synthetic accounts, makes no email requests, and removes only its own containers, anonymous database volume, and network. It checks HTTP routes, password signup/login, tenant isolation, Viewer restrictions, invitation URLs, real model inference, restart persistence, and missing bundled credential files. The app runs with all Linux capabilities dropped and `no-new-privileges`. By default, Laya gets a 2 GiB/1 CPU limit; the app gets 512 MiB/0.5 CPU. For slow AMD64 emulation on Apple Silicon, add `--laya-cpus 4`. This changes only local test allocation; the native Render run above verifies sequential operation on the actual 1 CPU instance.
 
 Flutter is pinned to the repository's existing 3.47.6 release and exact Git revision, with bundled Dart. Package resolution enforces `pubspec.lock`. Laya is pinned to 0.4.1, its dependency lock, and checkpoint revision `7b928d828b7b0e022f929d9bd2e44165aa270148`. CPU PyTorch wheels and cached weights are included in the Laya image. No host SDK upgrade is required.
 
 BuildKit downloads sqlite3 3.7.0's Linux native asset, verifies the package's published SHA-256, and seeds its build-hook cache. This avoids TLS failures in Dart's downloader while retaining the exact locked library. Update this pin and checksum together if the sqlite3 dependency is deliberately changed later.
 
-On this Mac, Docker's network could not reach GitHub's release-asset host, although macOS could. Local testing used Docker's supported `--build-context sqlite-asset=<directory>` override with the identical downloaded library at `<directory>/native/libsqlite3.so`. The builder verifies its SHA-256 again, including when overridden. Render uses the default official GitHub download; its clean network build still needs cloud verification.
+On this Mac, Docker's network could not reach GitHub's release-asset host, although macOS could. Local testing used Docker's supported `--build-context sqlite-asset=<directory>` override with the identical downloaded library at `<directory>/native/libsqlite3.so`. The builder verifies its SHA-256 again, including when overridden. Render's clean network build successfully used the default official GitHub download.
+
+Two Render-specific failures were fixed and retested: Flutter archive extraction now uses `TAR_OPTIONS=--no-same-owner` in the build stage, and the runtime recreates Caddy's executable without its upstream file capability. Caddy binds port 10000 and needs no privileged capability. The final Docker smoke test passed with all capabilities disabled, and the cloud deployment is live.
 
 The deployed backend allows 45 seconds per Laya HTTP request (`LAYA_REQUEST_TIMEOUT_SECONDS`, bounded to 1–90). A report can need two requests. The Docker-built Flutter client allows 120 seconds per API call; local development retains its existing defaults. Laya's batch token budget is 2048 to bound inference memory.
 
@@ -68,7 +99,7 @@ The Laya process accepts `PORT` and binds to `0.0.0.0`. `/health` exposes minima
 
 ## Google login and email delivery
 
-In the existing Google Cloud Web OAuth client, add the final deployed HTTPS origin to **Authorized JavaScript origins** and the exact `https://<app>.onrender.com/auth/callback` to **Authorized redirect URIs**. Keep the localhost entries for development. While Google OAuth is in Testing, intended users must be added as test users. Changing JSON on the backend does not change Google's allow-list. End-to-end Google login needs a browser check after the allowed URL is saved.
+The existing Google Cloud Web OAuth client now allows `https://feedback-aggregator-ak6p.onrender.com` as a JavaScript origin and `https://feedback-aggregator-ak6p.onrender.com/auth/callback` as a redirect URI, retaining localhost entries. End-to-end Google browser login passed after propagation. If the OAuth app remains in Testing, add intended users as test users. Changing backend JSON alone does not change Google's allow-list.
 
 Resend's `onboarding@resend.dev` sender remains limited to the Resend account owner's inbox. Deploying to Render does not remove that provider restriction. Sending reset/invitation emails to other people requires a verified sender domain; copyable invitation links and password signup/login do not require email delivery.
 
@@ -76,10 +107,12 @@ Resend's `onboarding@resend.dev` sender remains limited to the Resend account ow
 
 Local verification on 12 October 2026 passed `dart analyze`, 34 server tests, 18 Flutter tests, and the full production-container smoke test. See [the recorded results](deploy/docker-verification.json). All 34 reports completed through authenticated Serverpod RPC in 334.7 seconds under AMD64 emulation; the slowest report took 20.91 seconds. Password login, workspace isolation, Viewer permissions, invitation URLs, migrations, restart persistence, graceful shutdown, and unprivileged execution passed. The temporary containers and database volume were removed afterward.
 
-The model merged 5 reports and sent 19 for review. Pairwise precision was 83.3%, with 8.3% recall, 1 false merge, and 55 missed duplicate pairs. The low recall means most repeated issues still need review. The emulated model reached its 2 GiB RAM limit and used approximately 345 MiB of swap during inference. Native Render inference and memory usage remain unverified; this local run does not establish that the proposed 2 GiB cloud instance is sufficient.
+The model merged 5 reports and sent 19 for review. Pairwise precision was 83.3%, with 8.3% recall, 1 false merge, and 55 missed duplicate pairs. The low recall means most repeated issues still need review. The emulated model reached its 2 GiB RAM limit and used approximately 345 MiB of swap during inference. The native Render result is recorded above; memory headroom remains limited.
 
-At Render's checked pricing on 12 October 2026, the proposed app plan (`0.5c-512mb`) is $7/month, Laya (`1c-2g`) is $25/month, and PostgreSQL (`0.1c-256mb`) is $6/month. Base compute is approximately $38/month, plus any billable storage or usage. The Blueprint selects only 1 GB of database storage. See [Render pricing](https://render.com/pricing).
+At Render's checked pricing on 12 October 2026, the deployed app plan (`0.5c-512mb`) is $7/month, Laya (`1c-2g`) is $25/month, and PostgreSQL (`0.1c-256mb`) is $6/month. Base compute is approximately $38/month, plus any billable storage or usage. The database has 1 GB of storage. See [Render pricing](https://render.com/pricing).
 
-$50 in credits covers roughly five weeks at that base rate. Credits do not automatically impose a spending cap or stop services; suspend/delete resources before credit exhaustion if ongoing charges are unwanted. No workspace-plan upgrade or autoscaling is required.
+$50 in starting credits covers roughly one month of the $45/month workspace base compute, before storage, usage, or credits already consumed. Credits do not automatically impose a spending cap or stop services; suspend/delete resources before credit exhaustion if ongoing charges are unwanted. No workspace-plan upgrade or autoscaling is required.
 
-After deployment, verify `/healthz`, website assets, runtime API config, password login, workspace isolation, and an authenticated Laya run. Inspect Render deploy status and logs. Validate Google login separately after updating the OAuth allow-list, and confirm email sender readiness before testing password-reset delivery.
+The cloud checks above passed. External Resend delivery, concurrent model load, and a deliberate cloud restart were not tested; graceful restart and persisted tickets passed locally. Synthetic verification accounts, a labeled workspace, and one test ticket were created in the hosted database. Local smoke containers and volumes were removed.
+
+Pushes to `add-postbot-mascot` automatically deploy both web services. Documentation-only evidence commits use `[skip render]` to avoid rebuilding unchanged images; see [Render's deploy controls](https://render.com/docs/deploys#skipping-an-auto-deploy).
