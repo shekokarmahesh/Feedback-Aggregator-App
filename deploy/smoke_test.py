@@ -117,10 +117,11 @@ def main():
             env['APP_PUBLIC_URL'] = base
             names.append(tag + '-app')
             docker('run', '-d', '--platform', 'linux/amd64', '--name', names[-1], '--network', tag,
+                   '--cap-drop', 'ALL', '--security-opt', 'no-new-privileges',
                    '--memory', '512m', '--cpus', '0.5', '-p', f'127.0.0.1:{port}:10000',
                    '--env-file', envfile('app.env', env), args.image)
             wait_for(base + '/healthz')
-            passed('Production startup, migrations, and database readiness')
+            passed('Production startup without Linux capabilities, migrations, and database readiness')
             for path, contains in [('/', 'flutter_bootstrap.js'), ('/auth/callback', 'html')]:
                 code, body = http(base + path)
                 assert code == 200 and contains in body.lower(), path

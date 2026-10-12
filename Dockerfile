@@ -45,7 +45,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
     && rm -rf /var/lib/apt/lists/* \
     && groupadd --gid 10001 app && useradd --uid 10001 --gid app --no-create-home app
 WORKDIR /app
-COPY --from=proxy /usr/bin/caddy /usr/bin/caddy
+COPY --from=proxy /usr/bin/caddy /tmp/caddy
+# Render drops container capabilities. Recreate the binary without the upstream
+# cap_net_bind_service xattr; Caddy only binds the unprivileged PORT (10000).
+RUN install -m 0755 /tmp/caddy /usr/bin/caddy && rm /tmp/caddy
 COPY --from=build --chown=app:app /out/server/bundle/ ./
 COPY --from=build --chown=app:app /out/web/ web/app/
 COPY --chown=app:app feedback_aggregator/feedback_aggregator_server/config/production.yaml config/production.yaml
