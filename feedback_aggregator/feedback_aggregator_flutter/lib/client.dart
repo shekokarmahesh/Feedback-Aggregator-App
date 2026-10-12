@@ -28,9 +28,18 @@ const googleClientId = String.fromEnvironment('GOOGLE_CLIENT_ID');
 const googleSignInEnabled = kIsWeb && googleClientId != '';
 
 Future<void> initializeClient() async {
-  client = Client(await serverUrl)
-    ..connectivityMonitor = FlutterConnectivityMonitor()
-    ..authSessionManager = FlutterAuthSessionManager();
+  client =
+      Client(
+          await serverUrl,
+          connectionTimeout: const Duration(
+            seconds: int.fromEnvironment(
+              'API_TIMEOUT_SECONDS',
+              defaultValue: 20,
+            ),
+          ),
+        )
+        ..connectivityMonitor = FlutterConnectivityMonitor()
+        ..authSessionManager = FlutterAuthSessionManager();
   await client.auth.initialize();
 
   if (googleSignInEnabled) {

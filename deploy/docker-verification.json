@@ -1,0 +1,89 @@
+{
+  "platform": "linux/amd64",
+  "checks": [
+    "Laya CPU startup and bearer-token enforcement",
+    "Production startup, migrations, and database readiness",
+    "Flutter assets, runtime API URL, API proxy, and OAuth callback route",
+    "Email/password signup and login without OTP",
+    "Ticket creation, login gate, and tenant isolation",
+    "Public-origin invite links and Viewer read-only permissions",
+    "All 34 real Laya inferences through authenticated Serverpod RPC",
+    "Graceful restart, idempotent migrations, and persisted tickets",
+    "Non-root runtime and no bundled credential files"
+  ],
+  "laya": {
+    "device": "cpu",
+    "memoryLimit": "2 GiB",
+    "cpuLimit": 4,
+    "metrics": {
+      "precision": 0.8333333333333334,
+      "recall": 0.08333333333333333,
+      "falseMergePairs": 1,
+      "missedDuplicatePairs": 55,
+      "reviewCount": 19,
+      "noiseCount": 0,
+      "mergedCount": 5
+    },
+    "reportLatencySeconds": [
+      10.03,
+      11.21,
+      14.01,
+      7.96,
+      5.42,
+      17.16,
+      9.78,
+      8.31,
+      18.3,
+      2.65,
+      9.79,
+      13.15,
+      9.37,
+      20.91,
+      13.01,
+      2.39,
+      20.55,
+      15.21,
+      15.31,
+      14.77,
+      7.48,
+      9.52,
+      7.2,
+      8.99,
+      9.66,
+      9.41,
+      10.96,
+      8.92,
+      2.36,
+      2.38,
+      3.77,
+      3.14,
+      9.41,
+      2.16
+    ],
+    "containerStats": "1.974GiB / 2GiB / 0.62%",
+    "peakMemoryBytes": 2147483648,
+    "memoryObservationDuringRun": {
+      "at": "2026-10-12T12:35:06.499443+00:00",
+      "peakMemoryBytes": 2147483648,
+      "swapMemoryBytes": 361406464,
+      "note": "Sample during local AMD64 emulation on Apple Silicon; native Render capacity requires separate verification."
+    }
+  },
+  "appContainerStats": "66.78MiB / 512MiB / 0.01%",
+  "appImageId": "sha256:9c68c0e07f0346dec013e422b87ef14a8b170db0d82dc63cb44c8b8489b27ab8",
+  "layaImageId": "sha256:eb831b7b4e8d631410b3ba65c74736175097771268b714047b438b872716f732",
+  "passed": true,
+  "verifiedAt": "2026-10-12T13:31:59.352918+00:00",
+  "testHost": "macOS Apple Silicon; Linux AMD64 containers under emulation",
+  "automatedTests": {
+    "server": 34,
+    "flutter": 18,
+    "dartAnalyze": "passed"
+  },
+  "localBuildNote": "The locked SQLite asset was downloaded through macOS and supplied with a named build context because Docker networking could not reach GitHub release assets. Its SHA-256 was verified in the Docker build.",
+  "notVerified": [
+    "Native Render performance and RAM fit",
+    "Google OAuth with deployed URL allow-list",
+    "Resend delivery to external recipients"
+  ]
+}

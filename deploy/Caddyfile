@@ -1,0 +1,36 @@
+{
+	admin off
+	auto_https off
+}
+
+:{$PORT} {
+	header X-Content-Type-Options nosniff
+	header Referrer-Policy strict-origin-when-cross-origin
+	encode zstd gzip
+
+	# Serverpod readiness includes dependency checks; this is not a static 200.
+	handle /healthz {
+		rewrite * /readyz
+		reverse_proxy 127.0.0.1:8080
+	}
+
+	# Override Flutter's bundled localhost config with this deployment's API URL.
+	@config path /assets/assets/config.json /assets/config.json
+	handle @config {
+		header Content-Type application/json
+		header Cache-Control no-store
+		respond "{\"apiUrl\":\"{$PUBLIC_ORIGIN}/api/\"}" 200
+	}
+
+	handle /api {
+		redir /api/ 308
+	}
+	handle_path /api/* {
+		reverse_proxy 127.0.0.1:8080
+	}
+
+	# Includes Serverpod's /auth/callback and Flutter SPA fallback.
+	handle {
+		reverse_proxy 127.0.0.1:8082
+	}
+}

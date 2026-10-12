@@ -2,6 +2,8 @@
 
 Flutter web frontend and Serverpod backend for aggregating and grouping user feedback.
 
+Deployment containers and a three-resource Render configuration are described in [Render deployment](RENDER_DEPLOYMENT.md). Local development continues to run without Docker or Redis.
+
 The project lives in `feedback_aggregator/` and includes:
 
 - `feedback_aggregator_flutter`: Flutter frontend with Serverpod email/password sign-in.

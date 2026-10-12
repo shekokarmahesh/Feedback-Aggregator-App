@@ -46,8 +46,12 @@ abstract class LayaEvaluator {
 class LayaClient implements LayaEvaluator {
   final String apiKey;
   final Uri endpoint;
-  LayaClient({this.apiKey = '', Uri? endpoint})
-    : endpoint = endpoint ?? Uri.parse('http://127.0.0.1:8093/v1/systemone');
+  final Duration requestTimeout;
+  LayaClient({
+    this.apiKey = '',
+    Uri? endpoint,
+    this.requestTimeout = const Duration(seconds: 18),
+  }) : endpoint = endpoint ?? Uri.parse('http://127.0.0.1:8093/v1/systemone');
 
   Future<bool> isAvailable() async {
     final http = HttpClient()..connectionTimeout = const Duration(seconds: 2);
@@ -142,7 +146,7 @@ class LayaClient implements LayaEvaluator {
           }
         }
         return jsonDecode(utf8.decode(bytes));
-      })().timeout(const Duration(seconds: 18));
+      })().timeout(requestTimeout);
     } on LayaFailure {
       rethrow;
     } on TimeoutException {

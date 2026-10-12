@@ -1,0 +1,70 @@
+# Paid demo: app $7/mo + Laya $25/mo + Postgres $6/mo, plus database storage.
+# The $50 credit is not a permanent spending cap. See RENDER_DEPLOYMENT.md.
+services:
+  - type: web
+    name: feedback-aggregator
+    branch: add-postbot-mascot
+    runtime: docker
+    plan: 0.5c-512mb
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /healthz
+    envVars:
+      - key: PORT
+        value: "10000"
+      - key: SERVERPOD_DATABASE_HOST
+        fromDatabase: {name: feedback-aggregator-db, property: host}
+      - key: SERVERPOD_DATABASE_PORT
+        fromDatabase: {name: feedback-aggregator-db, property: port}
+      - key: SERVERPOD_DATABASE_NAME
+        fromDatabase: {name: feedback-aggregator-db, property: database}
+      - key: SERVERPOD_DATABASE_USER
+        fromDatabase: {name: feedback-aggregator-db, property: user}
+      - key: SERVERPOD_PASSWORD_database
+        fromDatabase: {name: feedback-aggregator-db, property: password}
+      - key: SERVERPOD_DATABASE_REQUIRE_SSL
+        value: "true"
+      - key: SERVERPOD_PASSWORD_serviceSecret
+        generateValue: true
+      - key: SERVERPOD_PASSWORD_jwtRefreshTokenHashPepper
+        generateValue: true
+      - key: SERVERPOD_PASSWORD_jwtHmacSha512PrivateKey
+        sync: false
+      - key: SERVERPOD_PASSWORD_emailSecretHashPepper
+        generateValue: true
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: SERVERPOD_PASSWORD_googleClientSecret
+        sync: false
+      - key: SERVERPOD_PASSWORD_resendApiKey
+        sync: false
+      - key: SERVERPOD_PASSWORD_resendFromEmail
+        sync: false
+      - key: LAYA_SERVICE_HOST
+        fromService: {type: web, name: feedback-laya, property: host}
+      - key: LAYA_SERVICE_PORT
+        value: "8093"
+      - key: SERVERPOD_PASSWORD_layaApiKey
+        fromService: {type: web, name: feedback-laya, envVarKey: LAYA_API_KEY}
+  - type: web
+    name: feedback-laya
+    branch: add-postbot-mascot
+    runtime: docker
+    plan: 1c-2g
+    region: singapore
+    dockerfilePath: ./feedback_aggregator/tools/laya/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: "8093"
+      - key: LAYA_API_KEY
+        generateValue: true
+databases:
+  - name: feedback-aggregator-db
+    plan: 0.1c-256mb
+    region: singapore
+    postgresMajorVersion: "16"
+    diskSizeGB: 1
+    ipAllowList: []

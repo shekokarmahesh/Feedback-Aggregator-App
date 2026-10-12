@@ -11,12 +11,7 @@ apiServer:
   publicPort: 443
   publicScheme: https
 
-# Configuration for the Insights server.
-insightsServer:
-  port: 8081
-  publicHost: insights.examplepod.com
-  publicPort: 443
-  publicScheme: https
+# Insights is not exposed in the public deployment.
 
 # Configuration for the web server.
 webServer:
@@ -41,7 +36,7 @@ database:
 maxRequestSize: 524288 # The maximum size of requests allowed in bytes
 
 sessionLogs:
-  consoleEnabled: false
+  consoleEnabled: true
 # persistentEnabled: true
 # consoleLogFormat: json # Defaults to "json", options are "text" or "json"
 

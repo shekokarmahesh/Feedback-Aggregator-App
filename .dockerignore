@@ -1,0 +1,27 @@
+.git
+.agents
+.codex
+**/.git
+**/.env
+**/.env.*
+**/passwords.yaml
+**/client_secret*.json
+api key
+**/.serverpod
+**/.venv
+**/.cache
+**/.runtime
+**/.dart_tool
+**/build
+**/web/app
+**/node_modules
+**/__pycache__
+**/*.pyc
+**/.DS_Store
+feedback_aggregator/artifacts
+feedback_aggregator/tools/laya/benchmark_results.json
+feedback_aggregator/feedback_aggregator_flutter/android
+feedback_aggregator/feedback_aggregator_flutter/ios
+feedback_aggregator/feedback_aggregator_flutter/linux
+feedback_aggregator/feedback_aggregator_flutter/macos
+feedback_aggregator/feedback_aggregator_flutter/windows

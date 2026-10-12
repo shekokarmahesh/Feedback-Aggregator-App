@@ -20,6 +20,14 @@ class LayaPocEndpoint extends Endpoint {
     endpoint: Uri.parse(
       Platform.environment['LAYA_URL'] ?? 'http://127.0.0.1:8093/v1/systemone',
     ),
+    requestTimeout: Duration(
+      seconds:
+          (int.tryParse(
+                    Platform.environment['LAYA_REQUEST_TIMEOUT_SECONDS'] ?? '',
+                  ) ??
+                  18)
+              .clamp(1, 90),
+    ),
   );
 
   Future<String> _snapshot(Session session, int workspaceId) async {

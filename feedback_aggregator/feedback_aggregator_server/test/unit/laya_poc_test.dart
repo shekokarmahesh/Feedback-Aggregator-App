@@ -205,6 +205,28 @@ void main() {
     },
   );
 
+  test('HTTP adapter honors its configured request timeout', () async {
+    final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+    addTearDown(() => server.close(force: true));
+    // Accept the request but deliberately never send a response.
+    final handled = server.first.then((req) => req.drain<void>());
+    final client = LayaClient(
+      endpoint: Uri.parse('http://127.0.0.1:${server.port}/v1/systemone'),
+      requestTimeout: const Duration(milliseconds: 200),
+    );
+    await expectLater(
+      client.evaluate(PocRun('run', [a]).requestForNext()),
+      throwsA(
+        isA<LayaFailure>().having(
+          (error) => error.message,
+          'message',
+          'Laya timed out. Resume to retry the current report.',
+        ),
+      ),
+    );
+    await handled;
+  }, timeout: const Timeout(Duration(seconds: 5)));
+
   Map<String, dynamic> validResponse() => {
     'model': 'laya-rl-agent',
     'routing': {'model': layaModel},
