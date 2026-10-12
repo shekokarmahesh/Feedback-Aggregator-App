@@ -20,6 +20,7 @@ import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
 import '../auth/email_idp_endpoint.dart' as _iuc1hd5t;
 import '../auth/google_idp_endpoint.dart' as _i71axiz0;
 import '../auth/jwt_refresh_endpoint.dart' as _inwq3ztq;
+import '../feedback/feedback_ingestion_endpoint.dart' as _ixgrydek;
 import '../greetings/greeting_endpoint.dart' as _il624ik7;
 import '../workspaces/workspace_endpoint.dart' as _iannd3dw;
 
@@ -43,6 +44,12 @@ class Endpoints extends _is.EndpointDispatch {
         ..initialize(
           server,
           'jwtRefresh',
+          null,
+        ),
+      'feedbackIngestion': _ixgrydek.FeedbackIngestionEndpoint()
+        ..initialize(
+          server,
+          'feedbackIngestion',
           null,
         ),
       'greeting': _il624ik7.GreetingEndpoint()
@@ -357,6 +364,81 @@ class Endpoints extends _is.EndpointDispatch {
                       .refreshAccessToken(
                         session,
                         refreshToken: params['refreshToken'],
+                      ),
+        ),
+      },
+    );
+    connectors['feedbackIngestion'] = _is.EndpointConnector(
+      name: 'feedbackIngestion',
+      endpoint: endpoints['feedbackIngestion']!,
+      methodConnectors: {
+        'createTeam': _is.MethodConnector(
+          name: 'createTeam',
+          params: {
+            'name': _is.ParameterDescription(
+              name: 'name',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['feedbackIngestion']
+                          as _ixgrydek.FeedbackIngestionEndpoint)
+                      .createTeam(
+                        session,
+                        params['name'],
+                      ),
+        ),
+        'generateKey': _is.MethodConnector(
+          name: 'generateKey',
+          params: {
+            'teamId': _is.ParameterDescription(
+              name: 'teamId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['feedbackIngestion']
+                          as _ixgrydek.FeedbackIngestionEndpoint)
+                      .generateKey(
+                        session,
+                        params['teamId'],
+                      ),
+        ),
+        'revokeKey': _is.MethodConnector(
+          name: 'revokeKey',
+          params: {
+            'teamId': _is.ParameterDescription(
+              name: 'teamId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'key': _is.ParameterDescription(
+              name: 'key',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['feedbackIngestion']
+                          as _ixgrydek.FeedbackIngestionEndpoint)
+                      .revokeKey(
+                        session,
+                        params['teamId'],
+                        params['key'],
                       ),
         ),
       },

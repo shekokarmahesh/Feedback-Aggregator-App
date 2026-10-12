@@ -11,6 +11,8 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _ida;
+import 'package:feedback_aggregator_client/src/protocol/feedback/team.dart'
+    as _idjwb3gv;
 import 'package:feedback_aggregator_client/src/protocol/greetings/greeting.dart'
     as _iqu387d1;
 import 'package:feedback_aggregator_client/src/protocol/workspaces/invitation_delivery.dart'
@@ -327,6 +329,43 @@ class EndpointJwtRefresh extends _iacc.EndpointRefreshJwtTokens {
       );
 }
 
+/// Authenticated workspace provisioning and ingestion-key management.
+/// {@category Endpoint}
+class EndpointFeedbackIngestion extends _isc.EndpointRef {
+  EndpointFeedbackIngestion(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'feedbackIngestion';
+
+  _ida.Future<_idjwb3gv.Team> createTeam(String name) =>
+      caller.callServerEndpoint<_idjwb3gv.Team>(
+        'feedbackIngestion',
+        'createTeam',
+        {'name': name},
+      );
+
+  /// Returns the raw key once. Store it privately on the integrating backend.
+  _ida.Future<String> generateKey(int teamId) =>
+      caller.callServerEndpoint<String>(
+        'feedbackIngestion',
+        'generateKey',
+        {'teamId': teamId},
+      );
+
+  /// Idempotent revocation; cannot revoke another team's keys.
+  _ida.Future<void> revokeKey(
+    int teamId,
+    String key,
+  ) => caller.callServerEndpoint<void>(
+    'feedbackIngestion',
+    'revokeKey',
+    {
+      'teamId': teamId,
+      'key': key,
+    },
+  );
+}
+
 /// This is an example endpoint that returns a greeting message through
 /// its [hello] method.
 /// {@category Endpoint}
@@ -541,6 +580,7 @@ class Client extends _isc.ServerpodClientShared {
     emailIdp = EndpointEmailIdp(this);
     googleIdp = EndpointGoogleIdp(this);
     jwtRefresh = EndpointJwtRefresh(this);
+    feedbackIngestion = EndpointFeedbackIngestion(this);
     greeting = EndpointGreeting(this);
     workspace = EndpointWorkspace(this);
     modules = Modules(this);
@@ -551,6 +591,8 @@ class Client extends _isc.ServerpodClientShared {
   late final EndpointGoogleIdp googleIdp;
 
   late final EndpointJwtRefresh jwtRefresh;
+
+  late final EndpointFeedbackIngestion feedbackIngestion;
 
   late final EndpointGreeting greeting;
 
@@ -563,6 +605,7 @@ class Client extends _isc.ServerpodClientShared {
     'emailIdp': emailIdp,
     'googleIdp': googleIdp,
     'jwtRefresh': jwtRefresh,
+    'feedbackIngestion': feedbackIngestion,
     'greeting': greeting,
     'workspace': workspace,
   };
