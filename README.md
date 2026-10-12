@@ -30,6 +30,11 @@ The app supports email/password sign-up, sign-in, password reset, session restor
 
 After sign-in, the dashboard shows the selected workspace's persisted feedback with search, status/source/priority filters, sorting, and ticket details. New workspaces start empty; Admins and Editors can add feedback and change its status. The account menu loads your real Serverpod profile and offers account-security information and sign-out.
 
+The greeting endpoint requires an authenticated Serverpod session. Tickets and activity are currently demo data. Live feedback sources, AI grouping, persisted tickets, and team roles still need implementation.
+
+A feedback model and `POST /webhooks/feedback` ingestion route are now defined.
+Code generation and the database migration are required before enabling ingestion.
+See [feedback webhook setup](feedback_aggregator/FEEDBACK_WEBHOOK_SETUP.md).
 The public landing preview uses sample data. Live feedback connectors and AI grouping still need implementation.
 
 Workspaces isolate each organization's feedback and team. Create a workspace after signing in, invite teammates through **Team**, and assign **Admin**, **Editor**, or **Viewer** access. **Create share link** works without an email provider or purchased domain. See [workspace setup and permissions](feedback_aggregator/WORKSPACES.md) for Resend delivery and access rules.

@@ -1,0 +1,19 @@
+### Feedback received from a user through a source channel.
+class: Feedback
+table: feedback
+fields:
+  ### Workspace determined by the authenticated ingestion key, never by payload.
+  teamId: int, relation(parent=feedback_team), column=team_id
+  ### Short summary of the feedback.
+  title: String
+  ### Full feedback text.
+  body: String
+  ### Originating channel, such as email, Slack, forms, or support.
+  source: String
+  ### Submitter's email address; does not prove ownership or grant access.
+  userEmail: String
+  ### Time the feedback was recorded, in UTC.
+  createdAt: DateTime, default=now
+indexes:
+  feedback_team_created_idx:
+    fields: teamId, createdAt

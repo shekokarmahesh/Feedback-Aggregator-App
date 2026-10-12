@@ -1,0 +1,10 @@
+### A feedback workspace. Only its authenticated owner can manage ingestion keys.
+class: Team
+table: feedback_team
+fields:
+  name: String
+  ownerUserId: String
+  createdAt: DateTime, default=now
+indexes:
+  feedback_team_owner_idx:
+    fields: ownerUserId
