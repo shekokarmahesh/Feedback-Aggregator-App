@@ -30,6 +30,7 @@ import 'feedback/feedback.dart' as _i810ioat;
 import 'feedback/feedback_webhook_key.dart' as _iyk5pcfx;
 import 'feedback/team.dart' as _ixmckfyn;
 import 'greetings/greeting.dart' as _izw8z7ou;
+import 'workspaces/discord_guild.dart' as _i0swa0s1;
 import 'workspaces/invitation_delivery.dart' as _i5p49uup;
 import 'workspaces/invitation_info.dart' as _iquvyw6s;
 import 'workspaces/member_info.dart' as _itiylzhc;
@@ -45,6 +46,7 @@ export 'feedback/feedback.dart';
 export 'feedback/feedback_webhook_key.dart';
 export 'feedback/team.dart';
 export 'greetings/greeting.dart';
+export 'workspaces/discord_guild.dart';
 export 'workspaces/invitation_delivery.dart';
 export 'workspaces/invitation_info.dart';
 export 'workspaces/member_info.dart';
@@ -64,6 +66,74 @@ class Protocol extends _is.DatabaseSerializationManager {
   static final Protocol _instance = Protocol._().._registerHostProtocols();
 
   static List<_isp.TableDefinition> get targetTableDefinitions => [
+    _isp.TableDefinition(
+      name: 'app_discord_guild',
+      dartName: 'DiscordGuild',
+      schema: 'public',
+      module: 'feedback_aggregator',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isp.ColumnDefinition(
+          name: 'workspaceId',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'guildId',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+      ],
+      foreignKeys: [
+        _isp.ForeignKeyDefinition(
+          constraintName: 'app_discord_guild_fk_0',
+          columns: ['workspaceId'],
+          referenceTable: 'app_workspace',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _isp.ForeignKeyAction.noAction,
+          onDelete: _isp.ForeignKeyAction.cascade,
+          matchType: null,
+        ),
+      ],
+      indexes: [
+        _isp.IndexDefinition(
+          indexName: 'discord_guild_unique',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'guildId',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+        _isp.IndexDefinition(
+          indexName: 'discord_workspace_unique',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'workspaceId',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
     _isp.TableDefinition(
       name: 'app_workspace',
       dartName: 'Workspace',
@@ -670,6 +740,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _izw8z7ou.Greeting) {
       return _izw8z7ou.Greeting.fromJson(data) as T;
     }
+    if (t == _i0swa0s1.DiscordGuild) {
+      return _i0swa0s1.DiscordGuild.fromJson(data) as T;
+    }
     if (t == _i5p49uup.InvitationDelivery) {
       return _i5p49uup.InvitationDelivery.fromJson(data) as T;
     }
@@ -716,6 +789,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (t == _is.getType<_izw8z7ou.Greeting?>()) {
       return (data != null ? _izw8z7ou.Greeting.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_i0swa0s1.DiscordGuild?>()) {
+      return (data != null ? _i0swa0s1.DiscordGuild.fromJson(data) : null) as T;
     }
     if (t == _is.getType<_i5p49uup.InvitationDelivery?>()) {
       return (data != null ? _i5p49uup.InvitationDelivery.fromJson(data) : null)
@@ -800,6 +876,7 @@ class Protocol extends _is.DatabaseSerializationManager {
       _iyk5pcfx.FeedbackWebhookKey => 'FeedbackWebhookKey',
       _ixmckfyn.Team => 'Team',
       _izw8z7ou.Greeting => 'Greeting',
+      _i0swa0s1.DiscordGuild => 'DiscordGuild',
       _i5p49uup.InvitationDelivery => 'InvitationDelivery',
       _iquvyw6s.InvitationInfo => 'InvitationInfo',
       _itiylzhc.MemberInfo => 'MemberInfo',
@@ -837,6 +914,8 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'Team';
       case _izw8z7ou.Greeting():
         return 'Greeting';
+      case _i0swa0s1.DiscordGuild():
+        return 'DiscordGuild';
       case _i5p49uup.InvitationDelivery():
         return 'InvitationDelivery';
       case _iquvyw6s.InvitationInfo():
@@ -897,6 +976,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (dataClassName == 'Greeting') {
       return deserialize<_izw8z7ou.Greeting>(data['data']);
+    }
+    if (dataClassName == 'DiscordGuild') {
+      return deserialize<_i0swa0s1.DiscordGuild>(data['data']);
     }
     if (dataClassName == 'InvitationDelivery') {
       return deserialize<_i5p49uup.InvitationDelivery>(data['data']);
@@ -975,6 +1057,8 @@ class Protocol extends _is.DatabaseSerializationManager {
         return _iyk5pcfx.FeedbackWebhookKey.t;
       case _ixmckfyn.Team:
         return _ixmckfyn.Team.t;
+      case _i0swa0s1.DiscordGuild:
+        return _i0swa0s1.DiscordGuild.t;
       case _ipnno8uy.Workspace:
         return _ipnno8uy.Workspace.t;
       case _i66b2tam.WorkspaceInvitation:

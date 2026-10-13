@@ -4,6 +4,7 @@ import 'package:crypto/crypto.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_idp_server/core.dart';
 import '../auth/auth_email.dart';
+import '../feedback/discord_submission.dart';
 import '../generated/protocol.dart';
 
 typedef InvitationMailer =
@@ -444,6 +445,62 @@ class WorkspaceService {
     );
   }
 
+  Future<String?> discordGuild(Session s, int id) async {
+    await _member(s, id);
+    return (await DiscordGuild.db.findFirstRow(
+      s,
+      where: (t) => t.workspaceId.equals(id),
+    ))?.guildId;
+  }
+
+  Future<void> setDiscordGuild(Session s, int id, String guildId) =>
+      s.db.transaction((tx) async {
+        await _lock(s, id, tx);
+        _admin(await _member(s, id, tx: tx));
+        guildId = guildId.trim();
+        if (!isDiscordGuildId(guildId)) {
+          throw WorkspaceException(
+            message: 'Enter the guild ID returned by /feedback setup.',
+          );
+        }
+        final existing = await DiscordGuild.db.findFirstRow(
+          s,
+          where: (t) => t.guildId.equals(guildId),
+          transaction: tx,
+        );
+        if (existing != null && existing.workspaceId != id) {
+          throw WorkspaceException(
+            message: 'This Discord guild is already linked to a workspace.',
+          );
+        }
+        final current = await DiscordGuild.db.findFirstRow(
+          s,
+          where: (t) => t.workspaceId.equals(id),
+          transaction: tx,
+        );
+        if (current == null) {
+          await DiscordGuild.db.insertRow(
+            s,
+            DiscordGuild(workspaceId: id, guildId: guildId),
+            transaction: tx,
+          );
+        } else {
+          current.guildId = guildId;
+          await DiscordGuild.db.updateRow(s, current, transaction: tx);
+        }
+      });
+
+  Future<void> disconnectDiscord(Session s, int id) =>
+      s.db.transaction((tx) async {
+        await _lock(s, id, tx);
+        _admin(await _member(s, id, tx: tx));
+        await DiscordGuild.db.deleteWhere(
+          s,
+          where: (t) => t.workspaceId.equals(id),
+          transaction: tx,
+        );
+      });
+
   Future<WorkspaceTicket> createTicket(
     Session s,
     int id,
@@ -466,6 +523,7 @@ class WorkspaceService {
           'Forms',
           'Email',
           'Slack',
+          'Discord',
           'Support',
           'App reviews',
         ].contains(source) ||

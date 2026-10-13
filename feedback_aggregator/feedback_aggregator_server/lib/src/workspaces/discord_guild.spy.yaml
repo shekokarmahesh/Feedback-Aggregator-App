@@ -1,0 +1,13 @@
+class: DiscordGuild
+table: app_discord_guild
+serverOnly: true
+fields:
+  workspaceId: int, relation(parent=app_workspace, onDelete=Cascade)
+  guildId: String
+indexes:
+  discord_guild_unique:
+    fields: guildId
+    unique: true
+  discord_workspace_unique:
+    fields: workspaceId
+    unique: true

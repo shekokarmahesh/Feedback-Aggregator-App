@@ -384,6 +384,7 @@ class EndpointGreeting extends _isc.EndpointRef {
       );
 }
 
+/// Workspace membership, tickets, and Discord guild configuration.
 /// {@category Endpoint}
 class EndpointWorkspace extends _isc.EndpointRef {
   EndpointWorkspace(_isc.EndpointCaller caller) : super(caller);
@@ -503,6 +504,32 @@ class EndpointWorkspace extends _isc.EndpointRef {
       caller.callServerEndpoint<List<_ikphcpie.WorkspaceTicket>>(
         'workspace',
         'tickets',
+        {'workspaceId': workspaceId},
+      );
+
+  _ida.Future<String?> discordGuild(int workspaceId) =>
+      caller.callServerEndpoint<String?>(
+        'workspace',
+        'discordGuild',
+        {'workspaceId': workspaceId},
+      );
+
+  _ida.Future<void> setDiscordGuild(
+    int workspaceId,
+    String guildId,
+  ) => caller.callServerEndpoint<void>(
+    'workspace',
+    'setDiscordGuild',
+    {
+      'workspaceId': workspaceId,
+      'guildId': guildId,
+    },
+  );
+
+  _ida.Future<void> disconnectDiscord(int workspaceId) =>
+      caller.callServerEndpoint<void>(
+        'workspace',
+        'disconnectDiscord',
         {'workspaceId': workspaceId},
       );
 

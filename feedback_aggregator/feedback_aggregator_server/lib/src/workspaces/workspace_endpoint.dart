@@ -3,6 +3,7 @@ import 'package:serverpod_auth_idp_server/core.dart';
 import '../generated/protocol.dart';
 import 'workspace_service.dart';
 
+/// Workspace membership, tickets, and Discord guild configuration.
 class WorkspaceEndpoint extends Endpoint {
   @override
   bool get requireLogin => true;
@@ -58,6 +59,15 @@ class WorkspaceEndpoint extends Endpoint {
       _service.accept(session, token);
   Future<List<WorkspaceTicket>> tickets(Session session, int workspaceId) =>
       _service.tickets(session, workspaceId);
+  Future<String?> discordGuild(Session session, int workspaceId) =>
+      _service.discordGuild(session, workspaceId);
+  Future<void> setDiscordGuild(
+    Session session,
+    int workspaceId,
+    String guildId,
+  ) => _service.setDiscordGuild(session, workspaceId, guildId);
+  Future<void> disconnectDiscord(Session session, int workspaceId) =>
+      _service.disconnectDiscord(session, workspaceId);
   Future<WorkspaceTicket> createTicket(
     Session session,
     int workspaceId,

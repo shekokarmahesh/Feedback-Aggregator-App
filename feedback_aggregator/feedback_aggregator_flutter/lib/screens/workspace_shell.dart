@@ -5,6 +5,7 @@ import '../client.dart';
 import '../models/demo_ticket.dart';
 import 'dashboard_screen.dart';
 import 'team_screen.dart';
+import 'discord_config_screen.dart';
 
 String workspaceError(Object error) => error is WorkspaceException
     ? error.message
@@ -26,6 +27,7 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
   List<WorkspaceSummary> _workspaces = [];
   List<WorkspaceTicket> _tickets = [];
   WorkspaceSummary? _active;
+  String? _discordGuild;
   bool _loading = true;
   String? _error;
   int _loadRevision = 0;
@@ -42,6 +44,7 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
       _loading = true;
       _error = null;
       _tickets = [];
+      _discordGuild = null;
     });
     try {
       final orgs = await client.workspace.list();
@@ -51,11 +54,15 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
       final tickets = active == null
           ? <WorkspaceTicket>[]
           : await client.workspace.tickets(active.id);
+      final guild = active == null
+          ? null
+          : await client.workspace.discordGuild(active.id);
       if (!mounted || revision != _loadRevision) return;
       setState(() {
         _workspaces = orgs;
         _active = active;
         _tickets = tickets;
+        _discordGuild = guild;
       });
     } catch (e) {
       if (mounted && revision == _loadRevision) {
@@ -156,6 +163,17 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
     await Navigator.push(
       context,
       MaterialPageRoute<void>(builder: (_) => TeamScreen(workspace: org)),
+    );
+    if (mounted) await _load(preferred: org.id);
+  }
+
+  Future<void> _discord() async {
+    final org = _active!;
+    await Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (_) => DiscordConfigScreen(workspace: org),
+      ),
     );
     if (mounted) await _load(preferred: org.id);
   }
@@ -424,6 +442,10 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
             : DashboardScreen(
                 key: ValueKey(_active!.id),
                 workspace: _active,
+                discordGuildId: _discordGuild,
+                onConfigureDiscord: _active!.role == WorkspaceRole.admin
+                    ? _discord
+                    : null,
                 tickets: _tickets
                     .map(
                       (t) => DemoTicket(

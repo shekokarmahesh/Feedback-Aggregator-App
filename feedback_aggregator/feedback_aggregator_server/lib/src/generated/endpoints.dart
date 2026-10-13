@@ -739,6 +739,69 @@ class Endpoints extends _is.EndpointDispatch {
                     params['workspaceId'],
                   ),
         ),
+        'discordGuild': _is.MethodConnector(
+          name: 'discordGuild',
+          params: {
+            'workspaceId': _is.ParameterDescription(
+              name: 'workspaceId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['workspace'] as _iannd3dw.WorkspaceEndpoint)
+                  .discordGuild(
+                    session,
+                    params['workspaceId'],
+                  ),
+        ),
+        'setDiscordGuild': _is.MethodConnector(
+          name: 'setDiscordGuild',
+          params: {
+            'workspaceId': _is.ParameterDescription(
+              name: 'workspaceId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'guildId': _is.ParameterDescription(
+              name: 'guildId',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['workspace'] as _iannd3dw.WorkspaceEndpoint)
+                  .setDiscordGuild(
+                    session,
+                    params['workspaceId'],
+                    params['guildId'],
+                  ),
+        ),
+        'disconnectDiscord': _is.MethodConnector(
+          name: 'disconnectDiscord',
+          params: {
+            'workspaceId': _is.ParameterDescription(
+              name: 'workspaceId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['workspace'] as _iannd3dw.WorkspaceEndpoint)
+                  .disconnectDiscord(
+                    session,
+                    params['workspaceId'],
+                  ),
+        ),
         'createTicket': _is.MethodConnector(
           name: 'createTicket',
           params: {
