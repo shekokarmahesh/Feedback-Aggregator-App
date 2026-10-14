@@ -2,6 +2,7 @@ import 'package:serverpod/serverpod.dart';
 
 import '../generated/protocol.dart';
 import 'mock_source_service.dart';
+import 'grouping_service.dart';
 
 class SourcesEndpoint extends Endpoint {
   @override
@@ -15,26 +16,43 @@ class SourcesEndpoint extends Endpoint {
     Session session,
     int workspaceId,
     String source,
-  ) => _service.connect(session, workspaceId, source);
+  ) async {
+    final result = await _service.connect(session, workspaceId, source);
+    await GroupingService().enqueue(session, workspaceId);
+    return result;
+  }
+
   Future<SourceSyncResult> configure(
     Session session,
     int workspaceId,
     String source,
-    String demoKey,
+    String webhookKey,
   ) async {
     if (!['Forms', 'Support', 'App reviews'].contains(source)) {
       throw WorkspaceException(
         message: 'Configure Forms, Support, or App reviews.',
       );
     }
-    return _service.connect(session, workspaceId, source, demoKey: demoKey);
+    final result = await _service.connect(
+      session,
+      workspaceId,
+      source,
+      webhookKey: webhookKey,
+    );
+    await GroupingService().enqueue(session, workspaceId);
+    return result;
   }
 
   Future<SourceSyncResult> sync(
     Session session,
     int workspaceId,
     String source,
-  ) => _service.sync(session, workspaceId, source);
+  ) async {
+    final result = await _service.sync(session, workspaceId, source);
+    await GroupingService().enqueue(session, workspaceId);
+    return result;
+  }
+
   Future<MockSourceConnection> disconnect(
     Session session,
     int workspaceId,

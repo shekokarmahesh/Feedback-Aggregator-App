@@ -1,0 +1,14 @@
+class: GroupedTicket
+fields:
+  id: int
+  primaryTicketId: int
+  title: String
+  description: String
+  status: String
+  priority: String
+  priorityScore: int
+  sources: List<String>
+  reports: List<WorkspaceTicket>
+  groupingState: String
+  confidence: double?
+  createdAt: DateTime

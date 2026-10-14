@@ -26,11 +26,6 @@ sources:
   - disconnect:
 greeting:
   - hello:
-layaPoc:
-  - read:
-  - start:
-  - step:
-  - updateStatus:
 workspace:
   - list:
   - create:
@@ -44,6 +39,8 @@ workspace:
   - previewInvitation:
   - acceptInvitation:
   - tickets:
+  - issues:
+  - retryGrouping:
   - discordGuild:
   - setDiscordGuild:
   - disconnectDiscord:

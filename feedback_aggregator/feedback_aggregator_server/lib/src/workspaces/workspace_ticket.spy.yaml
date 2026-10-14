@@ -11,10 +11,16 @@ fields:
   requester: String
   isMock: bool, default=false
   externalId: String?
+  issueGroupId: int?, relation(parent=app_issue_group, onDelete=SetNull)
+  groupingState: String, default='pending'
+  groupingConfidence: double?
+  severity: double?
   createdAt: DateTime, default=now
 indexes:
   workspace_ticket_lookup:
     fields: workspaceId
+  workspace_ticket_grouping:
+    fields: workspaceId, issueGroupId
   workspace_ticket_external_unique:
     fields: workspaceId, source, externalId
     unique: true

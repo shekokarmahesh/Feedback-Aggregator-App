@@ -13,7 +13,7 @@ class MockSourceService {
     final reports = mockSourceFeedback[source];
     if (reports == null) {
       throw WorkspaceException(
-        message: 'This source does not support demo sync.',
+        message: 'This source does not support automatic sync.',
       );
     }
     return reports;
@@ -64,13 +64,15 @@ class MockSourceService {
     Session session,
     int workspaceId,
     String source, {
-    String? demoKey,
+    String? webhookKey,
   }) async {
     final reports = _reports(source);
     if (['Forms', 'Support', 'App reviews'].contains(source) &&
-        (demoKey == null || demoKey.trim().isEmpty || demoKey.length > 128)) {
+        (webhookKey == null ||
+            webhookKey.trim().isEmpty ||
+            webhookKey.length > 128)) {
       throw WorkspaceException(
-        message: 'Enter a demo key of 1–128 characters.',
+        message: 'Enter a webhook key of 1–128 characters.',
       );
     }
     return _write(session, workspaceId, (tx) async {
@@ -109,7 +111,7 @@ class MockSourceService {
       );
       if (connection == null || !connection.connected) {
         throw WorkspaceException(
-          message: 'Connect this demo source before syncing.',
+          message: 'Connect this source before syncing.',
         );
       }
       return _sync(session, connection, reports, tx, limit: 3);

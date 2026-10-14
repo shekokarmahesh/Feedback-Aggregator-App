@@ -1,3 +1,6 @@
+import 'dart:math';
+import 'package:feedback_aggregator_client/feedback_aggregator_client.dart';
+
 class DemoTicket {
   final String id;
   final String title;
@@ -9,6 +12,70 @@ class DemoTicket {
   final int hoursAgo;
   final String requester;
   final bool isMock;
+  final List<String> platforms;
+  final List<WorkspaceTicket> reports;
+  final int priorityScore;
+  final String groupingState;
+  final double? confidence;
+  final int? primaryTicketId;
+  List<String> get sources => platforms.isEmpty ? [source] : platforms;
+  int reportsFrom(String name) => reports.isEmpty
+      ? (source == name ? supporters : 0)
+      : reports.where((r) => r.source == name).length;
+
+  static DemoTicket? fromGroup(GroupedTicket group, Set<String> hidden) {
+    final visible = group.reports
+        .where((r) => !hidden.contains(r.source))
+        .toList();
+    if (visible.isEmpty) return null;
+    final first = visible.first;
+    final sources = visible.map((r) => r.source).toSet().toList()..sort();
+    final severity = visible
+        .map(
+          (r) =>
+              r.severity ??
+              switch (r.priority) {
+                'High' => 3.0,
+                'Medium' => 2.0,
+                _ => 1.0,
+              },
+        )
+        .reduce(max);
+    final score =
+        ((25 * severity / 4).round() +
+                min(45, visible.length * 5) +
+                min(30, sources.length * 6))
+            .clamp(0, 100);
+    final created = visible
+        .map((r) => r.createdAt)
+        .reduce((a, b) => a.isAfter(b) ? a : b);
+    return DemoTicket(
+      group.id > 0 ? 'ISS-${group.id}' : 'FB-${first.id}',
+      first.title,
+      first.description,
+      sources.join(' + '),
+      group.status,
+      visible.any((r) => r.priority == 'High')
+          ? 'High'
+          : visible.any((r) => r.priority == 'Medium')
+          ? 'Medium'
+          : 'Low',
+      visible.length,
+      DateTime.now().toUtc().difference(created).inHours,
+      first.requester,
+      platforms: sources,
+      reports: visible,
+      priorityScore: score.toInt(),
+      groupingState: group.groupingState,
+      confidence: visible.any((r) => r.groupingConfidence != null)
+          ? visible
+                .where((r) => r.groupingConfidence != null)
+                .map((r) => r.groupingConfidence!)
+                .reduce(min)
+          : null,
+      primaryTicketId: first.id,
+    );
+  }
 
   const DemoTicket(
     this.id,
@@ -21,6 +88,12 @@ class DemoTicket {
     this.hoursAgo,
     this.requester, {
     this.isMock = false,
+    this.platforms = const [],
+    this.reports = const [],
+    this.priorityScore = 0,
+    this.groupingState = 'unprocessed',
+    this.confidence,
+    this.primaryTicketId,
   });
 }
 
@@ -140,7 +213,7 @@ List<DemoTicket> filterTickets({
       .where(
         (ticket) =>
             (status == 'All' || ticket.status == status) &&
-            (source == 'All' || ticket.source == source) &&
+            (source == 'All' || ticket.sources.contains(source)) &&
             (priority == 'All' || ticket.priority == priority) &&
             '${ticket.id} ${ticket.title} ${ticket.description} ${ticket.requester}'
                 .toLowerCase()
@@ -149,6 +222,7 @@ List<DemoTicket> filterTickets({
       .toList();
   filtered.sort(
     (a, b) => switch (sort) {
+      'Priority score' => b.priorityScore.compareTo(a.priorityScore),
       'Most recent' => a.hoursAgo.compareTo(b.hoursAgo),
       'Priority' =>
         ticketPriorities

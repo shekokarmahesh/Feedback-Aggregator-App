@@ -70,8 +70,7 @@ class _SourceConfigurationDialogState extends State<SourceConfigurationDialog> {
     final origin = ['http', 'https'].contains(Uri.base.scheme)
         ? Uri.base.origin
         : 'https://feedbackaggregatorai.online';
-    final sampleKey =
-        'demo-${widget.source.toLowerCase().replaceAll(' ', '-')}-key';
+    final sampleKey = 'your-webhook-key';
     final payload = const JsonEncoder.withIndent('  ').convert({
       'title': 'CSV export is empty',
       'body': 'Filtered feedback exports contain only headers.',
@@ -98,7 +97,7 @@ class _SourceConfigurationDialogState extends State<SourceConfigurationDialog> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
-                      'Demo setup · ${widget.availableCount} sample reports\nUse a sample key to try this connection. No real credentials or external requests are needed.',
+                      'Connect ${widget.source} · ${widget.availableCount} reports\nFollow the webhook format below and enter your webhook key to start importing feedback.',
                       style: const TextStyle(height: 1.5),
                     ),
                   ),
@@ -113,7 +112,7 @@ class _SourceConfigurationDialogState extends State<SourceConfigurationDialog> {
                   ),
                   _step('3. Example feedback payload', payload),
                   const Text(
-                    'The URL and headers preview the webhook format. This demo key loads generated tickets here; it does not authorize the live webhook.',
+                    'These connections currently import sample feedback. Laya processes the reports automatically in your workspace.',
                     style: TextStyle(
                       fontSize: 12,
                       height: 1.5,
@@ -122,18 +121,18 @@ class _SourceConfigurationDialogState extends State<SourceConfigurationDialog> {
                   ),
                   const SizedBox(height: 18),
                   TextFormField(
-                    key: const ValueKey('demo-webhook-key'),
+                    key: const ValueKey('webhook-key'),
                     controller: _key,
                     enabled: !_busy,
                     maxLength: 128,
                     decoration: InputDecoration(
-                      labelText: 'Demo webhook key',
+                      labelText: 'Your webhook key',
                       hintText: sampleKey,
                       helperText:
-                          'Enter any sample value, such as demo or mock.',
+                          'Enter your webhook key. Sample connections accept any nonempty value.',
                     ),
                     validator: (value) => value == null || value.trim().isEmpty
-                        ? 'Enter a demo key to connect.'
+                        ? 'Enter a webhook key to connect.'
                         : null,
                     onFieldSubmitted: (_) => _submit(),
                   ),

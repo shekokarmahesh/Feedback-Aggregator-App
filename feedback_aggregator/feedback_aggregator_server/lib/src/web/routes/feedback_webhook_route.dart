@@ -5,6 +5,7 @@ import 'package:serverpod/serverpod.dart';
 import '../../feedback/discord_submission.dart';
 import '../../feedback/feedback_submission.dart';
 import '../../feedback/webhook_key_service.dart';
+import '../../feedback/grouping_service.dart';
 import '../../generated/protocol.dart';
 
 class FeedbackWebhookRoute extends Route {
@@ -151,6 +152,19 @@ class FeedbackWebhookRoute extends Route {
           requester: input.requester,
         ),
       );
+      final admin = await WorkspaceMember.db.findFirstRow(
+        session,
+        where: (t) =>
+            t.workspaceId.equals(mapping!.workspaceId) &
+            t.role.equals(WorkspaceRole.admin),
+      );
+      if (admin != null) {
+        await GroupingService().enqueueFor(
+          session,
+          mapping.workspaceId,
+          admin.authUserId,
+        );
+      }
       return _json(201, {
         'id': ticket.id,
         'createdAt': ticket.createdAt.toIso8601String(),

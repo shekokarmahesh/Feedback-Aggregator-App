@@ -26,8 +26,13 @@ abstract class WorkspaceTicket
     required this.requester,
     bool? isMock,
     this.externalId,
+    this.issueGroupId,
+    String? groupingState,
+    this.groupingConfidence,
+    this.severity,
     DateTime? createdAt,
   }) : isMock = isMock ?? false,
+       groupingState = groupingState ?? 'pending',
        createdAt = createdAt ?? DateTime.now();
 
   factory WorkspaceTicket({
@@ -42,6 +47,10 @@ abstract class WorkspaceTicket
     required String requester,
     bool? isMock,
     String? externalId,
+    int? issueGroupId,
+    String? groupingState,
+    double? groupingConfidence,
+    double? severity,
     DateTime? createdAt,
   }) = _WorkspaceTicketImpl;
 
@@ -60,6 +69,11 @@ abstract class WorkspaceTicket
           ? null
           : _is.BoolJsonExtension.fromJson(jsonSerialization['isMock']),
       externalId: jsonSerialization['externalId'] as String?,
+      issueGroupId: jsonSerialization['issueGroupId'] as int?,
+      groupingState: jsonSerialization['groupingState'] as String?,
+      groupingConfidence: (jsonSerialization['groupingConfidence'] as num?)
+          ?.toDouble(),
+      severity: (jsonSerialization['severity'] as num?)?.toDouble(),
       createdAt: jsonSerialization['createdAt'] == null
           ? null
           : _is.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
@@ -93,6 +107,14 @@ abstract class WorkspaceTicket
 
   String? externalId;
 
+  int? issueGroupId;
+
+  String groupingState;
+
+  double? groupingConfidence;
+
+  double? severity;
+
   DateTime createdAt;
 
   @override
@@ -113,6 +135,10 @@ abstract class WorkspaceTicket
     String? requester,
     bool? isMock,
     String? externalId,
+    int? issueGroupId,
+    String? groupingState,
+    double? groupingConfidence,
+    double? severity,
     DateTime? createdAt,
   });
   @override
@@ -130,6 +156,10 @@ abstract class WorkspaceTicket
       'requester': requester,
       'isMock': isMock,
       if (externalId != null) 'externalId': externalId,
+      if (issueGroupId != null) 'issueGroupId': issueGroupId,
+      'groupingState': groupingState,
+      if (groupingConfidence != null) 'groupingConfidence': groupingConfidence,
+      if (severity != null) 'severity': severity,
       'createdAt': createdAt.toJson(),
     };
   }
@@ -149,6 +179,10 @@ abstract class WorkspaceTicket
       'requester': requester,
       'isMock': isMock,
       if (externalId != null) 'externalId': externalId,
+      if (issueGroupId != null) 'issueGroupId': issueGroupId,
+      'groupingState': groupingState,
+      if (groupingConfidence != null) 'groupingConfidence': groupingConfidence,
+      if (severity != null) 'severity': severity,
       'createdAt': createdAt.toJson(),
     };
   }
@@ -196,6 +230,10 @@ class _WorkspaceTicketImpl extends WorkspaceTicket {
     required String requester,
     bool? isMock,
     String? externalId,
+    int? issueGroupId,
+    String? groupingState,
+    double? groupingConfidence,
+    double? severity,
     DateTime? createdAt,
   }) : super._(
          id: id,
@@ -209,6 +247,10 @@ class _WorkspaceTicketImpl extends WorkspaceTicket {
          requester: requester,
          isMock: isMock,
          externalId: externalId,
+         issueGroupId: issueGroupId,
+         groupingState: groupingState,
+         groupingConfidence: groupingConfidence,
+         severity: severity,
          createdAt: createdAt,
        );
 
@@ -228,6 +270,10 @@ class _WorkspaceTicketImpl extends WorkspaceTicket {
     String? requester,
     bool? isMock,
     Object? externalId = _Undefined,
+    Object? issueGroupId = _Undefined,
+    String? groupingState,
+    Object? groupingConfidence = _Undefined,
+    Object? severity = _Undefined,
     DateTime? createdAt,
   }) {
     return WorkspaceTicket(
@@ -242,6 +288,12 @@ class _WorkspaceTicketImpl extends WorkspaceTicket {
       requester: requester ?? this.requester,
       isMock: isMock ?? this.isMock,
       externalId: externalId is String? ? externalId : this.externalId,
+      issueGroupId: issueGroupId is int? ? issueGroupId : this.issueGroupId,
+      groupingState: groupingState ?? this.groupingState,
+      groupingConfidence: groupingConfidence is double?
+          ? groupingConfidence
+          : this.groupingConfidence,
+      severity: severity is double? ? severity : this.severity,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -300,6 +352,28 @@ class WorkspaceTicketUpdateTable extends _is.UpdateTable<WorkspaceTicketTable> {
     value,
   );
 
+  _is.ColumnValue<int, int> issueGroupId(int? value) => _is.ColumnValue(
+    table.issueGroupId,
+    value,
+  );
+
+  _is.ColumnValue<String, String> groupingState(String value) =>
+      _is.ColumnValue(
+        table.groupingState,
+        value,
+      );
+
+  _is.ColumnValue<double, double> groupingConfidence(double? value) =>
+      _is.ColumnValue(
+        table.groupingConfidence,
+        value,
+      );
+
+  _is.ColumnValue<double, double> severity(double? value) => _is.ColumnValue(
+    table.severity,
+    value,
+  );
+
   _is.ColumnValue<DateTime, DateTime> createdAt(DateTime value) =>
       _is.ColumnValue(
         table.createdAt,
@@ -352,6 +426,23 @@ class WorkspaceTicketTable extends _is.Table<int?> {
       'externalId',
       this,
     );
+    issueGroupId = _is.ColumnInt(
+      'issueGroupId',
+      this,
+    );
+    groupingState = _is.ColumnString(
+      'groupingState',
+      this,
+      hasDefault: true,
+    );
+    groupingConfidence = _is.ColumnDouble(
+      'groupingConfidence',
+      this,
+    );
+    severity = _is.ColumnDouble(
+      'severity',
+      this,
+    );
     createdAt = _is.ColumnDateTime(
       'createdAt',
       this,
@@ -381,6 +472,14 @@ class WorkspaceTicketTable extends _is.Table<int?> {
 
   late final _is.ColumnString externalId;
 
+  late final _is.ColumnInt issueGroupId;
+
+  late final _is.ColumnString groupingState;
+
+  late final _is.ColumnDouble groupingConfidence;
+
+  late final _is.ColumnDouble severity;
+
   late final _is.ColumnDateTime createdAt;
 
   @override
@@ -396,6 +495,10 @@ class WorkspaceTicketTable extends _is.Table<int?> {
     requester,
     isMock,
     externalId,
+    issueGroupId,
+    groupingState,
+    groupingConfidence,
+    severity,
     createdAt,
   ];
 }

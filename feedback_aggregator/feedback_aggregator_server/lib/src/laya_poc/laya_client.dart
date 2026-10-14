@@ -80,7 +80,7 @@ class LayaClient implements LayaEvaluator {
   @override
   Future<LayaDecision> evaluate(Map<String, dynamic> request) async {
     final body = {...request}..remove('candidates');
-    final result = await _post(endpoint, body);
+    final result = await post(endpoint, body);
     // Validate the complete triage response before spending work on candidates.
     final triage = _triage(result, request);
     final candidates = request['candidates'] as List;
@@ -88,7 +88,7 @@ class LayaClient implements LayaEvaluator {
     if (['bug', 'feature'].contains(triage.choice) &&
         triage.confidence >= pocTriageThreshold &&
         candidates.isNotEmpty) {
-      final batch = await _post(
+      final batch = await post(
         endpoint.replace(path: '${endpoint.path}/batch'),
         {
           'model': request['model'],
@@ -116,7 +116,7 @@ class LayaClient implements LayaEvaluator {
     return parseLayaDecision(result, request, duplicateResults: duplicates);
   }
 
-  Future<dynamic> _post(Uri url, Map<String, dynamic> body) async {
+  Future<dynamic> post(Uri url, Map<String, dynamic> body) async {
     final http = HttpClient()..connectionTimeout = const Duration(seconds: 8);
     try {
       return await (() async {

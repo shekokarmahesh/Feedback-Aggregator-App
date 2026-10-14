@@ -69,6 +69,27 @@ class _WorkspaceApi implements EndpointWorkspace {
       ? store.heldTickets!.future
       : List.of(store.tickets[workspaceId]!);
   @override
+  Future<List<GroupedTicket>> issues(int workspaceId) async {
+    final rows = await tickets(workspaceId);
+    return [
+      for (final row in rows)
+        GroupedTicket(
+          id: -row.id!,
+          primaryTicketId: row.id!,
+          title: row.title,
+          description: row.description,
+          status: row.status,
+          priority: row.priority,
+          priorityScore: 0,
+          sources: [row.source],
+          reports: [row],
+          groupingState: 'pending',
+          createdAt: row.createdAt,
+        ),
+    ];
+  }
+
+  @override
   Future<String?> discordGuild(int workspaceId) async => null;
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -163,7 +184,7 @@ void main() {
       store.holdWorkspace = null;
       await tester.pumpAndSettle();
       expect(find.byKey(const ValueKey('connect-Email')), findsOneWidget);
-      expect(find.text('12 of 12 sample reports imported'), findsNothing);
+      expect(find.text('12 of 12 reports imported'), findsNothing);
       await tester.tap(find.text('Inbox').first);
       await tester.pumpAndSettle();
       expect(find.textContaining('Alpha email report'), findsNothing);
@@ -177,7 +198,7 @@ void main() {
       await tester.ensureVisible(find.byKey(const ValueKey('connect-Email')));
       await tester.tap(find.byKey(const ValueKey('connect-Email')));
       await tester.pumpAndSettle();
-      expect(find.text('12 of 12 sample reports imported'), findsOneWidget);
+      expect(find.text('12 of 12 reports imported'), findsOneWidget);
       await tester.tap(find.text('Inbox').first);
       await tester.pumpAndSettle();
       expect(find.text('Alpha email report 0'), findsOneWidget);
@@ -198,7 +219,7 @@ void main() {
         await tester.pumpAndSettle();
         expect(find.text('Feedback sources'), findsOneWidget);
         expect(
-          find.text('$count of 12 sample reports imported'),
+          find.text('$count of 12 reports imported'),
           findsOneWidget,
         );
       }
@@ -206,7 +227,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(store.syncCalls, [1, 1, 1]);
       expect(
-        find.text('Up to date. All sample reports are in your inbox.'),
+        find.text('Up to date. All reports are in your inbox.'),
         findsOneWidget,
       );
       await tester.tap(find.text('Inbox').first);
@@ -254,7 +275,7 @@ void main() {
       await tester.pump(const Duration(seconds: 30));
       await tester.pumpAndSettle();
       expect(find.text('Source unavailable. Try again.'), findsNothing);
-      expect(find.text('8 of 12 sample reports imported'), findsOneWidget);
+      expect(find.text('8 of 12 reports imported'), findsOneWidget);
       await tester.pumpWidget(const SizedBox.shrink());
     },
   );

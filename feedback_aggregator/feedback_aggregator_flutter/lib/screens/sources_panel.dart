@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../models/demo_ticket.dart';
 import 'source_configuration_dialog.dart';
 
-const demoSourceCounts = {
+const sourceFeedCounts = {
   'Email': 12,
   'Slack': 20,
   'Forms': 8,
@@ -90,12 +90,12 @@ class _SourcesPanelState extends State<SourcesPanel> {
 
   String _syncMessage(String source, SourceSyncResult result) {
     if (result.addedCount > 0) {
-      return '${result.addedCount} sample reports from $source added to your inbox.';
+      return '${result.addedCount} reports from $source added to your inbox.';
     }
     if (result.connection.syncedCount < result.connection.availableCount) {
-      return '$source is connected. Auto-sync will import the remaining sample reports.';
+      return '$source is connected. Auto-sync will import the remaining reports.';
     }
-    return '$source is up to date. No duplicate tickets were added.';
+    return '$source is up to date. Related reports are grouped automatically.';
   }
 
   String _lastSynced(DateTime? value) {
@@ -171,7 +171,7 @@ class _SourcesPanelState extends State<SourcesPanel> {
         ),
         const SizedBox(height: 12),
         Text(
-          '${widget.connections.any((c) => c.source == source && !c.connected) ? 0 : widget.tickets.where((t) => t.source == source).length} feedback tickets in this inbox',
+          '${widget.connections.any((c) => c.source == source && !c.connected) ? 0 : widget.tickets.fold<int>(0, (count, ticket) => count + ticket.reportsFrom(source))} feedback reports imported',
           style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
         ),
         ...children,
@@ -190,7 +190,7 @@ class _SourcesPanelState extends State<SourcesPanel> {
         widget.workspace!.role != WorkspaceRole.viewer;
     final busy = _busy.contains(source) || widget.syncing.contains(source);
     final error = _errors[source] ?? widget.syncErrors[source];
-    final available = demoSourceCounts[source]!;
+    final available = sourceFeedCounts[source]!;
     final needsConfiguration = !['Email', 'Slack'].contains(source);
     final remaining = connection == null
         ? available
@@ -206,27 +206,26 @@ class _SourcesPanelState extends State<SourcesPanel> {
       },
       description: switch (source) {
         'Email' =>
-          'Bring sample support emails, feature requests, and issue reports into your workspace.',
+          'Bring support emails, feature requests, and issue reports into your workspace.',
         'Slack' =>
-          'Sync sample conversations from #customer-feedback, #support-triage, and #product-ideas.',
-        'Forms' =>
-          'Configure a website feedback form and import sample submissions.',
+          'Sync conversations from #customer-feedback, #support-triage, and #product-ideas.',
+        'Forms' => 'Configure a website feedback form and import submissions.',
         'Support' =>
-          'Bring sample help desk cases and customer escalations into your inbox.',
+          'Bring help desk cases and customer escalations into your inbox.',
         _ =>
-          'Collect sample Google Play and App Store reviews for your team to triage.',
+          'Collect Google Play and App Store reviews for your team to triage.',
       },
       status: busy
           ? 'Syncing…'
           : connected
-          ? 'Demo connected'
+          ? 'Connected'
           : 'Not connected',
       active: connected,
       children: [
         const SizedBox(height: 16),
         if (connected && connection != null) ...[
           Text(
-            '${connection.syncedCount} of ${connection.availableCount} sample reports imported',
+            '${connection.syncedCount} of ${connection.availableCount} reports imported',
             style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
           ),
           const SizedBox(height: 8),
@@ -249,8 +248,8 @@ class _SourcesPanelState extends State<SourcesPanel> {
           connected
               ? remaining > 0
                     ? 'Auto-sync every 30 seconds while this workspace is open.'
-                    : 'Up to date. All sample reports are in your inbox.'
-              : '${needsConfiguration ? 'Configure' : 'Connect'} to import the first 5 of $available sample reports. Tickets from this source stay hidden while disconnected.',
+                    : 'Up to date. All reports are in your inbox.'
+              : '${needsConfiguration ? 'Configure' : 'Connect'} to import the first 5 of $available reports. Tickets from this source stay hidden while disconnected.',
           style: const TextStyle(
             height: 1.5,
             fontSize: 12,
@@ -343,7 +342,7 @@ class _SourcesPanelState extends State<SourcesPanel> {
       barrierDismissible: false,
       builder: (_) => SourceConfigurationDialog(
         source: source,
-        availableCount: demoSourceCounts[source]!,
+        availableCount: sourceFeedCounts[source]!,
         onSubmit: (key) => widget.onConfigure!(source, key),
       ),
     );
@@ -381,8 +380,8 @@ class _SourcesPanelState extends State<SourcesPanel> {
             SizedBox(width: 12),
             Expanded(
               child: Text(
-                'Email, Slack, Forms, Support, and App reviews use generated demo feedback. '
-                'No account credentials are needed. Imported tickets are marked Demo and shared only with this workspace.',
+                'Laya groups related reports across connected platforms into one issue. '
+                'These sources currently use sample feedback, shared only with this workspace.',
                 style: TextStyle(height: 1.5),
               ),
             ),

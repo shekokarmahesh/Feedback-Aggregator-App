@@ -68,10 +68,10 @@ void main() {
       await tester.tap(find.byKey(const ValueKey('connect-Forms')));
       await tester.pumpAndSettle();
       await tester.ensureVisible(
-        find.byKey(const ValueKey('demo-webhook-key')),
+        find.byKey(const ValueKey('webhook-key')),
       );
       await tester.enterText(
-        find.byKey(const ValueKey('demo-webhook-key')),
+        find.byKey(const ValueKey('webhook-key')),
         'demo',
       );
       await tester.ensureVisible(
@@ -122,7 +122,7 @@ void main() {
                 source: name,
                 connected: true,
                 syncedCount: 5,
-                availableCount: demoSourceCounts[name]!,
+                availableCount: sourceFeedCounts[name]!,
               ),
               addedCount: 5,
             );
@@ -142,9 +142,9 @@ void main() {
         );
         await tester.pumpAndSettle();
         expect(calls, isEmpty);
-        expect(find.text('Enter a demo key to connect.'), findsOneWidget);
+        expect(find.text('Enter a webhook key to connect.'), findsOneWidget);
         await tester.enterText(
-          find.byKey(const ValueKey('demo-webhook-key')),
+          find.byKey(const ValueKey('webhook-key')),
           'mock',
         );
         await tester.tap(
@@ -152,9 +152,9 @@ void main() {
         );
         await tester.pumpAndSettle();
         expect(calls, ['$source:mock']);
-        expect(find.byKey(const ValueKey('demo-webhook-key')), findsNothing);
+        expect(find.byKey(const ValueKey('webhook-key')), findsNothing);
         expect(
-          find.text('5 sample reports from $source added to your inbox.'),
+          find.text('5 reports from $source added to your inbox.'),
           findsOneWidget,
         );
         expect(tester.takeException(), isNull);
@@ -179,7 +179,7 @@ void main() {
       await tester.tap(find.byKey(const ValueKey('connect-Forms')));
       await tester.pumpAndSettle();
       await tester.enterText(
-        find.byKey(const ValueKey('demo-webhook-key')),
+        find.byKey(const ValueKey('webhook-key')),
         'demo',
       );
       await tester.ensureVisible(
@@ -196,7 +196,7 @@ void main() {
       expect(
         tester
             .widget<TextFormField>(
-              find.byKey(const ValueKey('demo-webhook-key')),
+              find.byKey(const ValueKey('webhook-key')),
             )
             .controller!
             .text,
@@ -267,19 +267,19 @@ void main() {
       await tester.tap(find.byKey(const ValueKey('connect-Email')));
       await tester.pumpAndSettle();
       expect(find.text('Feedback sources'), findsOneWidget);
-      expect(find.text('Demo connected'), findsOneWidget);
-      expect(find.text('5 of 12 sample reports imported'), findsOneWidget);
-      expect(find.text('5 feedback tickets in this inbox'), findsOneWidget);
+      expect(find.text('Connected'), findsOneWidget);
+      expect(find.text('5 of 12 reports imported'), findsOneWidget);
+      expect(find.text('5 feedback reports imported'), findsOneWidget);
       await tester.ensureVisible(find.text('Inbox').first);
       await tester.tap(find.text('Inbox').first);
       await tester.pumpAndSettle();
       expect(find.text('Sample email report 1'), findsOneWidget);
-      expect(find.text('Demo'), findsNWidgets(5));
+      expect(find.text('Demo'), findsNothing);
       await tester.ensureVisible(find.text('Sample email report 1'));
       await tester.tap(find.text('Sample email report 1'));
       await tester.pumpAndSettle();
-      expect(find.text('Demo ticket'), findsOneWidget);
-      expect(find.textContaining('Generated demo feedback'), findsOneWidget);
+      expect(find.text('Workspace ticket'), findsOneWidget);
+      expect(find.textContaining('Generated demo feedback'), findsNothing);
       expect(tester.takeException(), isNull);
     },
   );
@@ -308,7 +308,7 @@ void main() {
     expect(attempts, 2);
     expect(find.text('Connection unavailable. Try again.'), findsNothing);
     expect(
-      find.text('5 sample reports from Email added to your inbox.'),
+      find.text('5 reports from Email added to your inbox.'),
       findsOneWidget,
     );
   });
@@ -364,7 +364,9 @@ void main() {
       await tester.pumpAndSettle();
       expect(calls, 1);
       expect(
-        find.text('Email is up to date. No duplicate tickets were added.'),
+        find.text(
+          'Email is up to date. Related reports are grouped automatically.',
+        ),
         findsOneWidget,
       );
       await showPanel(
@@ -432,8 +434,8 @@ void main() {
       );
       await tester.tap(find.byKey(const ValueKey('disconnect-Email')));
       await tester.pumpAndSettle();
-      expect(find.text('1 feedback tickets in this inbox'), findsNothing);
-      expect(find.text('5 of 12 sample reports imported'), findsNothing);
+      expect(find.text('1 feedback reports imported'), findsNothing);
+      expect(find.text('5 of 12 reports imported'), findsNothing);
       expect(find.byKey(const ValueKey('connect-Email')), findsOneWidget);
       expect(
         find.textContaining(

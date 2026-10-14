@@ -1,0 +1,10 @@
+class: IssueGroup
+table: app_issue_group
+serverOnly: true
+fields:
+  workspaceId: int, relation(parent=app_workspace, onDelete=Cascade)
+  status: String
+  createdAt: DateTime, default=now
+indexes:
+  issue_group_workspace:
+    fields: workspaceId

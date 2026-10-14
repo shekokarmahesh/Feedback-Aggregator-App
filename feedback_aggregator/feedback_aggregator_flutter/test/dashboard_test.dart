@@ -73,7 +73,7 @@ void main() {
     await tester.tap(find.text('Add dark mode to the dashboard'));
     await tester.pumpAndSettle();
     expect(find.text('What customers are saying'), findsOneWidget);
-    expect(find.text('28 customer requests'), findsOneWidget);
+    expect(find.text('28 reports across 1 platforms'), findsOneWidget);
   });
 
   testWidgets('workspace Admin can open Discord configuration from sources', (

@@ -1,34 +1,31 @@
-# Demo source integrations
+# Source integrations and automatic issue grouping
 
-Open a workspace as an Admin and choose **Sources**. Email and Slack have **Connect** buttons. Forms, Support, and App reviews have **Configure** dialogs showing the webhook URL, `Content-Type` and `X-Feedback-Webhook-Key` headers, a sample JSON payload, and a demo-key field. Enter any nonempty sample value (such as `demo` or `mock`) and choose **Connect and import**. The field accepts up to 128 characters; the key is not saved or used to authenticate external requests.
+Admins connect Email and Slack from **Sources**. Forms, Support, and App reviews have **Configure** dialogs containing the current website's `/webhooks/feedback` address, `Content-Type: application/json`, `X-Feedback-Webhook-Key: your-webhook-key`, a JSON example, and **Your webhook key**. Enter any nonempty key up to 128 characters to connect the current sample feed. The key is not saved or used to authorize real external webhook requests.
 
-Each initial connection imports five reports immediately. While the workspace remains open, automatic sync imports up to three more every 30 seconds. **Sync now** imports the next batch immediately. The completed feed sizes vary: Email **12**, Slack **20**, Forms **8**, Support **15**, and App reviews **9**, for **64** sample tickets per workspace. Existing Slack connections discover the expanded 20-report feed on refresh.
+Initial connections import five reports. **Sync now** imports up to three additional reports, and the open workspace automatically syncs every 30 seconds. Feed sizes are Email 12, Slack 20, Forms 8, Support 15, and App reviews 9: 64 reports altogether. These providers use sample data; the existing Discord bot/guild flow remains live.
 
-The samples include email subjects/senders, Slack channels, website form submissions, help desk cases, store reviews, feature requests, and repeated issue reports across the two sources. Tickets carry a **Demo** badge; their details identify them as generated feedback. Inbox search, source/priority/status filters, ticket details, and status changes work on these persisted tickets.
+## Normal inbox
 
-No mailbox, Slack workspace, provider API key, or Resend configuration is needed. The Configure dialogs preview a webhook format; demo keys do not authorize the existing live webhook. These connections do not read real conversations or send emails. Feedback is imported as individual tickets; the separate Laya POC tab remains its own synthetic grouping evaluation.
+The separate Laya POC screen and endpoint have been removed. Imports, manually created feedback, existing workspace reports, and Discord webhook submissions enter the normal persistent grouping pipeline. Laya runs through the existing authenticated private service; no OpenRouter key or new provider credential is needed.
 
-## Permissions and persistence
+Serverpod future calls process reports independently of the browser. `app_grouping_job` stores a workspace's queue state, authorized requesting member, expiring worker lease, retry timing, and errors. `app_issue_group` stores persistent issue identity and team status. Each `app_workspace_ticket` remains an original report linked to its group, with model severity, confidence, and grouping state. The additive `20261014134312019-automatic-grouping` migration preserves existing tickets and authentication data.
 
-- Admins connect and disconnect integrations and can sync.
-- Editors can sync existing connections and triage their tickets.
-- Viewers can read connection status and imported tickets.
-- Every endpoint verifies authentication and workspace membership. Writes lock the workspace row, using the same transaction boundary as role changes.
-- `app_mock_source_connection` stores each workspace's connection state, counters, and last sync time in PostgreSQL.
-- Mock reports have stable source IDs. A unique workspace/source/external-ID index and the tenant lock prevent duplicate imports, including concurrent requests.
-- Disconnect stops imports, resets the card, and hides **all** tickets with that source label, including manually created or previously persisted tickets. The authenticated ticket query filters them before returning database rows. The UI immediately evicts local rows and guards against stale refreshes, so they stay absent after reload or workspace switching. Records are retained internally; reconnect restores them and resumes remaining reports without duplication or lost status changes. Hidden tickets cannot be updated until reconnect.
-- Background refresh keeps the selected tab and inbox filters. Old requests cannot replace data after switching workspaces. A sync failure is shown on the source card and retried on the next tick.
+Each worker rechecks the requesting member's workspace permission before inference and before committing results. It processes three reports per invocation, outside database transactions during model inference. Workspace locks and leases prevent concurrent workers from creating duplicate groups. Model failures preserve ungrouped reports, show a waiting state, and retry with backoff up to five minutes. Admins and Editors can use **Retry grouping**; Viewers only read results.
 
-The feed is bounded. Once all reports arrive, automatic polling refreshes workspace data without writing more samples. Automatic sync runs while the browser has this workspace open; it is not a continuously running server job.
+Candidate retrieval uses lexical overlap within the same workspace to shortlist three existing issues. Laya evaluates both title pairs and report-body pairs. A merge requires model probability at least 0.75, a margin of 0.08 over competing groups, and no strong contradiction between the two views. This is an operational policy, not an accuracy guarantee. Ambiguous matches become separate **Needs review** issues; no keyword-only or fabricated model result is used. The first issue also calls Laya for severity.
 
-## Existing integrations from main
+The inbox displays one row per issue, report counts, contributing platforms, grouping state, and a 0–100 priority score. Opening it shows the original source reports and available match confidence. Source filters match every contributing platform. Updating the row's status updates the persistent shared issue. The score combines up to 25 severity points (`25 × maximum model severity / 4`), 45 frequency points (`5 × visible report count`), and 30 platform points (`6 × visible platform count`). The default sort is **Priority score**.
 
-The Discord guild configuration and `/webhooks/feedback` implementation are preserved. Discord submissions create workspace tickets. Generic form/website/support webhooks use the existing team ingestion key and store `Feedback` rows separately; connecting that store to the workspace inbox is a separate follow-up. The Forms, Support, and App reviews Configure dialogs connect the mock feed to this inbox. Their demo keys do not configure the separate real webhook.
+## Disconnect and isolation
 
-## Running and deploying
+Disconnect hides all reports carrying that source label, including manual or previously stored reports. Group evidence, request counts, sources, titles, descriptions, confidence, and score derive from the remaining visible reports. An issue disappears when it has no visible reports. The card resets to Connect/Configure. Reload cannot restore hidden platform reports; reconnect restores the existing records without duplicates or lost team status.
 
-The additive `20261014082842938-mock-sources` migration adds the connection table and `isMock`/nullable `externalId` fields to workspace tickets. Existing tickets remain ordinary tickets with null external IDs. Generated models, endpoint clients, and test helpers were regenerated by Serverpod 4.0.3.
+Every endpoint verifies workspace membership. Group reads and model candidates include the workspace ID. Background jobs retain and revalidate their authorized actor. Hidden reports are not processed until reconnect, and model results cannot commit after that source disconnects or the actor loses write access. Local UI revision guards prevent stale requests from replacing the active workspace.
 
-Start development using `serverpod start` in the server package, as usual; it applies pending migrations. For Render, the committed startup script applies them when the new image deploys. No new environment variables are required.
+## Webhooks and limitations
 
-Implementation lives in `mock_source_feedback.dart`, `mock_source_service.dart`, and `sources_endpoint.dart`, with `SourcesPanel` and workspace refresh orchestration in Flutter. Real provider adapters and server scheduling can be added later while retaining the workspace authorization and ticket deduplication boundary.
+Discord submissions are persisted as workspace reports and queued for grouping. The generic form/support webhook still requires a real team ingestion key and stores separate `Feedback` rows; bridging that real store into workspace reports remains follow-up work. The Configure flows described here simulate provider imports into the workspace inbox.
+
+The pinned English Laya model can miss duplicates or produce uncertain matches. Original evidence remains available for team review. Inference runs sequentially on the existing Render CPU plan. Large backlogs take time; the inbox updates every 30 seconds while open. The current workspace query is bounded to 500 reports and the shortlist to three candidate groups; larger ingestion volumes need pagination and retrieval work.
+
+No host development server was started. Use `serverpod start` yourself for local development. Render applies the committed migration on startup and runs durable grouping through Serverpod's built-in PostgreSQL-backed future-call scheduler, without Redis.

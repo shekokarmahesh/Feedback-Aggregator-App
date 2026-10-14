@@ -15,8 +15,14 @@ import 'dart:async' as _ida;
 import 'dart:io' as _idi;
 import 'package:feedback_aggregator_server/src/generated/feedback/team.dart'
     as _i952o7i4;
+import 'package:feedback_aggregator_server/src/generated/future_calls.dart'
+    as _ijk9x4dd;
+import 'package:feedback_aggregator_server/src/generated/future_calls_generated_models/grouping_future_call_process_model.dart'
+    as _i2j0ya3c;
 import 'package:feedback_aggregator_server/src/generated/greetings/greeting.dart'
     as _i5w5ug6y;
+import 'package:feedback_aggregator_server/src/generated/workspaces/grouped_ticket.dart'
+    as _ifvqah9b;
 import 'package:feedback_aggregator_server/src/generated/workspaces/invitation_delivery.dart'
     as _ixxuycvf;
 import 'package:feedback_aggregator_server/src/generated/workspaces/invitation_info.dart'
@@ -170,6 +176,8 @@ void withServerpod(
 }
 
 class TestEndpoints {
+  late final futureCalls = _FutureCalls();
+
   late final _EmailIdpEndpoint emailIdp;
 
   late final _GoogleIdpEndpoint googleIdp;
@@ -181,8 +189,6 @@ class TestEndpoints {
   late final _SourcesEndpoint sources;
 
   late final _GreetingEndpoint greeting;
-
-  late final _LayaPocEndpoint layaPoc;
 
   late final _WorkspaceEndpoint workspace;
 }
@@ -218,15 +224,15 @@ class _InternalTestEndpoints extends TestEndpoints
       endpoints,
       serializationManager,
     );
-    layaPoc = _LayaPocEndpoint(
-      endpoints,
-      serializationManager,
-    );
     workspace = _WorkspaceEndpoint(
       endpoints,
       serializationManager,
     );
   }
+}
+
+class _FutureCalls {
+  late final grouping = _GroupingFutureCall();
 }
 
 class _EmailIdpEndpoint {
@@ -881,7 +887,7 @@ class _SourcesEndpoint {
     _ist.TestSessionBuilder sessionBuilder,
     int workspaceId,
     String source,
-    String demoKey,
+    String webhookKey,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -897,7 +903,7 @@ class _SourcesEndpoint {
           parameters: _ist.testObjectToJson({
             'workspaceId': workspaceId,
             'source': source,
-            'demoKey': demoKey,
+            'webhookKey': webhookKey,
           }),
           serializationManager: _serializationManager,
         );
@@ -1019,159 +1025,6 @@ class _GreetingEndpoint {
                   _localCallContext.arguments,
                 )
                 as _ida.Future<_i5w5ug6y.Greeting>);
-        return _localReturnValue;
-      } finally {
-        await _localUniqueSession.close();
-      }
-    });
-  }
-}
-
-class _LayaPocEndpoint {
-  _LayaPocEndpoint(
-    this._endpointDispatch,
-    this._serializationManager,
-  );
-
-  final _is.EndpointDispatch _endpointDispatch;
-
-  final _is.SerializationManager _serializationManager;
-
-  _ida.Future<String> read(
-    _ist.TestSessionBuilder sessionBuilder,
-    int workspaceId,
-  ) async {
-    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
-      var _localUniqueSession =
-          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
-            endpoint: 'layaPoc',
-            method: 'read',
-          );
-      try {
-        var _localCallContext = await _endpointDispatch.getMethodCallContext(
-          createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'layaPoc',
-          methodName: 'read',
-          parameters: _ist.testObjectToJson({'workspaceId': workspaceId}),
-          serializationManager: _serializationManager,
-        );
-        var _localReturnValue =
-            await (_localCallContext.method.call(
-                  _localUniqueSession,
-                  _localCallContext.arguments,
-                )
-                as _ida.Future<String>);
-        return _localReturnValue;
-      } finally {
-        await _localUniqueSession.close();
-      }
-    });
-  }
-
-  _ida.Future<String> start(
-    _ist.TestSessionBuilder sessionBuilder,
-    int workspaceId,
-    List<String> sources,
-  ) async {
-    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
-      var _localUniqueSession =
-          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
-            endpoint: 'layaPoc',
-            method: 'start',
-          );
-      try {
-        var _localCallContext = await _endpointDispatch.getMethodCallContext(
-          createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'layaPoc',
-          methodName: 'start',
-          parameters: _ist.testObjectToJson({
-            'workspaceId': workspaceId,
-            'sources': sources,
-          }),
-          serializationManager: _serializationManager,
-        );
-        var _localReturnValue =
-            await (_localCallContext.method.call(
-                  _localUniqueSession,
-                  _localCallContext.arguments,
-                )
-                as _ida.Future<String>);
-        return _localReturnValue;
-      } finally {
-        await _localUniqueSession.close();
-      }
-    });
-  }
-
-  _ida.Future<String> step(
-    _ist.TestSessionBuilder sessionBuilder,
-    int workspaceId,
-    String runId,
-    int expectedIndex,
-  ) async {
-    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
-      var _localUniqueSession =
-          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
-            endpoint: 'layaPoc',
-            method: 'step',
-          );
-      try {
-        var _localCallContext = await _endpointDispatch.getMethodCallContext(
-          createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'layaPoc',
-          methodName: 'step',
-          parameters: _ist.testObjectToJson({
-            'workspaceId': workspaceId,
-            'runId': runId,
-            'expectedIndex': expectedIndex,
-          }),
-          serializationManager: _serializationManager,
-        );
-        var _localReturnValue =
-            await (_localCallContext.method.call(
-                  _localUniqueSession,
-                  _localCallContext.arguments,
-                )
-                as _ida.Future<String>);
-        return _localReturnValue;
-      } finally {
-        await _localUniqueSession.close();
-      }
-    });
-  }
-
-  _ida.Future<String> updateStatus(
-    _ist.TestSessionBuilder sessionBuilder,
-    int workspaceId,
-    String runId,
-    String issueId,
-    String status,
-  ) async {
-    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
-      var _localUniqueSession =
-          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
-            endpoint: 'layaPoc',
-            method: 'updateStatus',
-          );
-      try {
-        var _localCallContext = await _endpointDispatch.getMethodCallContext(
-          createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'layaPoc',
-          methodName: 'updateStatus',
-          parameters: _ist.testObjectToJson({
-            'workspaceId': workspaceId,
-            'runId': runId,
-            'issueId': issueId,
-            'status': status,
-          }),
-          serializationManager: _serializationManager,
-        );
-        var _localReturnValue =
-            await (_localCallContext.method.call(
-                  _localUniqueSession,
-                  _localCallContext.arguments,
-                )
-                as _ida.Future<String>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1587,6 +1440,68 @@ class _WorkspaceEndpoint {
     });
   }
 
+  _ida.Future<List<_ifvqah9b.GroupedTicket>> issues(
+    _ist.TestSessionBuilder sessionBuilder,
+    int workspaceId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'workspace',
+            method: 'issues',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'workspace',
+          methodName: 'issues',
+          parameters: _ist.testObjectToJson({'workspaceId': workspaceId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<List<_ifvqah9b.GroupedTicket>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<void> retryGrouping(
+    _ist.TestSessionBuilder sessionBuilder,
+    int workspaceId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'workspace',
+            method: 'retryGrouping',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'workspace',
+          methodName: 'retryGrouping',
+          parameters: _ist.testObjectToJson({'workspaceId': workspaceId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
   _ida.Future<String?> discordGuild(
     _ist.TestSessionBuilder sessionBuilder,
     int workspaceId,
@@ -1760,5 +1675,26 @@ class _WorkspaceEndpoint {
         await _localUniqueSession.close();
       }
     });
+  }
+}
+
+class _GroupingFutureCall {
+  Future<void> process(
+    _ist.TestSessionBuilder sessionBuilder,
+    int workspaceId,
+  ) async {
+    var object = _i2j0ya3c.GroupingFutureCallProcessModel(
+      workspaceId: workspaceId,
+    );
+    var _localUniqueSession =
+        (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild();
+    try {
+      await _ijk9x4dd.GroupingProcessFutureCall().invoke(
+        _localUniqueSession,
+        object,
+      );
+    } finally {
+      await _localUniqueSession.close();
+    }
   }
 }

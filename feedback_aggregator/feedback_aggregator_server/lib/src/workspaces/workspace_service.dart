@@ -612,6 +612,18 @@ class WorkspaceService {
       );
     }
     ticket.status = status;
+    if (ticket.issueGroupId != null) {
+      final group = await IssueGroup.db.findFirstRow(
+        s,
+        where: (t) =>
+            t.workspaceId.equals(id) & t.id.equals(ticket.issueGroupId),
+        transaction: tx,
+      );
+      if (group != null) {
+        group.status = status;
+        await IssueGroup.db.updateRow(s, group, transaction: tx);
+      }
+    }
     return WorkspaceTicket.db.updateRow(s, ticket, transaction: tx);
   });
 }

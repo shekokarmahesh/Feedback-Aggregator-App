@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:feedback_aggregator_client/feedback_aggregator_client.dart';
 import '../client.dart';
 import '../models/demo_ticket.dart';
-import 'laya_poc_panel.dart';
 import 'sources_panel.dart';
 
 class AccountProfile {
@@ -48,6 +47,7 @@ class DashboardScreen extends StatefulWidget {
   final Future<SourceSyncResult> Function(String)? onSyncSource;
   final Future<void> Function(String)? onDisconnectSource;
   final Future<void> Function(DemoTicket, String)? onUpdateStatus;
+  final Future<void> Function()? onRetryGrouping;
   final Future<AccountProfile> Function() loadProfile;
   const DashboardScreen({
     super.key,
@@ -65,6 +65,7 @@ class DashboardScreen extends StatefulWidget {
     this.onSyncSource,
     this.onDisconnectSource,
     this.onUpdateStatus,
+    this.onRetryGrouping,
     this.loadProfile = loadAccountProfile,
   });
   @override
@@ -77,7 +78,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String _status = 'All';
   String _source = 'All';
   String _priority = 'All';
-  String _sort = 'Most requested';
+  String _sort = 'Priority score';
   final _search = TextEditingController();
   AccountProfile? _profile;
   bool _profileFailed = false;
@@ -240,13 +241,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _navigation() => Row(
-    mainAxisSize: MainAxisSize.min,
+  Widget _navigation() => Wrap(
+    runSpacing: 6,
     children: [
       for (final entry in [
         ('Inbox', Icons.inbox_outlined),
         ('Sources', Icons.hub_outlined),
-        if (widget.workspace != null) ('Laya POC', Icons.auto_awesome),
         ('Activity', Icons.history_outlined),
       ])
         Padding(
@@ -459,11 +459,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ? _inbox(wide)
                             : _tab == 'Sources'
                             ? _sources(wide)
-                            : _tab == 'Laya POC'
-                            ? LayaPocPanel(
-                                key: ValueKey(widget.workspace!.id),
-                                workspace: widget.workspace!,
-                              )
                             : _activity(),
                         const SizedBox(height: 28),
                         Text(
@@ -523,6 +518,50 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        if (widget.workspace != null &&
+            widget.tickets.any(
+              (t) => ['pending', 'retrying'].contains(t.groupingState),
+            ))
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.auto_awesome,
+                  size: 18,
+                  color: Color(0xFF6154A4),
+                ),
+                const SizedBox(width: 10),
+                const Expanded(
+                  child: Text(
+                    'Laya is grouping incoming feedback. This inbox updates automatically.',
+                    style: TextStyle(height: 1.5),
+                  ),
+                ),
+                if (widget.onRetryGrouping != null &&
+                    widget.tickets.any((t) => t.groupingState == 'retrying'))
+                  TextButton(
+                    onPressed: () async {
+                      try {
+                        await widget.onRetryGrouping!();
+                      } catch (_) {
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Could not retry grouping. Please try again.',
+                              ),
+                            ),
+                          );
+                        }
+                      }
+                    },
+                    child: const Text('Retry grouping'),
+                  ),
+              ],
+            ),
+          ),
+
         Wrap(
           spacing: 20,
           runSpacing: 16,
@@ -568,9 +607,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   width,
                 ),
                 _metric(
-                  'Customer requests',
+                  'Feedback reports',
                   '${widget.tickets.fold<int>(0, (sum, t) => sum + t.supporters)}',
-                  'People behind the feedback',
+                  'Reports across connected platforms',
                   Icons.people_outline,
                   const Color(0xFF0891B2),
                   width,
@@ -585,7 +624,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 _metric(
                   'Sources represented',
-                  '${widget.tickets.map((t) => t.source).toSet().length}',
+                  '${widget.tickets.expand((t) => t.sources).toSet().length}',
                   widget.workspace == null
                       ? 'Across your sample inbox'
                       : 'Across this workspace',
@@ -672,7 +711,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         _filter(
                           'Sort',
                           _sort,
-                          ['Most requested', 'Most recent', 'Priority'],
+                          [
+                            'Priority score',
+                            'Most requested',
+                            'Most recent',
+                            'Priority',
+                          ],
                           (value) => setState(() => _sort = value),
                           includeAll: false,
                         ),
@@ -995,11 +1039,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     spacing: 8,
                     runSpacing: 8,
                     children: [
-                      _pill(ticket.source, const Color(0xFF64748B)),
+                      for (final source in ticket.sources)
+                        _pill(source, const Color(0xFF64748B)),
                       _pill(ticket.status, _statusColor(ticket.status)),
                       _pill(ticket.priority, _priorityColor(ticket.priority)),
                       _pill(
-                        '${ticket.supporters} requests',
+                        '${ticket.supporters} reports',
                         const Color(0xFF4F46E5),
                       ),
                     ],
@@ -1024,9 +1069,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
         '${ticket.id} · ${ticket.requester}',
         style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11),
       ),
-      if (ticket.isMock) ...[
+      if (ticket.groupingState != 'unprocessed') ...[
         const SizedBox(height: 7),
-        _pill('Demo', const Color(0xFF6154A4)),
+        _pill(switch (ticket.groupingState) {
+          'pending' => 'Grouping…',
+          'retrying' => 'Waiting for grouping',
+          'review' => 'Needs review',
+          _ => ticket.supporters > 1 ? 'Grouped by Laya' : 'Analyzed by Laya',
+        }, const Color(0xFF6154A4)),
       ],
     ],
   );
@@ -1049,18 +1099,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
             children: [
               Row(
                 children: [
-                  Text(
-                    ticket.id,
-                    style: const TextStyle(color: Color(0xFF64748B)),
+                  Expanded(
+                    child: Text(
+                      ticket.id,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: Color(0xFF64748B)),
+                    ),
                   ),
-                  const Spacer(),
-                  _pill(
-                    ticket.isMock
-                        ? 'Demo ticket'
-                        : widget.workspace == null
-                        ? 'Sample ticket'
-                        : 'Workspace ticket',
-                    const Color(0xFF7C3AED),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: _pill(
+                      widget.workspace == null
+                          ? 'Sample ticket'
+                          : 'Workspace ticket',
+                      const Color(0xFF7C3AED),
+                    ),
                   ),
                   IconButton(
                     tooltip: 'Close ticket',
@@ -1087,7 +1141,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     '${ticket.priority} priority',
                     _priorityColor(ticket.priority),
                   ),
-                  _pill(ticket.source, const Color(0xFF64748B)),
+                  for (final source in ticket.sources)
+                    _pill(source, const Color(0xFF64748B)),
                 ],
               ),
               const SizedBox(height: 28),
@@ -1103,14 +1158,53 @@ class _DashboardScreenState extends State<DashboardScreen> {
               const SizedBox(height: 28),
               _detail('First reported by', ticket.requester),
               _detail(
-                'Requests grouped together',
-                '${ticket.supporters} customer requests',
+                'Reports grouped together',
+                '${ticket.supporters} reports across ${ticket.sources.length} platforms',
               ),
+              _detail(
+                'Priority score',
+                '${ticket.priorityScore}/100 · severity, report frequency, and platform coverage',
+              ),
+              if (ticket.confidence != null)
+                _detail(
+                  'Laya match confidence',
+                  '${(ticket.confidence! * 100).round()}%',
+                ),
+              if (ticket.reports.isNotEmpty) ...[
+                const SizedBox(height: 20),
+                const Text(
+                  'Original reports',
+                  style: TextStyle(fontWeight: FontWeight.w700),
+                ),
+                for (final report in ticket.reports)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${report.source} · ${report.requester}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          report.title,
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        Text(
+                          report.description,
+                          style: const TextStyle(height: 1.5),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
               _detail('Added', _updated(ticket)),
               Text(
-                ticket.isMock
-                    ? 'Generated demo feedback imported by a sample source. Your team can triage it like any other workspace ticket.'
-                    : widget.workspace == null
+                widget.workspace == null
                     ? 'This is a preview of a grouped support ticket. Live feedback ingestion and status changes will be connected later.'
                     : 'This feedback is saved in your workspace. Admins and Editors can update its status.',
                 style: TextStyle(

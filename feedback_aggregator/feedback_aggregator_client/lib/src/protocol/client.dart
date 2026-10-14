@@ -15,6 +15,8 @@ import 'package:feedback_aggregator_client/src/protocol/feedback/team.dart'
     as _idjwb3gv;
 import 'package:feedback_aggregator_client/src/protocol/greetings/greeting.dart'
     as _iqu387d1;
+import 'package:feedback_aggregator_client/src/protocol/workspaces/grouped_ticket.dart'
+    as _ie62q91q;
 import 'package:feedback_aggregator_client/src/protocol/workspaces/invitation_delivery.dart'
     as _iwdqf0nn;
 import 'package:feedback_aggregator_client/src/protocol/workspaces/invitation_info.dart'
@@ -399,14 +401,14 @@ class EndpointSources extends _isc.EndpointRef {
   _ida.Future<_iz26az6v.SourceSyncResult> configure(
     int workspaceId,
     String source,
-    String demoKey,
+    String webhookKey,
   ) => caller.callServerEndpoint<_iz26az6v.SourceSyncResult>(
     'sources',
     'configure',
     {
       'workspaceId': workspaceId,
       'source': source,
-      'demoKey': demoKey,
+      'webhookKey': webhookKey,
     },
   );
 
@@ -451,63 +453,6 @@ class EndpointGreeting extends _isc.EndpointRef {
         'hello',
         {'name': name},
       );
-}
-
-/// {@category Endpoint}
-class EndpointLayaPoc extends _isc.EndpointRef {
-  EndpointLayaPoc(_isc.EndpointCaller caller) : super(caller);
-
-  @override
-  String get name => 'layaPoc';
-
-  _ida.Future<String> read(int workspaceId) =>
-      caller.callServerEndpoint<String>(
-        'layaPoc',
-        'read',
-        {'workspaceId': workspaceId},
-      );
-
-  _ida.Future<String> start(
-    int workspaceId,
-    List<String> sources,
-  ) => caller.callServerEndpoint<String>(
-    'layaPoc',
-    'start',
-    {
-      'workspaceId': workspaceId,
-      'sources': sources,
-    },
-  );
-
-  _ida.Future<String> step(
-    int workspaceId,
-    String runId,
-    int expectedIndex,
-  ) => caller.callServerEndpoint<String>(
-    'layaPoc',
-    'step',
-    {
-      'workspaceId': workspaceId,
-      'runId': runId,
-      'expectedIndex': expectedIndex,
-    },
-  );
-
-  _ida.Future<String> updateStatus(
-    int workspaceId,
-    String runId,
-    String issueId,
-    String status,
-  ) => caller.callServerEndpoint<String>(
-    'layaPoc',
-    'updateStatus',
-    {
-      'workspaceId': workspaceId,
-      'runId': runId,
-      'issueId': issueId,
-      'status': status,
-    },
-  );
 }
 
 /// Workspace membership, tickets, and Discord guild configuration.
@@ -633,6 +578,20 @@ class EndpointWorkspace extends _isc.EndpointRef {
         {'workspaceId': workspaceId},
       );
 
+  _ida.Future<List<_ie62q91q.GroupedTicket>> issues(int workspaceId) =>
+      caller.callServerEndpoint<List<_ie62q91q.GroupedTicket>>(
+        'workspace',
+        'issues',
+        {'workspaceId': workspaceId},
+      );
+
+  _ida.Future<void> retryGrouping(int workspaceId) =>
+      caller.callServerEndpoint<void>(
+        'workspace',
+        'retryGrouping',
+        {'workspaceId': workspaceId},
+      );
+
   _ida.Future<String?> discordGuild(int workspaceId) =>
       caller.callServerEndpoint<String?>(
         'workspace',
@@ -736,7 +695,6 @@ class Client extends _isc.ServerpodClientShared {
     feedbackIngestion = EndpointFeedbackIngestion(this);
     sources = EndpointSources(this);
     greeting = EndpointGreeting(this);
-    layaPoc = EndpointLayaPoc(this);
     workspace = EndpointWorkspace(this);
     modules = Modules(this);
   }
@@ -753,8 +711,6 @@ class Client extends _isc.ServerpodClientShared {
 
   late final EndpointGreeting greeting;
 
-  late final EndpointLayaPoc layaPoc;
-
   late final EndpointWorkspace workspace;
 
   late final Modules modules;
@@ -767,7 +723,6 @@ class Client extends _isc.ServerpodClientShared {
     'feedbackIngestion': feedbackIngestion,
     'sources': sources,
     'greeting': greeting,
-    'layaPoc': layaPoc,
     'workspace': workspace,
   };
 

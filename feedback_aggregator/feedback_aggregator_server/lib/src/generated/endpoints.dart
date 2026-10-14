@@ -10,6 +10,8 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:feedback_aggregator_server/src/generated/future_calls.dart'
+    as _ijk9x4dd;
 import 'package:feedback_aggregator_server/src/generated/workspaces/workspace_role.dart'
     as _ixvotuht;
 import 'package:serverpod/serverpod.dart' as _is;
@@ -23,8 +25,8 @@ import '../auth/jwt_refresh_endpoint.dart' as _inwq3ztq;
 import '../feedback/feedback_ingestion_endpoint.dart' as _ixgrydek;
 import '../feedback/sources_endpoint.dart' as _ie902svq;
 import '../greetings/greeting_endpoint.dart' as _il624ik7;
-import '../laya_poc/laya_poc_endpoint.dart' as _ilph5eyz;
 import '../workspaces/workspace_endpoint.dart' as _iannd3dw;
+export 'future_calls.dart' show ServerpodFutureCallsGetter;
 
 class Endpoints extends _is.EndpointDispatch {
   @override
@@ -64,12 +66,6 @@ class Endpoints extends _is.EndpointDispatch {
         ..initialize(
           server,
           'greeting',
-          null,
-        ),
-      'layaPoc': _ilph5eyz.LayaPocEndpoint()
-        ..initialize(
-          server,
-          'layaPoc',
           null,
         ),
       'workspace': _iannd3dw.WorkspaceEndpoint()
@@ -518,8 +514,8 @@ class Endpoints extends _is.EndpointDispatch {
               type: _is.getType<String>(),
               nullable: false,
             ),
-            'demoKey': _is.ParameterDescription(
-              name: 'demoKey',
+            'webhookKey': _is.ParameterDescription(
+              name: 'webhookKey',
               type: _is.getType<String>(),
               nullable: false,
             ),
@@ -533,7 +529,7 @@ class Endpoints extends _is.EndpointDispatch {
                     session,
                     params['workspaceId'],
                     params['source'],
-                    params['demoKey'],
+                    params['webhookKey'],
                   ),
         ),
         'sync': _is.MethodConnector(
@@ -609,124 +605,6 @@ class Endpoints extends _is.EndpointDispatch {
                   (endpoints['greeting'] as _il624ik7.GreetingEndpoint).hello(
                     session,
                     params['name'],
-                  ),
-        ),
-      },
-    );
-    connectors['layaPoc'] = _is.EndpointConnector(
-      name: 'layaPoc',
-      endpoint: endpoints['layaPoc']!,
-      methodConnectors: {
-        'read': _is.MethodConnector(
-          name: 'read',
-          params: {
-            'workspaceId': _is.ParameterDescription(
-              name: 'workspaceId',
-              type: _is.getType<int>(),
-              nullable: false,
-            ),
-          },
-          call:
-              (
-                _is.Session session,
-                Map<String, dynamic> params,
-              ) async =>
-                  (endpoints['layaPoc'] as _ilph5eyz.LayaPocEndpoint).read(
-                    session,
-                    params['workspaceId'],
-                  ),
-        ),
-        'start': _is.MethodConnector(
-          name: 'start',
-          params: {
-            'workspaceId': _is.ParameterDescription(
-              name: 'workspaceId',
-              type: _is.getType<int>(),
-              nullable: false,
-            ),
-            'sources': _is.ParameterDescription(
-              name: 'sources',
-              type: _is.getType<List<String>>(),
-              nullable: false,
-            ),
-          },
-          call:
-              (
-                _is.Session session,
-                Map<String, dynamic> params,
-              ) async =>
-                  (endpoints['layaPoc'] as _ilph5eyz.LayaPocEndpoint).start(
-                    session,
-                    params['workspaceId'],
-                    params['sources'],
-                  ),
-        ),
-        'step': _is.MethodConnector(
-          name: 'step',
-          params: {
-            'workspaceId': _is.ParameterDescription(
-              name: 'workspaceId',
-              type: _is.getType<int>(),
-              nullable: false,
-            ),
-            'runId': _is.ParameterDescription(
-              name: 'runId',
-              type: _is.getType<String>(),
-              nullable: false,
-            ),
-            'expectedIndex': _is.ParameterDescription(
-              name: 'expectedIndex',
-              type: _is.getType<int>(),
-              nullable: false,
-            ),
-          },
-          call:
-              (
-                _is.Session session,
-                Map<String, dynamic> params,
-              ) async =>
-                  (endpoints['layaPoc'] as _ilph5eyz.LayaPocEndpoint).step(
-                    session,
-                    params['workspaceId'],
-                    params['runId'],
-                    params['expectedIndex'],
-                  ),
-        ),
-        'updateStatus': _is.MethodConnector(
-          name: 'updateStatus',
-          params: {
-            'workspaceId': _is.ParameterDescription(
-              name: 'workspaceId',
-              type: _is.getType<int>(),
-              nullable: false,
-            ),
-            'runId': _is.ParameterDescription(
-              name: 'runId',
-              type: _is.getType<String>(),
-              nullable: false,
-            ),
-            'issueId': _is.ParameterDescription(
-              name: 'issueId',
-              type: _is.getType<String>(),
-              nullable: false,
-            ),
-            'status': _is.ParameterDescription(
-              name: 'status',
-              type: _is.getType<String>(),
-              nullable: false,
-            ),
-          },
-          call:
-              (
-                _is.Session session,
-                Map<String, dynamic> params,
-              ) async => (endpoints['layaPoc'] as _ilph5eyz.LayaPocEndpoint)
-                  .updateStatus(
-                    session,
-                    params['workspaceId'],
-                    params['runId'],
-                    params['issueId'],
-                    params['status'],
                   ),
         ),
       },
@@ -1002,6 +880,44 @@ class Endpoints extends _is.EndpointDispatch {
                     params['workspaceId'],
                   ),
         ),
+        'issues': _is.MethodConnector(
+          name: 'issues',
+          params: {
+            'workspaceId': _is.ParameterDescription(
+              name: 'workspaceId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['workspace'] as _iannd3dw.WorkspaceEndpoint)
+                  .issues(
+                    session,
+                    params['workspaceId'],
+                  ),
+        ),
+        'retryGrouping': _is.MethodConnector(
+          name: 'retryGrouping',
+          params: {
+            'workspaceId': _is.ParameterDescription(
+              name: 'workspaceId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['workspace'] as _iannd3dw.WorkspaceEndpoint)
+                  .retryGrouping(
+                    session,
+                    params['workspaceId'],
+                  ),
+        ),
         'discordGuild': _is.MethodConnector(
           name: 'discordGuild',
           params: {
@@ -1145,5 +1061,10 @@ class Endpoints extends _is.EndpointDispatch {
       ..initializeEndpoints(server);
     modules['serverpod_auth_core'] = _iacs.Endpoints()
       ..initializeEndpoints(server);
+  }
+
+  @override
+  _is.FutureCallDispatch? get futureCalls {
+    return _ijk9x4dd.FutureCalls();
   }
 }

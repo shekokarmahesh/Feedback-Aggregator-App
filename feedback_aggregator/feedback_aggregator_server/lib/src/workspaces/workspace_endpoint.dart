@@ -2,6 +2,7 @@ import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_idp_server/core.dart';
 import '../generated/protocol.dart';
 import 'workspace_service.dart';
+import '../feedback/grouping_service.dart';
 
 /// Workspace membership, tickets, and Discord guild configuration.
 class WorkspaceEndpoint extends Endpoint {
@@ -59,6 +60,10 @@ class WorkspaceEndpoint extends Endpoint {
       _service.accept(session, token);
   Future<List<WorkspaceTicket>> tickets(Session session, int workspaceId) =>
       _service.tickets(session, workspaceId);
+  Future<List<GroupedTicket>> issues(Session session, int workspaceId) =>
+      GroupingService().read(session, workspaceId);
+  Future<void> retryGrouping(Session session, int workspaceId) =>
+      GroupingService().enqueue(session, workspaceId, retry: true);
   Future<String?> discordGuild(Session session, int workspaceId) =>
       _service.discordGuild(session, workspaceId);
   Future<void> setDiscordGuild(
@@ -75,14 +80,19 @@ class WorkspaceEndpoint extends Endpoint {
     String description,
     String source,
     String priority,
-  ) => _service.createTicket(
-    session,
-    workspaceId,
-    title,
-    description,
-    source,
-    priority,
-  );
+  ) async {
+    final result = await _service.createTicket(
+      session,
+      workspaceId,
+      title,
+      description,
+      source,
+      priority,
+    );
+    await GroupingService().enqueue(session, workspaceId);
+    return result;
+  }
+
   Future<WorkspaceTicket> updateTicketStatus(
     Session session,
     int workspaceId,

@@ -26,8 +26,13 @@ abstract class WorkspaceTicket
     required this.requester,
     bool? isMock,
     this.externalId,
+    this.issueGroupId,
+    String? groupingState,
+    this.groupingConfidence,
+    this.severity,
     DateTime? createdAt,
   }) : isMock = isMock ?? false,
+       groupingState = groupingState ?? 'pending',
        createdAt = createdAt ?? DateTime.now();
 
   factory WorkspaceTicket({
@@ -42,6 +47,10 @@ abstract class WorkspaceTicket
     required String requester,
     bool? isMock,
     String? externalId,
+    int? issueGroupId,
+    String? groupingState,
+    double? groupingConfidence,
+    double? severity,
     DateTime? createdAt,
   }) = _WorkspaceTicketImpl;
 
@@ -60,6 +69,11 @@ abstract class WorkspaceTicket
           ? null
           : _isc.BoolJsonExtension.fromJson(jsonSerialization['isMock']),
       externalId: jsonSerialization['externalId'] as String?,
+      issueGroupId: jsonSerialization['issueGroupId'] as int?,
+      groupingState: jsonSerialization['groupingState'] as String?,
+      groupingConfidence: (jsonSerialization['groupingConfidence'] as num?)
+          ?.toDouble(),
+      severity: (jsonSerialization['severity'] as num?)?.toDouble(),
       createdAt: jsonSerialization['createdAt'] == null
           ? null
           : _isc.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
@@ -91,6 +105,14 @@ abstract class WorkspaceTicket
 
   String? externalId;
 
+  int? issueGroupId;
+
+  String groupingState;
+
+  double? groupingConfidence;
+
+  double? severity;
+
   DateTime createdAt;
 
   /// Returns a shallow copy of this [WorkspaceTicket]
@@ -108,6 +130,10 @@ abstract class WorkspaceTicket
     String? requester,
     bool? isMock,
     String? externalId,
+    int? issueGroupId,
+    String? groupingState,
+    double? groupingConfidence,
+    double? severity,
     DateTime? createdAt,
   });
   @override
@@ -125,6 +151,10 @@ abstract class WorkspaceTicket
       'requester': requester,
       'isMock': isMock,
       if (externalId != null) 'externalId': externalId,
+      if (issueGroupId != null) 'issueGroupId': issueGroupId,
+      'groupingState': groupingState,
+      if (groupingConfidence != null) 'groupingConfidence': groupingConfidence,
+      if (severity != null) 'severity': severity,
       'createdAt': createdAt.toJson(),
     };
   }
@@ -144,6 +174,10 @@ abstract class WorkspaceTicket
       'requester': requester,
       'isMock': isMock,
       if (externalId != null) 'externalId': externalId,
+      if (issueGroupId != null) 'issueGroupId': issueGroupId,
+      'groupingState': groupingState,
+      if (groupingConfidence != null) 'groupingConfidence': groupingConfidence,
+      if (severity != null) 'severity': severity,
       'createdAt': createdAt.toJson(),
     };
   }
@@ -169,6 +203,10 @@ class _WorkspaceTicketImpl extends WorkspaceTicket {
     required String requester,
     bool? isMock,
     String? externalId,
+    int? issueGroupId,
+    String? groupingState,
+    double? groupingConfidence,
+    double? severity,
     DateTime? createdAt,
   }) : super._(
          id: id,
@@ -182,6 +220,10 @@ class _WorkspaceTicketImpl extends WorkspaceTicket {
          requester: requester,
          isMock: isMock,
          externalId: externalId,
+         issueGroupId: issueGroupId,
+         groupingState: groupingState,
+         groupingConfidence: groupingConfidence,
+         severity: severity,
          createdAt: createdAt,
        );
 
@@ -201,6 +243,10 @@ class _WorkspaceTicketImpl extends WorkspaceTicket {
     String? requester,
     bool? isMock,
     Object? externalId = _Undefined,
+    Object? issueGroupId = _Undefined,
+    String? groupingState,
+    Object? groupingConfidence = _Undefined,
+    Object? severity = _Undefined,
     DateTime? createdAt,
   }) {
     return WorkspaceTicket(
@@ -215,6 +261,12 @@ class _WorkspaceTicketImpl extends WorkspaceTicket {
       requester: requester ?? this.requester,
       isMock: isMock ?? this.isMock,
       externalId: externalId is String? ? externalId : this.externalId,
+      issueGroupId: issueGroupId is int? ? issueGroupId : this.issueGroupId,
+      groupingState: groupingState ?? this.groupingState,
+      groupingConfidence: groupingConfidence is double?
+          ? groupingConfidence
+          : this.groupingConfidence,
+      severity: severity is double? ? severity : this.severity,
       createdAt: createdAt ?? this.createdAt,
     );
   }

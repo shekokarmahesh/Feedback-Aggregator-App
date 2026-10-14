@@ -287,7 +287,7 @@ void main() {
             admin,
             workspace.id,
             entry.key,
-            demoKey: 'mock-demo-key',
+            webhookKey: 'mock-demo-key',
           );
           expect(result.addedCount, 5);
           expect(result.connection.availableCount, entry.value);
@@ -336,7 +336,7 @@ void main() {
             admin,
             workspace.id,
             entry.key,
-            demoKey: 'any-demo-value',
+            webhookKey: 'any-demo-value',
           );
           expect(
             (await workspaces.tickets(
@@ -356,7 +356,7 @@ void main() {
         for (final source in ['Forms', 'Support', 'App reviews']) {
           for (final key in ['', '   ', 'x' * 129]) {
             await expectLater(
-              sources.connect(admin, workspace.id, source, demoKey: key),
+              sources.connect(admin, workspace.id, source, webhookKey: key),
               throwsA(isA<WorkspaceException>()),
             );
           }
@@ -365,7 +365,7 @@ void main() {
               admin,
               workspace.id,
               source,
-              demoKey: 'demo',
+              webhookKey: 'demo',
             )).addedCount,
             5,
           );

@@ -183,7 +183,7 @@ def main():
             def connect(source):
                 if source in ('Email', 'Slack'):
                     return rpc('sources', 'connect', {'workspaceId': wid, 'source': source}, admin)
-                return rpc('sources', 'configure', {'workspaceId': wid, 'source': source, 'demoKey': 'mock'}, admin)
+                return rpc('sources', 'configure', {'workspaceId': wid, 'source': source, 'webhookKey': 'mock'}, admin)
             for source, total in counts.items():
                 result = connect(source)
                 assert result['addedCount'] == 5 and result['connection']['connected']
@@ -197,7 +197,7 @@ def main():
                 assert result['connection']['syncedCount'] == total
                 for method in ('connect', 'sync', 'disconnect'):
                     assert http(base + '/api/sources/' + method, {'workspaceId': wid, 'source': source}, viewer)[0] in (400, 401, 403)
-                assert http(base + '/api/sources/configure', {'workspaceId': wid, 'source': source, 'demoKey': 'mock'}, viewer)[0] in (400,401,403)
+                assert http(base + '/api/sources/configure', {'workspaceId': wid, 'source': source, 'webhookKey': 'mock'}, viewer)[0] in (400,401,403)
             imported = rpc('workspace', 'tickets', {'workspaceId': wid}, admin)
             mock_rows = [row for row in imported if row['isMock']]
             assert len(imported) == 65 and len(mock_rows) == 64
@@ -217,24 +217,29 @@ def main():
             assert rpc('workspace', 'tickets', {'workspaceId': beta['id']}, admin) == []
             report['mockSources'] = {'sources': counts, 'importedReports': 64, 'disconnectHidesDatabaseRows': True, 'duplicateFree': True, 'tenantIsolation': True, 'viewerRestrictions': True}
             passed('Five demo source configurations, delta sync, hidden disconnected rows, reconnect, deduplication, roles, and tenant isolation')
+            issues = rpc('workspace', 'issues', {'workspaceId': wid}, admin)
+            assert sum(len(issue['reports']) for issue in issues) == 65
+            assert len(rpc('workspace', 'issues', {'workspaceId': wid}, viewer)) == len(issues)
+            assert http(base + '/api/workspace/retryGrouping', {'workspaceId': wid}, viewer)[0] in (400,401,403)
             if args.laya_image:
-                snapshot = json.loads(rpc('layaPoc', 'start', {'workspaceId': wid, 'sources': ['Discord', 'Slack', 'Email', 'Forms', 'Support']}, admin))
-                run = snapshot['run']
-                latencies = []
-                for index in range(34):
-                    started = time.monotonic()
-                    snapshot = json.loads(rpc('layaPoc', 'step', {'workspaceId': wid, 'runId': run['id'], 'expectedIndex': index}, admin))
-                    latencies.append(round(time.monotonic() - started, 2))
-                    run = snapshot['run']
-                    assert run['processed'] == index + 1
-                    if (index + 1) % 6 == 0:
-                        print('Laya reports processed:', index + 1, flush=True)
-                report['laya']['metrics'] = run['metrics']
-                report['laya']['reportLatencySeconds'] = latencies
-                report['laya']['containerStats'] = docker('stats', '--no-stream', '--format', '{{.MemUsage}} / {{.CPUPerc}}', tag + '-laya')
-                report['laya']['peakMemoryBytes'] = int(docker('exec', tag + '-laya', 'cat', '/sys/fs/cgroup/memory.peak'))
-                report['laya']['swapMemoryBytes'] = int(docker('exec', tag + '-laya', 'cat', '/sys/fs/cgroup/memory.swap.current'))
-                passed('All 34 real Laya inferences through authenticated Serverpod RPC')
+                started = time.monotonic()
+                deadline = started + 1800
+                while time.monotonic() < deadline:
+                    issues = rpc('workspace', 'issues', {'workspaceId': wid}, admin)
+                    pending = sum(len(issue['reports']) for issue in issues if issue['groupingState'] in ('pending','retrying'))
+                    if pending == 0:
+                        break
+                    print('Reports awaiting Laya:', pending, flush=True)
+                    time.sleep(15)
+                else:
+                    raise RuntimeError('Automatic Laya grouping did not complete')
+                assert len(issues) < 65
+                assert any(len(issue['sources']) > 1 for issue in issues)
+                report['laya']['grouping'] = {'reports':65,'issues':len(issues),'mergedReports':65-len(issues),'reviewIssues':sum(issue['groupingState']=='review' for issue in issues),'seconds':round(time.monotonic()-started,2)}
+                passed('Real Laya background grouping of persisted workspace reports across sources')
+            else:
+                assert all(issue['groupingState'] in ('pending','retrying') for issue in issues)
+                passed('Persistent grouped inbox retains reports when Laya is unavailable, without fabricated matches')
             rpc('sources', 'disconnect', {'workspaceId': wid, 'source': 'App reviews'}, admin)
             docker('stop', '--time', '20', tag + '-app')
             state = json.loads(docker('inspect', '--format', '{{json .State}}', tag + '-app'))
@@ -244,6 +249,9 @@ def main():
             restored = rpc('workspace', 'tickets', {'workspaceId': wid}, admin)
             assert any(row['id'] == ticket['id'] for row in restored)
             assert len(restored) == 56 and not any(row['source'] == 'App reviews' for row in restored)
+            visible_issues = rpc('workspace','issues',{'workspaceId':wid},admin)
+            assert sum(len(issue['reports']) for issue in visible_issues) == 56
+            assert not any('App reviews' in issue['sources'] for issue in visible_issues)
             connections = rpc('sources', 'list', {'workspaceId': wid}, admin)
             assert len(connections) == 5 and not next(c for c in connections if c['source'] == 'App reviews')['connected']
             assert connect('App reviews')['addedCount'] == 0

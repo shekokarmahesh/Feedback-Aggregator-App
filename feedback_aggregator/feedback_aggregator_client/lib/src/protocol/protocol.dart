@@ -11,6 +11,8 @@
 // ignore_for_file: dead_code, unnecessary_type_check
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:feedback_aggregator_client/src/protocol/workspaces/grouped_ticket.dart'
+    as _ie62q91q;
 import 'package:feedback_aggregator_client/src/protocol/workspaces/invitation_info.dart'
     as _ib0gvgdq;
 import 'package:feedback_aggregator_client/src/protocol/workspaces/member_info.dart'
@@ -30,6 +32,7 @@ import 'auth/auth_flow_exception.dart' as _iffl96zw;
 import 'feedback/feedback.dart' as _i810ioat;
 import 'feedback/team.dart' as _ixmckfyn;
 import 'greetings/greeting.dart' as _izw8z7ou;
+import 'workspaces/grouped_ticket.dart' as _ichzz8bw;
 import 'workspaces/invitation_delivery.dart' as _i5p49uup;
 import 'workspaces/invitation_info.dart' as _iquvyw6s;
 import 'workspaces/member_info.dart' as _itiylzhc;
@@ -43,6 +46,7 @@ export 'auth/auth_flow_exception.dart';
 export 'feedback/feedback.dart';
 export 'feedback/team.dart';
 export 'greetings/greeting.dart';
+export 'workspaces/grouped_ticket.dart';
 export 'workspaces/invitation_delivery.dart';
 export 'workspaces/invitation_info.dart';
 export 'workspaces/member_info.dart';
@@ -100,6 +104,9 @@ class Protocol extends _isc.SerializationManager {
     if (t == _izw8z7ou.Greeting) {
       return _izw8z7ou.Greeting.fromJson(data) as T;
     }
+    if (t == _ichzz8bw.GroupedTicket) {
+      return _ichzz8bw.GroupedTicket.fromJson(data) as T;
+    }
     if (t == _i5p49uup.InvitationDelivery) {
       return _i5p49uup.InvitationDelivery.fromJson(data) as T;
     }
@@ -140,6 +147,10 @@ class Protocol extends _isc.SerializationManager {
     if (t == _isc.getType<_izw8z7ou.Greeting?>()) {
       return (data != null ? _izw8z7ou.Greeting.fromJson(data) : null) as T;
     }
+    if (t == _isc.getType<_ichzz8bw.GroupedTicket?>()) {
+      return (data != null ? _ichzz8bw.GroupedTicket.fromJson(data) : null)
+          as T;
+    }
     if (t == _isc.getType<_i5p49uup.InvitationDelivery?>()) {
       return (data != null ? _i5p49uup.InvitationDelivery.fromJson(data) : null)
           as T;
@@ -177,14 +188,20 @@ class Protocol extends _isc.SerializationManager {
       return (data != null ? _ir8cxu8v.WorkspaceTicket.fromJson(data) : null)
           as T;
     }
+    if (t == List<String>) {
+      return (data as List).map((e) => deserialize<String>(e)).toList() as T;
+    }
+    if (t == List<_ir8cxu8v.WorkspaceTicket>) {
+      return (data as List)
+              .map((e) => deserialize<_ir8cxu8v.WorkspaceTicket>(e))
+              .toList()
+          as T;
+    }
     if (t == List<_io1hkon9.MockSourceConnection>) {
       return (data as List)
               .map((e) => deserialize<_io1hkon9.MockSourceConnection>(e))
               .toList()
           as T;
-    }
-    if (t == List<String>) {
-      return (data as List).map((e) => deserialize<String>(e)).toList() as T;
     }
     if (t == List<_in30w5p5.WorkspaceSummary>) {
       return (data as List)
@@ -210,6 +227,12 @@ class Protocol extends _isc.SerializationManager {
               .toList()
           as T;
     }
+    if (t == List<_ie62q91q.GroupedTicket>) {
+      return (data as List)
+              .map((e) => deserialize<_ie62q91q.GroupedTicket>(e))
+              .toList()
+          as T;
+    }
     try {
       return _iaic.Protocol().deserialize<T>(data, t);
     } on _isc.DeserializationTypeNotFoundException catch (_) {}
@@ -225,6 +248,7 @@ class Protocol extends _isc.SerializationManager {
       _i810ioat.Feedback => 'Feedback',
       _ixmckfyn.Team => 'Team',
       _izw8z7ou.Greeting => 'Greeting',
+      _ichzz8bw.GroupedTicket => 'GroupedTicket',
       _i5p49uup.InvitationDelivery => 'InvitationDelivery',
       _iquvyw6s.InvitationInfo => 'InvitationInfo',
       _itiylzhc.MemberInfo => 'MemberInfo',
@@ -259,6 +283,8 @@ class Protocol extends _isc.SerializationManager {
         return 'Team';
       case _izw8z7ou.Greeting():
         return 'Greeting';
+      case _ichzz8bw.GroupedTicket():
+        return 'GroupedTicket';
       case _i5p49uup.InvitationDelivery():
         return 'InvitationDelivery';
       case _iquvyw6s.InvitationInfo():
@@ -310,6 +336,9 @@ class Protocol extends _isc.SerializationManager {
     }
     if (dataClassName == 'Greeting') {
       return deserialize<_izw8z7ou.Greeting>(data['data']);
+    }
+    if (dataClassName == 'GroupedTicket') {
+      return deserialize<_ichzz8bw.GroupedTicket>(data['data']);
     }
     if (dataClassName == 'InvitationDelivery') {
       return deserialize<_i5p49uup.InvitationDelivery>(data['data']);

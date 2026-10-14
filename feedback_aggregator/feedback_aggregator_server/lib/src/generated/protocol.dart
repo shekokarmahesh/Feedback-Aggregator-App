@@ -11,6 +11,8 @@
 // ignore_for_file: dead_code, unnecessary_type_check
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:feedback_aggregator_server/src/generated/workspaces/grouped_ticket.dart'
+    as _ifvqah9b;
 import 'package:feedback_aggregator_server/src/generated/workspaces/invitation_info.dart'
     as _in9kijmm;
 import 'package:feedback_aggregator_server/src/generated/workspaces/member_info.dart'
@@ -31,10 +33,15 @@ import 'auth/auth_flow_exception.dart' as _iffl96zw;
 import 'feedback/feedback.dart' as _i810ioat;
 import 'feedback/feedback_webhook_key.dart' as _iyk5pcfx;
 import 'feedback/team.dart' as _ixmckfyn;
+import 'future_calls_generated_models/grouping_future_call_process_model.dart'
+    as _imd26z8h;
 import 'greetings/greeting.dart' as _izw8z7ou;
 import 'workspaces/discord_guild.dart' as _i0swa0s1;
+import 'workspaces/grouped_ticket.dart' as _ichzz8bw;
+import 'workspaces/grouping_job.dart' as _ir0iqr2v;
 import 'workspaces/invitation_delivery.dart' as _i5p49uup;
 import 'workspaces/invitation_info.dart' as _iquvyw6s;
+import 'workspaces/issue_group.dart' as _irth3bb9;
 import 'workspaces/member_info.dart' as _itiylzhc;
 import 'workspaces/mock_source_connection.dart' as _i8sxq4gq;
 import 'workspaces/source_sync_result.dart' as _ixag6zju;
@@ -51,8 +58,11 @@ export 'feedback/feedback_webhook_key.dart';
 export 'feedback/team.dart';
 export 'greetings/greeting.dart';
 export 'workspaces/discord_guild.dart';
+export 'workspaces/grouped_ticket.dart';
+export 'workspaces/grouping_job.dart';
 export 'workspaces/invitation_delivery.dart';
 export 'workspaces/invitation_info.dart';
+export 'workspaces/issue_group.dart';
 export 'workspaces/member_info.dart';
 export 'workspaces/mock_source_connection.dart';
 export 'workspaces/source_sync_result.dart';
@@ -135,6 +145,167 @@ class Protocol extends _is.DatabaseSerializationManager {
           ],
           type: 'btree',
           isUnique: true,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _isp.TableDefinition(
+      name: 'app_grouping_job',
+      dartName: 'GroupingJob',
+      schema: 'public',
+      module: 'feedback_aggregator',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isp.ColumnDefinition(
+          name: 'workspaceId',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'requestedBy',
+          columnType: _isp.ColumnType.uuid,
+          isNullable: false,
+          dartType: 'UuidValue',
+        ),
+        _isp.ColumnDefinition(
+          name: 'status',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+          columnDefault: '\'idle\'',
+        ),
+        _isp.ColumnDefinition(
+          name: 'scheduledAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: true,
+          dartType: 'DateTime?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'leaseToken',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'leaseUntil',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: true,
+          dartType: 'DateTime?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'retryAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: true,
+          dartType: 'DateTime?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'failures',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+          columnDefault: '0',
+        ),
+        _isp.ColumnDefinition(
+          name: 'lastError',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+      ],
+      foreignKeys: [
+        _isp.ForeignKeyDefinition(
+          constraintName: 'app_grouping_job_fk_0',
+          columns: ['workspaceId'],
+          referenceTable: 'app_workspace',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _isp.ForeignKeyAction.noAction,
+          onDelete: _isp.ForeignKeyAction.cascade,
+          matchType: null,
+        ),
+      ],
+      indexes: [
+        _isp.IndexDefinition(
+          indexName: 'grouping_job_workspace',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'workspaceId',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _isp.TableDefinition(
+      name: 'app_issue_group',
+      dartName: 'IssueGroup',
+      schema: 'public',
+      module: 'feedback_aggregator',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isp.ColumnDefinition(
+          name: 'workspaceId',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'status',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'createdAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+          columnDefault: 'now',
+        ),
+      ],
+      foreignKeys: [
+        _isp.ForeignKeyDefinition(
+          constraintName: 'app_issue_group_fk_0',
+          columns: ['workspaceId'],
+          referenceTable: 'app_workspace',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _isp.ForeignKeyAction.noAction,
+          onDelete: _isp.ForeignKeyAction.cascade,
+          matchType: null,
+        ),
+      ],
+      indexes: [
+        _isp.IndexDefinition(
+          indexName: 'issue_group_workspace',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'workspaceId',
+            ),
+          ],
+          type: 'btree',
+          isUnique: false,
           isPrimary: false,
         ),
       ],
@@ -546,6 +717,31 @@ class Protocol extends _is.DatabaseSerializationManager {
           dartType: 'String?',
         ),
         _isp.ColumnDefinition(
+          name: 'issueGroupId',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: true,
+          dartType: 'int?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'groupingState',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+          columnDefault: '\'pending\'',
+        ),
+        _isp.ColumnDefinition(
+          name: 'groupingConfidence',
+          columnType: _isp.ColumnType.doublePrecision,
+          isNullable: true,
+          dartType: 'double?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'severity',
+          columnType: _isp.ColumnType.doublePrecision,
+          isNullable: true,
+          dartType: 'double?',
+        ),
+        _isp.ColumnDefinition(
           name: 'createdAt',
           columnType: _isp.ColumnType.timestampWithoutTimeZone,
           isNullable: false,
@@ -564,6 +760,16 @@ class Protocol extends _is.DatabaseSerializationManager {
           onDelete: _isp.ForeignKeyAction.cascade,
           matchType: null,
         ),
+        _isp.ForeignKeyDefinition(
+          constraintName: 'app_workspace_ticket_fk_1',
+          columns: ['issueGroupId'],
+          referenceTable: 'app_issue_group',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _isp.ForeignKeyAction.noAction,
+          onDelete: _isp.ForeignKeyAction.setNull,
+          matchType: null,
+        ),
       ],
       indexes: [
         _isp.IndexDefinition(
@@ -573,6 +779,23 @@ class Protocol extends _is.DatabaseSerializationManager {
             _isp.IndexElementDefinition(
               type: _isp.IndexElementDefinitionType.column,
               definition: 'workspaceId',
+            ),
+          ],
+          type: 'btree',
+          isUnique: false,
+          isPrimary: false,
+        ),
+        _isp.IndexDefinition(
+          indexName: 'workspace_ticket_grouping',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'workspaceId',
+            ),
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'issueGroupId',
             ),
           ],
           type: 'btree',
@@ -869,17 +1092,29 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _ixmckfyn.Team) {
       return _ixmckfyn.Team.fromJson(data) as T;
     }
+    if (t == _imd26z8h.GroupingFutureCallProcessModel) {
+      return _imd26z8h.GroupingFutureCallProcessModel.fromJson(data) as T;
+    }
     if (t == _izw8z7ou.Greeting) {
       return _izw8z7ou.Greeting.fromJson(data) as T;
     }
     if (t == _i0swa0s1.DiscordGuild) {
       return _i0swa0s1.DiscordGuild.fromJson(data) as T;
     }
+    if (t == _ichzz8bw.GroupedTicket) {
+      return _ichzz8bw.GroupedTicket.fromJson(data) as T;
+    }
+    if (t == _ir0iqr2v.GroupingJob) {
+      return _ir0iqr2v.GroupingJob.fromJson(data) as T;
+    }
     if (t == _i5p49uup.InvitationDelivery) {
       return _i5p49uup.InvitationDelivery.fromJson(data) as T;
     }
     if (t == _iquvyw6s.InvitationInfo) {
       return _iquvyw6s.InvitationInfo.fromJson(data) as T;
+    }
+    if (t == _irth3bb9.IssueGroup) {
+      return _irth3bb9.IssueGroup.fromJson(data) as T;
     }
     if (t == _itiylzhc.MemberInfo) {
       return _itiylzhc.MemberInfo.fromJson(data) as T;
@@ -925,11 +1160,24 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _is.getType<_ixmckfyn.Team?>()) {
       return (data != null ? _ixmckfyn.Team.fromJson(data) : null) as T;
     }
+    if (t == _is.getType<_imd26z8h.GroupingFutureCallProcessModel?>()) {
+      return (data != null
+              ? _imd26z8h.GroupingFutureCallProcessModel.fromJson(data)
+              : null)
+          as T;
+    }
     if (t == _is.getType<_izw8z7ou.Greeting?>()) {
       return (data != null ? _izw8z7ou.Greeting.fromJson(data) : null) as T;
     }
     if (t == _is.getType<_i0swa0s1.DiscordGuild?>()) {
       return (data != null ? _i0swa0s1.DiscordGuild.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_ichzz8bw.GroupedTicket?>()) {
+      return (data != null ? _ichzz8bw.GroupedTicket.fromJson(data) : null)
+          as T;
+    }
+    if (t == _is.getType<_ir0iqr2v.GroupingJob?>()) {
+      return (data != null ? _ir0iqr2v.GroupingJob.fromJson(data) : null) as T;
     }
     if (t == _is.getType<_i5p49uup.InvitationDelivery?>()) {
       return (data != null ? _i5p49uup.InvitationDelivery.fromJson(data) : null)
@@ -938,6 +1186,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _is.getType<_iquvyw6s.InvitationInfo?>()) {
       return (data != null ? _iquvyw6s.InvitationInfo.fromJson(data) : null)
           as T;
+    }
+    if (t == _is.getType<_irth3bb9.IssueGroup?>()) {
+      return (data != null ? _irth3bb9.IssueGroup.fromJson(data) : null) as T;
     }
     if (t == _is.getType<_itiylzhc.MemberInfo?>()) {
       return (data != null ? _itiylzhc.MemberInfo.fromJson(data) : null) as T;
@@ -981,14 +1232,20 @@ class Protocol extends _is.DatabaseSerializationManager {
       return (data != null ? _ir8cxu8v.WorkspaceTicket.fromJson(data) : null)
           as T;
     }
+    if (t == List<String>) {
+      return (data as List).map((e) => deserialize<String>(e)).toList() as T;
+    }
+    if (t == List<_ir8cxu8v.WorkspaceTicket>) {
+      return (data as List)
+              .map((e) => deserialize<_ir8cxu8v.WorkspaceTicket>(e))
+              .toList()
+          as T;
+    }
     if (t == List<_iig9z06a.MockSourceConnection>) {
       return (data as List)
               .map((e) => deserialize<_iig9z06a.MockSourceConnection>(e))
               .toList()
           as T;
-    }
-    if (t == List<String>) {
-      return (data as List).map((e) => deserialize<String>(e)).toList() as T;
     }
     if (t == List<_i9st2zmz.WorkspaceSummary>) {
       return (data as List)
@@ -1014,6 +1271,12 @@ class Protocol extends _is.DatabaseSerializationManager {
               .toList()
           as T;
     }
+    if (t == List<_ifvqah9b.GroupedTicket>) {
+      return (data as List)
+              .map((e) => deserialize<_ifvqah9b.GroupedTicket>(e))
+              .toList()
+          as T;
+    }
     try {
       return _iais.Protocol().deserialize<T>(data, t);
     } on _is.DeserializationTypeNotFoundException catch (_) {}
@@ -1032,10 +1295,15 @@ class Protocol extends _is.DatabaseSerializationManager {
       _i810ioat.Feedback => 'Feedback',
       _iyk5pcfx.FeedbackWebhookKey => 'FeedbackWebhookKey',
       _ixmckfyn.Team => 'Team',
+      _imd26z8h.GroupingFutureCallProcessModel =>
+        'GroupingFutureCallProcessModel',
       _izw8z7ou.Greeting => 'Greeting',
       _i0swa0s1.DiscordGuild => 'DiscordGuild',
+      _ichzz8bw.GroupedTicket => 'GroupedTicket',
+      _ir0iqr2v.GroupingJob => 'GroupingJob',
       _i5p49uup.InvitationDelivery => 'InvitationDelivery',
       _iquvyw6s.InvitationInfo => 'InvitationInfo',
+      _irth3bb9.IssueGroup => 'IssueGroup',
       _itiylzhc.MemberInfo => 'MemberInfo',
       _i8sxq4gq.MockSourceConnection => 'MockSourceConnection',
       _ixag6zju.SourceSyncResult => 'SourceSyncResult',
@@ -1071,14 +1339,22 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'FeedbackWebhookKey';
       case _ixmckfyn.Team():
         return 'Team';
+      case _imd26z8h.GroupingFutureCallProcessModel():
+        return 'GroupingFutureCallProcessModel';
       case _izw8z7ou.Greeting():
         return 'Greeting';
       case _i0swa0s1.DiscordGuild():
         return 'DiscordGuild';
+      case _ichzz8bw.GroupedTicket():
+        return 'GroupedTicket';
+      case _ir0iqr2v.GroupingJob():
+        return 'GroupingJob';
       case _i5p49uup.InvitationDelivery():
         return 'InvitationDelivery';
       case _iquvyw6s.InvitationInfo():
         return 'InvitationInfo';
+      case _irth3bb9.IssueGroup():
+        return 'IssueGroup';
       case _itiylzhc.MemberInfo():
         return 'MemberInfo';
       case _i8sxq4gq.MockSourceConnection():
@@ -1137,17 +1413,31 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (dataClassName == 'Team') {
       return deserialize<_ixmckfyn.Team>(data['data']);
     }
+    if (dataClassName == 'GroupingFutureCallProcessModel') {
+      return deserialize<_imd26z8h.GroupingFutureCallProcessModel>(
+        data['data'],
+      );
+    }
     if (dataClassName == 'Greeting') {
       return deserialize<_izw8z7ou.Greeting>(data['data']);
     }
     if (dataClassName == 'DiscordGuild') {
       return deserialize<_i0swa0s1.DiscordGuild>(data['data']);
     }
+    if (dataClassName == 'GroupedTicket') {
+      return deserialize<_ichzz8bw.GroupedTicket>(data['data']);
+    }
+    if (dataClassName == 'GroupingJob') {
+      return deserialize<_ir0iqr2v.GroupingJob>(data['data']);
+    }
     if (dataClassName == 'InvitationDelivery') {
       return deserialize<_i5p49uup.InvitationDelivery>(data['data']);
     }
     if (dataClassName == 'InvitationInfo') {
       return deserialize<_iquvyw6s.InvitationInfo>(data['data']);
+    }
+    if (dataClassName == 'IssueGroup') {
+      return deserialize<_irth3bb9.IssueGroup>(data['data']);
     }
     if (dataClassName == 'MemberInfo') {
       return deserialize<_itiylzhc.MemberInfo>(data['data']);
@@ -1228,6 +1518,10 @@ class Protocol extends _is.DatabaseSerializationManager {
         return _ixmckfyn.Team.t;
       case _i0swa0s1.DiscordGuild:
         return _i0swa0s1.DiscordGuild.t;
+      case _ir0iqr2v.GroupingJob:
+        return _ir0iqr2v.GroupingJob.t;
+      case _irth3bb9.IssueGroup:
+        return _irth3bb9.IssueGroup.t;
       case _i8sxq4gq.MockSourceConnection:
         return _i8sxq4gq.MockSourceConnection.t;
       case _ipnno8uy.Workspace:

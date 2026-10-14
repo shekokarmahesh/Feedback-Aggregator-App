@@ -30,6 +30,7 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
   Client get _client => widget.apiClient ?? client;
   List<WorkspaceSummary> _workspaces = [];
   List<WorkspaceTicket> _tickets = [];
+  List<GroupedTicket> _issues = [];
   WorkspaceSummary? _active;
   String? _discordGuild;
   List<MockSourceConnection> _sourceConnections = [];
@@ -68,7 +69,7 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
       }
       _autoSyncing = true;
       try {
-        await _refreshActive(syncDemo: true);
+        await _refreshActive(syncSources: true);
       } finally {
         _autoSyncing = false;
       }
@@ -88,6 +89,7 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
       _loading = true;
       _error = null;
       _tickets = [];
+      _issues = [];
       _discordGuild = null;
       _sourceConnections = [];
       _syncingSources = {};
@@ -108,11 +110,15 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
       final connections = active == null
           ? <MockSourceConnection>[]
           : await _client.sources.list(active.id);
+      final issues = active == null
+          ? <GroupedTicket>[]
+          : await _client.workspace.issues(active.id);
       if (!mounted || revision != _loadRevision) return;
       setState(() {
         _workspaces = orgs;
         _active = active;
         _tickets = _visibleTickets(tickets, connections);
+        _issues = issues;
         _discordGuild = guild;
         _sourceConnections = connections;
       });
@@ -132,7 +138,7 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
 
   /// Background refresh keeps the current tab, filters, and scroll position.
   /// A request started in one workspace can never replace a different tenant.
-  Future<void> _refreshActive({bool syncDemo = false}) async {
+  Future<void> _refreshActive({bool syncSources = false}) async {
     final org = _active;
     if (org == null || _loading) return;
     final loadRevision = _loadRevision;
@@ -153,7 +159,7 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
       var connections = await _client.sources.list(org.id);
       if (!current()) return;
       final errors = <String, String>{};
-      if (syncDemo && active.role != WorkspaceRole.viewer) {
+      if (syncSources && active.role != WorkspaceRole.viewer) {
         final pending = connections
             .where((c) => c.connected && c.syncedCount < c.availableCount)
             .toList();
@@ -171,11 +177,13 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
       if (!current()) return;
       final tickets = await _client.workspace.tickets(org.id);
       final guild = await _client.workspace.discordGuild(org.id);
+      final issues = await _client.workspace.issues(org.id);
       if (!current()) return;
       setState(() {
         _workspaces = orgs;
         _active = active;
         _tickets = _visibleTickets(tickets, connections);
+        _issues = issues;
         _discordGuild = guild;
         _sourceConnections = connections;
         _sourceSyncErrors = errors;
@@ -204,11 +212,11 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
 
   Future<SourceSyncResult> _configureSource(
     String source,
-    String demoKey,
+    String webhookKey,
   ) async {
     return _changeSource(
       source,
-      () => _client.sources.configure(_active!.id, source, demoKey),
+      () => _client.sources.configure(_active!.id, source, webhookKey),
     );
   }
 
@@ -486,7 +494,7 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
     try {
       await _client.workspace.updateTicketStatus(
         org.id,
-        int.parse(ticket.id.substring(3)),
+        ticket.primaryTicketId ?? int.parse(ticket.id.substring(3)),
         status,
       );
       if (mounted) await _load(preferred: org.id);
@@ -661,22 +669,24 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
                 onConfigureDiscord: _active!.role == WorkspaceRole.admin
                     ? _discord
                     : null,
-                tickets: _tickets
+                tickets: _issues
                     .map(
-                      (t) => DemoTicket(
-                        'FB-${t.id}',
-                        t.title,
-                        t.description,
-                        t.source,
-                        t.status,
-                        t.priority,
-                        t.supporters,
-                        DateTime.now().toUtc().difference(t.createdAt).inHours,
-                        t.requester,
-                        isMock: t.isMock,
+                      (issue) => DemoTicket.fromGroup(
+                        issue,
+                        _sourceConnections
+                            .where((c) => !c.connected)
+                            .map((c) => c.source)
+                            .toSet(),
                       ),
                     )
+                    .whereType<DemoTicket>()
                     .toList(),
+                onRetryGrouping: _active!.role == WorkspaceRole.viewer
+                    ? null
+                    : () async {
+                        await _client.workspace.retryGrouping(_active!.id);
+                        await _refreshActive();
+                      },
                 onCreateTicket: _active!.role == WorkspaceRole.viewer
                     ? null
                     : _createTicket,

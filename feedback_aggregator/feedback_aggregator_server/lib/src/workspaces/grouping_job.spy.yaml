@@ -1,0 +1,17 @@
+class: GroupingJob
+table: app_grouping_job
+serverOnly: true
+fields:
+  workspaceId: int, relation(parent=app_workspace, onDelete=Cascade)
+  requestedBy: UuidValue
+  status: String, default='idle'
+  scheduledAt: DateTime?
+  leaseToken: String?
+  leaseUntil: DateTime?
+  retryAt: DateTime?
+  failures: int, default=0
+  lastError: String?
+indexes:
+  grouping_job_workspace:
+    fields: workspaceId
+    unique: true
