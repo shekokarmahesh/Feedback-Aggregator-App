@@ -25,6 +25,8 @@ import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
     as _iaic;
 import 'package:serverpod_client/serverpod_client.dart' as _isc;
 import 'auth/auth_flow_exception.dart' as _iffl96zw;
+import 'feedback/feedback.dart' as _i810ioat;
+import 'feedback/team.dart' as _ixmckfyn;
 import 'greetings/greeting.dart' as _izw8z7ou;
 import 'workspaces/invitation_delivery.dart' as _i5p49uup;
 import 'workspaces/invitation_info.dart' as _iquvyw6s;
@@ -34,6 +36,8 @@ import 'workspaces/workspace_role.dart' as _i6w1n5dc;
 import 'workspaces/workspace_summary.dart' as _i0zqiur8;
 import 'workspaces/workspace_ticket.dart' as _ir8cxu8v;
 export 'auth/auth_flow_exception.dart';
+export 'feedback/feedback.dart';
+export 'feedback/team.dart';
 export 'greetings/greeting.dart';
 export 'workspaces/invitation_delivery.dart';
 export 'workspaces/invitation_info.dart';
@@ -81,6 +85,12 @@ class Protocol extends _isc.SerializationManager {
     if (t == _iffl96zw.AuthFlowException) {
       return _iffl96zw.AuthFlowException.fromJson(data) as T;
     }
+    if (t == _i810ioat.Feedback) {
+      return _i810ioat.Feedback.fromJson(data) as T;
+    }
+    if (t == _ixmckfyn.Team) {
+      return _ixmckfyn.Team.fromJson(data) as T;
+    }
     if (t == _izw8z7ou.Greeting) {
       return _izw8z7ou.Greeting.fromJson(data) as T;
     }
@@ -108,6 +118,12 @@ class Protocol extends _isc.SerializationManager {
     if (t == _isc.getType<_iffl96zw.AuthFlowException?>()) {
       return (data != null ? _iffl96zw.AuthFlowException.fromJson(data) : null)
           as T;
+    }
+    if (t == _isc.getType<_i810ioat.Feedback?>()) {
+      return (data != null ? _i810ioat.Feedback.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_ixmckfyn.Team?>()) {
+      return (data != null ? _ixmckfyn.Team.fromJson(data) : null) as T;
     }
     if (t == _isc.getType<_izw8z7ou.Greeting?>()) {
       return (data != null ? _izw8z7ou.Greeting.fromJson(data) : null) as T;
@@ -178,6 +194,8 @@ class Protocol extends _isc.SerializationManager {
   static String? getClassNameForType(Type type) {
     return switch (type) {
       _iffl96zw.AuthFlowException => 'AuthFlowException',
+      _i810ioat.Feedback => 'Feedback',
+      _ixmckfyn.Team => 'Team',
       _izw8z7ou.Greeting => 'Greeting',
       _i5p49uup.InvitationDelivery => 'InvitationDelivery',
       _iquvyw6s.InvitationInfo => 'InvitationInfo',
@@ -205,6 +223,10 @@ class Protocol extends _isc.SerializationManager {
     switch (data) {
       case _iffl96zw.AuthFlowException():
         return 'AuthFlowException';
+      case _i810ioat.Feedback():
+        return 'Feedback';
+      case _ixmckfyn.Team():
+        return 'Team';
       case _izw8z7ou.Greeting():
         return 'Greeting';
       case _i5p49uup.InvitationDelivery():
@@ -245,6 +267,12 @@ class Protocol extends _isc.SerializationManager {
     }
     if (dataClassName == 'AuthFlowException') {
       return deserialize<_iffl96zw.AuthFlowException>(data['data']);
+    }
+    if (dataClassName == 'Feedback') {
+      return deserialize<_i810ioat.Feedback>(data['data']);
+    }
+    if (dataClassName == 'Team') {
+      return deserialize<_ixmckfyn.Team>(data['data']);
     }
     if (dataClassName == 'Greeting') {
       return deserialize<_izw8z7ou.Greeting>(data['data']);

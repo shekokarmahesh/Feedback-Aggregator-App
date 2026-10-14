@@ -34,6 +34,8 @@ class DashboardScreen extends StatefulWidget {
   final WorkspaceSummary? workspace;
   final List<DemoTicket> tickets;
   final VoidCallback? onCreateTicket;
+  final VoidCallback? onConfigureDiscord;
+  final String? discordGuildId;
   final Future<void> Function(DemoTicket, String)? onUpdateStatus;
   final Future<AccountProfile> Function() loadProfile;
   const DashboardScreen({
@@ -42,6 +44,8 @@ class DashboardScreen extends StatefulWidget {
     this.workspace,
     this.tickets = demoTickets,
     this.onCreateTicket,
+    this.onConfigureDiscord,
+    this.discordGuildId,
     this.onUpdateStatus,
     this.loadProfile = loadAccountProfile,
   });
@@ -1130,6 +1134,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
         'A shared inbox for every place your customers talk to you.',
       ),
       const SizedBox(height: 24),
+      if (widget.workspace != null) ...[
+        _surface(
+          Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Discord setup',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'Install the bot, run /feedback setup in your Discord server, then paste the guild ID to link it to this workspace.',
+                ),
+                const SizedBox(height: 16),
+                if (widget.onConfigureDiscord != null)
+                  FilledButton.icon(
+                    onPressed: widget.onConfigureDiscord,
+                    icon: const Icon(Icons.settings_outlined),
+                    label: Text(
+                      widget.discordGuildId == null
+                          ? 'Set up Discord'
+                          : 'Configure Discord',
+                    ),
+                  )
+                else
+                  const Text('Ask a workspace Admin to set up Discord.'),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 20),
+      ],
       _surface(
         Padding(
           padding: const EdgeInsets.all(20),
@@ -1139,7 +1177,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               const SizedBox(width: 12),
               const Expanded(
                 child: Text(
-                  'These integrations are planned. You can add feedback manually and label its source.',
+                  'Link Discord to receive feedback from your bot. Other integrations are planned; you can also add feedback manually.',
                   style: TextStyle(height: 1.5),
                 ),
               ),
@@ -1187,7 +1225,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ],
                     ),
                   ),
-                  _pill('Not connected', const Color(0xFF64748B)),
+                  _pill(
+                    source == 'Discord' && widget.discordGuildId != null
+                        ? 'Connected'
+                        : 'Not connected',
+                    const Color(0xFF64748B),
+                  ),
                 ],
               ),
             ),

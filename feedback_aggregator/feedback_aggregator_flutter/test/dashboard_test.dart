@@ -3,6 +3,8 @@ import 'package:feedback_aggregator_client/feedback_aggregator_client.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:feedback_aggregator_flutter/models/demo_ticket.dart';
 import 'package:feedback_aggregator_flutter/screens/dashboard_screen.dart';
+import 'package:feedback_aggregator_flutter/screens/discord_config_screen.dart';
+import 'package:url_launcher/link.dart';
 
 void main() {
   test('combines search, status, source, and priority filters', () {
@@ -27,6 +29,8 @@ void main() {
     WorkspaceSummary? workspace,
     List<DemoTicket> tickets = demoTickets,
     VoidCallback? onCreateTicket,
+    VoidCallback? onConfigureDiscord,
+    String? discordGuildId,
     Future<void> Function(DemoTicket, String)? onUpdateStatus,
   }) async {
     await tester.pumpWidget(
@@ -36,6 +40,8 @@ void main() {
             workspace: workspace,
             tickets: tickets,
             onCreateTicket: onCreateTicket,
+            onConfigureDiscord: onConfigureDiscord,
+            discordGuildId: discordGuildId,
             onUpdateStatus: onUpdateStatus,
             onSignOut: () async {
               signedOut?.call();
@@ -68,6 +74,47 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('What customers are saying'), findsOneWidget);
     expect(find.text('28 customer requests'), findsOneWidget);
+  });
+
+  testWidgets('workspace Admin can open Discord configuration from sources', (
+    tester,
+  ) async {
+    var configured = false;
+    await showDashboard(
+      tester,
+      workspace: WorkspaceSummary(
+        id: 1,
+        name: 'Test workspace',
+        role: WorkspaceRole.admin,
+      ),
+      onConfigureDiscord: () => configured = true,
+      discordGuildId: '123456789012345678',
+    );
+    await tester.tap(find.text('Manage sources'));
+    await tester.pumpAndSettle();
+    expect(find.text('Discord setup'), findsOneWidget);
+    await tester.ensureVisible(find.text('Configure Discord'));
+    await tester.tap(find.text('Configure Discord'));
+    expect(configured, isTrue);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: DiscordConfigScreen(
+          workspace: WorkspaceSummary(
+            id: 1,
+            name: 'Test workspace',
+            role: WorkspaceRole.admin,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Install Discord bot'), findsOneWidget);
+    expect(
+      tester.widget<Link>(find.byType(Link)).uri.toString(),
+      'https://discord.com/oauth2/authorize?client_id=1558486882793427014',
+    );
+    expect(find.text('2. Run /feedback setup in that server.'), findsOneWidget);
+    expect(find.text('Discord guild ID'), findsOneWidget);
   });
   testWidgets(
     'profile displays account data and sign-out invokes auth callback',

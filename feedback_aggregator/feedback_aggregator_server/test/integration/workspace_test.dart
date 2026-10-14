@@ -1,8 +1,13 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_idp_server/core.dart';
 import 'package:feedback_aggregator_server/src/generated/protocol.dart';
 import 'package:feedback_aggregator_server/src/workspaces/workspace_service.dart';
 import 'package:feedback_aggregator_server/src/auth/auth_email.dart';
+import 'package:feedback_aggregator_server/src/web/routes/feedback_webhook_route.dart';
+import 'package:feedback_aggregator_server/src/feedback/webhook_key_service.dart';
 import 'package:test/test.dart';
 import 'test_tools/serverpod_test_tools.dart';
 
@@ -242,6 +247,157 @@ void main() {
         throwsA(isA<WorkspaceException>()),
       );
     });
+
+    test(
+      'Discord setup is Admin-only and guilds cannot cross workspaces',
+      () async {
+        final org = await service.create(admin, 'Discord Alpha');
+        final outsider = await account('discord-outsider@example.com');
+        final beta = await service.create(outsider, 'Discord Beta');
+        const guild = '123456789012345678';
+        await expectLater(
+          service.setDiscordGuild(outsider, org.id, guild),
+          throwsA(isA<WorkspaceException>()),
+        );
+        await expectLater(
+          service.discordGuild(outsider, org.id),
+          throwsA(isA<WorkspaceException>()),
+        );
+        await expectLater(
+          service.setDiscordGuild(admin, org.id, 'invalid'),
+          throwsA(isA<WorkspaceException>()),
+        );
+        await service.setDiscordGuild(admin, org.id, guild);
+        expect(await service.discordGuild(admin, org.id), guild);
+        await expectLater(
+          service.setDiscordGuild(outsider, beta.id, guild),
+          throwsA(isA<WorkspaceException>()),
+        );
+        await service.invite(
+          admin,
+          org.id,
+          'discord-outsider@example.com',
+          WorkspaceRole.editor,
+        );
+        await service.accept(outsider, token(sentUrl));
+        await expectLater(
+          service.setDiscordGuild(outsider, org.id, guild),
+          throwsA(isA<WorkspaceException>()),
+        );
+        await expectLater(
+          service.disconnectDiscord(outsider, org.id),
+          throwsA(isA<WorkspaceException>()),
+        );
+        await service.setDiscordGuild(admin, org.id, '223456789012345678');
+        expect(await service.discordGuild(admin, org.id), '223456789012345678');
+        await service.disconnectDiscord(admin, org.id);
+        expect(await service.discordGuild(admin, org.id), isNull);
+        await service.setDiscordGuild(outsider, beta.id, guild);
+        expect(await service.discordGuild(outsider, beta.id), guild);
+      },
+    );
+
+    test(
+      'Discord HTTP ingestion routes by guild, without a key or email',
+      () async {
+        final org = await service.create(admin, 'Discord HTTP');
+        const guild = '323456789012345678';
+        await service.setDiscordGuild(admin, org.id, guild);
+        final web = admin.serverpod.webServer;
+        web.addRoute(FeedbackWebhookRoute(), '/webhooks/feedback');
+        web.addRoute(
+          FlutterRoute(Directory('web/app'), enableWasmHeaders: false),
+          '/',
+        );
+        expect(await web.start(), isTrue);
+        addTearDown(web.stop);
+        final http = HttpClient();
+        addTearDown(http.close);
+        Future<int> post(
+          Object data, {
+          String contentType = 'application/json',
+          String? key,
+        }) async {
+          final request = await http.postUrl(
+            Uri.parse('http://localhost:${web.port}/webhooks/feedback'),
+          );
+          request.headers.set('Content-Type', contentType);
+          if (key != null) request.headers.set('X-Feedback-Webhook-Key', key);
+          request.write(data is String ? data : jsonEncode(data));
+          final response = await request.close();
+          await response.drain<void>();
+          return response.statusCode;
+        }
+
+        const payload = {
+          'platform': 'discord',
+          'guild_id': guild,
+          'title': ' Export ',
+          'body': 'Please add CSV export.',
+          'requester': 'Alice',
+          'workspaceId': 999,
+        };
+        expect(await post(payload), 201);
+        final tickets = await service.tickets(admin, org.id);
+        expect(tickets, hasLength(1));
+        expect(tickets.single.workspaceId, org.id);
+        expect(tickets.single.title, 'Export');
+        expect(tickets.single.source, 'Discord');
+        expect(tickets.single.requester, 'Alice');
+        expect(await post({...payload, 'guild_id': '423456789012345678'}), 422);
+        expect(await post({...payload, 'guild_id': 123}), 400);
+        expect(await post({...payload, 'body': ''}), 400);
+        expect(await post({...payload, 'body': 'x' * 65536}), 413);
+        expect(await post(payload, contentType: 'text/plain'), 415);
+        expect(await post({'title': 'Non-Discord'}), 401);
+        final team = await Team.db.insertRow(
+          admin,
+          Team(
+            name: 'Regular webhook',
+            ownerUserId: admin.authenticated!.userIdentifier,
+            createdAt: DateTime.now().toUtc(),
+          ),
+        );
+        final key = generateWebhookKey();
+        await FeedbackWebhookKey.db.insertRow(
+          admin,
+          FeedbackWebhookKey(
+            teamId: team.id!,
+            keyHash: hashWebhookKey(key),
+            createdByUserId: admin.authenticated!.userIdentifier,
+            createdAt: DateTime.now().toUtc(),
+          ),
+        );
+        const regular = {
+          'title': 'Regular feedback',
+          'body': 'Still requires a key',
+          'source': 'website-support',
+          'userEmail': 'USER@example.com',
+        };
+        expect(await post(regular), 401);
+        expect(await post(regular, key: key), 201);
+        expect(
+          await post(
+            Uri(queryParameters: regular).query,
+            key: key,
+            contentType: 'application/x-www-form-urlencoded',
+          ),
+          201,
+        );
+        final rows = await Feedback.db.find(
+          admin,
+          where: (t) => t.teamId.equals(team.id!),
+        );
+        expect(rows, hasLength(2));
+        expect(
+          rows.every((row) => row.userEmail == 'user@example.com'),
+          isTrue,
+        );
+        await service.disconnectDiscord(admin, org.id);
+        expect(await post(payload), 422);
+        expect(await service.tickets(admin, org.id), hasLength(1));
+      },
+    );
 
     test('revoked, expired, and superseded invitations cannot join', () async {
       final org = await service.create(admin, 'Alpha');

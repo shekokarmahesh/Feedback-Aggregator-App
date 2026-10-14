@@ -14,6 +14,10 @@ googleIdp:
   - hasAccount:
 jwtRefresh:
   - refreshAccessToken:
+feedbackIngestion:
+  - createTeam:
+  - generateKey:
+  - revokeKey:
 greeting:
   - hello:
 layaPoc:
@@ -34,5 +38,8 @@ workspace:
   - previewInvitation:
   - acceptInvitation:
   - tickets:
+  - discordGuild:
+  - setDiscordGuild:
+  - disconnectDiscord:
   - createTicket:
   - updateTicketStatus:

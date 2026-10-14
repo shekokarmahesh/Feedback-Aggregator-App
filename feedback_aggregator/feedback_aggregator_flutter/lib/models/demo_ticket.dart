@@ -114,7 +114,14 @@ const demoTickets = [
 ];
 
 const ticketStatuses = ['Open', 'Planned', 'In progress', 'Resolved'];
-const ticketSources = ['Forms', 'Email', 'Slack', 'Support', 'App reviews'];
+const ticketSources = [
+  'Forms',
+  'Email',
+  'Slack',
+  'Discord',
+  'Support',
+  'App reviews',
+];
 const ticketPriorities = ['High', 'Medium', 'Low'];
 
 List<DemoTicket> filterTickets({
