@@ -59,7 +59,7 @@ void main() {
       var calls = 0;
       await showPanel(
         tester,
-        onConfigure: (_, __) {
+        onConfigure: (_, _) {
           calls++;
           return response.future;
         },

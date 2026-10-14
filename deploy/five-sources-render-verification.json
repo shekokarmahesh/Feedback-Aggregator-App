@@ -1,0 +1,46 @@
+{
+  "checkedAt": "2026-10-14T13:12:41.052496+00:00",
+  "url": "https://feedbackaggregatorai.online",
+  "commit": "ca262b0ba935977a3241b7c4272e9f95d2ccc277",
+  "checks": [
+    "Custom domain, website, runtime API origin, OAuth callback route, and database readiness",
+    "Existing password login and authenticated Sources endpoint",
+    "New workspace begins disconnected and rejects a nonmember",
+    "Five connections import unequal feeds, reject Viewer writes, and complete delta sync without duplicates",
+    "Disconnect hides persisted, manual, and cached-source rows after fresh login; reconnect preserves tickets and status; Discord rows unaffected",
+    "Source imports stay isolated from the existing verification workspace and preserve its original ticket"
+  ],
+  "mockSources": {
+    "sources": {
+      "Email": 12,
+      "Slack": 20,
+      "Forms": 8,
+      "Support": 15,
+      "App reviews": 9
+    },
+    "importedReports": 64,
+    "disconnectHidesDatabaseRows": true,
+    "disconnectPersistsAfterLogin": true,
+    "duplicateFree": true,
+    "tenantIsolation": true,
+    "viewerRestrictions": true,
+    "reconnectPreservesTickets": true
+  },
+  "passed": true,
+  "monitoring": {
+    "mainServiceLive": true,
+    "layaServiceLive": true,
+    "layaHealthStatus": 200,
+    "serverFailureOrRestartEvents": 0,
+    "expectedNegativeTestErrors": 27,
+    "unexpectedErrorsObserved": 0
+  },
+  "browserChecks": [
+    "Existing Admin workspace and Discord connection retained",
+    "Existing Slack connection discovers and imports its expanded 20-report feed",
+    "Forms configuration with demo key imports eight reports including automatic sync",
+    "Forms Disconnect resets the card and removes its tickets from inbox metrics",
+    "Reloaded user workspace keeps Forms disconnected with zero tickets and original 32 inbox rows",
+    "Forms reconnect using mock restores exactly eight reports and is left connected for the user"
+  ]
+}
