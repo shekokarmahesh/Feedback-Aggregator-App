@@ -2,6 +2,18 @@
 
 The deployment packages the Flutter website, compiled Serverpod backend, and Caddy proxy in one Linux AMD64 image. PostgreSQL runs as a separate managed database. The Laya POC runs in a second CPU-only container with bearer authentication. Redis and Docker Compose are unnecessary. Local development continues using Serverpod-managed PostgreSQL.
 
+## Sources update — 14 October 2026
+
+The current website is **[feedbackaggregatorai.online](https://feedbackaggregatorai.online)**. Both web services automatically deployed commit `d879df029b3a885b73d4b107f8465a7de9332e7f`; the app deployment is `dep-db7ks8u0tbcc73c050k0`. The previous image contained the old Sources placeholder, which displayed “Not connected” without actions even for Admins. The new image includes the merged changes from `main`, the additive source migration, and the Email/Slack demo integrations.
+
+Reload the website, select your Admin workspace, and open **Sources**. **Connect Email** or **Connect Slack** immediately imports five generated tickets. **Sync now** imports the next batch; automatic sync imports up to three more every 30 seconds while the workspace stays open, until each source reaches 12. Open **Inbox** to filter by source and inspect or triage tickets marked **Demo**. Admins manage connections, Editors sync and triage, and Viewers read. Disconnect keeps existing tickets, and reconnect does not duplicate them. No new environment variables or provider credentials are needed.
+
+Discord has **Set up Discord** for the existing bot and guild linking. Forms and Support have **View webhook setup** for the existing ingestion endpoint. That generic webhook currently stores separate `Feedback` rows; it does not populate the workspace inbox. App reviews remain **Coming later**. The separate Laya POC retains its existing synthetic grouping evaluation; source imports do not automatically run that evaluation. See [the source guide](feedback_aggregator/MOCK_SOURCES.md).
+
+Verification passed 55 backend tests and 29 Flutter tests, static analysis, the release web build, and the production Linux AMD64 Docker smoke test. Live HTTP verification imported 24 reports in a clearly labeled synthetic test workspace and checked initial imports, delta sync, replay protection, Viewer restrictions, disconnect/reconnect, preserved ticket status, and tenant isolation. The existing verification workspace and original ticket remained unchanged. Browser verification confirmed the user's Admin workspace now shows the Connect buttons, without importing samples into that workspace. See [Docker evidence](deploy/mock-sources-docker-verification.json) and [Render evidence](deploy/mock-sources-render-verification.json).
+
+The custom domain, runtime API URL, website assets, `/auth/callback` route, and `/healthz`/database readiness passed. Both web services are live and Laya health returned 200. No failure/restart events were recorded during verification. The eight logged errors were the deliberate permission/disconnected-source rejection checks; no unexpected errors were observed. Google sign-in itself was not repeated for this source update. No new services, plans, credentials, or real provider connections were configured; the Discord worker was left unchanged.
+
 ## Live deployment — 12 October 2026
 
 Open **[Feedback Aggregator](https://feedback-aggregator-ak6p.onrender.com)**. The Flutter website and Serverpod backend, Laya, and PostgreSQL are running in Singapore in **Feedback Aggregator's workspace**.

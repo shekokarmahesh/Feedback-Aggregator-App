@@ -1,0 +1,27 @@
+{
+  "platform": "linux/amd64",
+  "checks": [
+    "Production startup without Linux capabilities, migrations, and database readiness",
+    "Flutter assets, runtime API URL, API proxy, and OAuth callback route",
+    "Email/password signup and login without OTP",
+    "Ticket creation, login gate, and tenant isolation",
+    "Public-origin invite links and Viewer read-only permissions",
+    "Email/Slack source connections, delta sync, deduplication, roles, and tenant isolation",
+    "Graceful restart, idempotent migrations, and persisted tickets",
+    "Non-root runtime and no bundled credential files"
+  ],
+  "laya": null,
+  "mockSources": {
+    "sources": [
+      "Email",
+      "Slack"
+    ],
+    "importedReports": 24,
+    "duplicateFree": true,
+    "tenantIsolation": true,
+    "viewerRestrictions": true
+  },
+  "appContainerStats": "66.52MiB / 512MiB / 0.02%",
+  "appImageId": "sha256:234fe14426171ac0e282e1f1b89423e101a8da466f74adc7e7a5b430ddcc7200",
+  "passed": true
+}

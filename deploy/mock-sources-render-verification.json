@@ -1,0 +1,34 @@
+{
+  "checkedAt": "2026-10-14T09:43:57.421110+00:00",
+  "url": "https://feedbackaggregatorai.online",
+  "commit": "d879df029b3a885b73d4b107f8465a7de9332e7f",
+  "checks": [
+    "Custom domain, website, runtime API origin, OAuth callback route, and database readiness",
+    "Existing password login and authenticated Sources endpoint",
+    "New workspace begins disconnected and rejects a nonmember",
+    "Admin Connect imports five reports, delta Sync completes twelve per source without duplicates, Viewer writes denied",
+    "Persisted Demo tickets and connection state, Viewer reads, disconnect/reconnect, and preserved triage status",
+    "Source imports stay isolated from the existing verification workspace and preserve its original ticket"
+  ],
+  "mockSources": {
+    "sources": [
+      "Email",
+      "Slack"
+    ],
+    "importedReports": 24,
+    "reportsPerSource": 12,
+    "duplicateFree": true,
+    "tenantIsolation": true,
+    "viewerRestrictions": true,
+    "reconnectPreservesTickets": true
+  },
+  "passed": true,
+  "monitoring": {
+    "mainServiceLive": true,
+    "layaServiceLive": true,
+    "layaHealthStatus": 200,
+    "serverFailureOrRestartEvents": 0,
+    "expectedNegativeTestErrors": 8,
+    "unexpectedErrorsObserved": 0
+  }
+}
