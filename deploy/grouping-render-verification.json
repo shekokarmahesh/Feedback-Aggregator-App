@@ -1,0 +1,571 @@
+{
+  "url": "https://feedbackaggregatorai.online",
+  "commit": "a1e8701e37a2fe14a98e0e2ae7a9ce767f98e833",
+  "checkedAt": "2026-10-14T14:54:48.573755+00:00",
+  "checks": [
+    "Live custom domain, password login, database readiness, and retired POC endpoint",
+    "Resumed the existing 65-report verification workspace without reimporting data",
+    "Real hosted Laya groups persisted reports across platforms, preserves all evidence, and shares team status",
+    "Disconnect removes platform evidence and counts from grouped rows; reconnect restores stable issues without duplicate reports",
+    "Fresh login retains issue groups and the separate original verification workspace remains intact"
+  ],
+  "discordInference": {
+    "groupedAcrossPlatforms": false,
+    "state": "review"
+  },
+  "verificationResumedAfterTokenExpiry": true,
+  "grouping": {
+    "reports": 65,
+    "issues": 45,
+    "mergedReports": 20,
+    "crossPlatformIssues": 7,
+    "reviewIssues": 22,
+    "resumeVerificationSeconds": 10.92,
+    "sources": {
+      "Email": 12,
+      "Slack": 20,
+      "Forms": 8,
+      "Support": 15,
+      "App reviews": 9,
+      "Discord": 1
+    },
+    "topIssue": {
+      "title": "Workspace invitations never arrive",
+      "reportCount": 7,
+      "sources": [
+        "Email",
+        "Forms",
+        "Slack",
+        "Support"
+      ],
+      "score": 73,
+      "confidence": 0.8029
+    }
+  },
+  "issues": [
+    {
+      "id": 4,
+      "title": "Google sign-in returns me to the login page",
+      "reportCount": 6,
+      "sources": [
+        "App reviews",
+        "Email",
+        "Forms",
+        "Slack",
+        "Support"
+      ],
+      "score": 74,
+      "state": "review",
+      "confidence": 0.8976
+    },
+    {
+      "id": 2,
+      "title": "Workspace invitations never arrive",
+      "reportCount": 7,
+      "sources": [
+        "Email",
+        "Forms",
+        "Slack",
+        "Support"
+      ],
+      "score": 73,
+      "state": "complete",
+      "confidence": 0.8029
+    },
+    {
+      "id": 3,
+      "title": "Please add a dark theme",
+      "reportCount": 5,
+      "sources": [
+        "App reviews",
+        "Email",
+        "Forms",
+        "Slack",
+        "Support"
+      ],
+      "score": 65,
+      "state": "complete",
+      "confidence": 0.7889
+    },
+    {
+      "id": 14,
+      "title": "Filtered exports are empty again",
+      "reportCount": 3,
+      "sources": [
+        "App reviews",
+        "Slack"
+      ],
+      "score": 39,
+      "state": "review",
+      "confidence": 0.7547
+    },
+    {
+      "id": 9,
+      "title": "Assign a feedback owner",
+      "reportCount": 2,
+      "sources": [
+        "Email",
+        "Support"
+      ],
+      "score": 35,
+      "state": "complete",
+      "confidence": 0.8417
+    },
+    {
+      "id": 15,
+      "title": "Loading a large workspace takes thirty seconds",
+      "reportCount": 2,
+      "sources": [
+        "Slack",
+        "Support"
+      ],
+      "score": 35,
+      "state": "review",
+      "confidence": 0.7515
+    },
+    {
+      "id": 6,
+      "title": "Exported CSV is missing filtered feedback",
+      "reportCount": 2,
+      "sources": [
+        "Email",
+        "Forms"
+      ],
+      "score": 34,
+      "state": "review",
+      "confidence": 0.8118
+    },
+    {
+      "id": 10,
+      "title": "Google OAuth loops after choosing an account",
+      "reportCount": 1,
+      "sources": [
+        "Email"
+      ],
+      "score": 25,
+      "state": "review",
+      "confidence": null
+    },
+    {
+      "id": 40,
+      "title": "Slow with a lot of feedback",
+      "reportCount": 1,
+      "sources": [
+        "App reviews"
+      ],
+      "score": 24,
+      "state": "review",
+      "confidence": null
+    },
+    {
+      "id": 31,
+      "title": "Requester wants updates after resolution",
+      "reportCount": 1,
+      "sources": [
+        "Support"
+      ],
+      "score": 24,
+      "state": "review",
+      "confidence": null
+    },
+    {
+      "id": 35,
+      "title": "Screenshot upload requested",
+      "reportCount": 1,
+      "sources": [
+        "Support"
+      ],
+      "score": 24,
+      "state": "complete",
+      "confidence": null
+    },
+    {
+      "id": 30,
+      "title": "Export incident affects weekly reporting",
+      "reportCount": 1,
+      "sources": [
+        "Support"
+      ],
+      "score": 23,
+      "state": "review",
+      "confidence": null
+    },
+    {
+      "id": 13,
+      "title": "Show who is responsible for each issue",
+      "reportCount": 1,
+      "sources": [
+        "Slack"
+      ],
+      "score": 23,
+      "state": "review",
+      "confidence": null
+    },
+    {
+      "id": 23,
+      "title": "Add severity alongside priority",
+      "reportCount": 1,
+      "sources": [
+        "Slack"
+      ],
+      "score": 23,
+      "state": "complete",
+      "confidence": null
+    },
+    {
+      "id": 5,
+      "title": "Remember the last selected workspace",
+      "reportCount": 1,
+      "sources": [
+        "Email"
+      ],
+      "score": 23,
+      "state": "complete",
+      "confidence": null
+    },
+    {
+      "id": 20,
+      "title": "Invite delivery needs a retry indicator",
+      "reportCount": 1,
+      "sources": [
+        "Slack"
+      ],
+      "score": 23,
+      "state": "review",
+      "confidence": null
+    },
+    {
+      "id": 26,
+      "title": "Remember my current workspace",
+      "reportCount": 1,
+      "sources": [
+        "Forms"
+      ],
+      "score": 23,
+      "state": "review",
+      "confidence": null
+    },
+    {
+      "id": 29,
+      "title": "Feedback search should match descriptions",
+      "reportCount": 1,
+      "sources": [
+        "Forms"
+      ],
+      "score": 23,
+      "state": "review",
+      "confidence": null
+    },
+    {
+      "id": 32,
+      "title": "Repeated CSV export failure",
+      "reportCount": 1,
+      "sources": [
+        "Support"
+      ],
+      "score": 23,
+      "state": "review",
+      "confidence": null
+    },
+    {
+      "id": 34,
+      "title": "Resolve multiple requests together",
+      "reportCount": 1,
+      "sources": [
+        "Support"
+      ],
+      "score": 23,
+      "state": "review",
+      "confidence": null
+    },
+    {
+      "id": 37,
+      "title": "Missing search results for body text",
+      "reportCount": 1,
+      "sources": [
+        "Support"
+      ],
+      "score": 23,
+      "state": "review",
+      "confidence": null
+    },
+    {
+      "id": 12,
+      "title": "CSV export has headers but no ticket rows",
+      "reportCount": 1,
+      "sources": [
+        "Slack"
+      ],
+      "score": 23,
+      "state": "review",
+      "confidence": null
+    },
+    {
+      "id": 17,
+      "title": "Remember the inbox filters",
+      "reportCount": 1,
+      "sources": [
+        "Slack"
+      ],
+      "score": 22,
+      "state": "complete",
+      "confidence": null
+    },
+    {
+      "id": 44,
+      "title": "Search needs to include descriptions",
+      "reportCount": 1,
+      "sources": [
+        "App reviews"
+      ],
+      "score": 22,
+      "state": "complete",
+      "confidence": null
+    },
+    {
+      "id": 45,
+      "title": "CSV export has headers but no rows",
+      "reportCount": 1,
+      "sources": [
+        "Discord"
+      ],
+      "score": 22,
+      "state": "review",
+      "confidence": null
+    },
+    {
+      "id": 7,
+      "title": "Dashboard loads slowly for larger teams",
+      "reportCount": 1,
+      "sources": [
+        "Email"
+      ],
+      "score": 22,
+      "state": "review",
+      "confidence": null
+    },
+    {
+      "id": 42,
+      "title": "Mobile layout cuts off tickets",
+      "reportCount": 1,
+      "sources": [
+        "App reviews"
+      ],
+      "score": 22,
+      "state": "review",
+      "confidence": null
+    },
+    {
+      "id": 39,
+      "title": "Team invitations need attention",
+      "reportCount": 1,
+      "sources": [
+        "App reviews"
+      ],
+      "score": 22,
+      "state": "complete",
+      "confidence": null
+    },
+    {
+      "id": 22,
+      "title": "Improve duplicate ticket suggestions",
+      "reportCount": 1,
+      "sources": [
+        "Slack"
+      ],
+      "score": 21,
+      "state": "complete",
+      "confidence": null
+    },
+    {
+      "id": 8,
+      "title": "Notify requesters when a ticket is resolved",
+      "reportCount": 1,
+      "sources": [
+        "Email"
+      ],
+      "score": 21,
+      "state": "complete",
+      "confidence": null
+    },
+    {
+      "id": 24,
+      "title": "Mobile dashboard table needs horizontal scroll",
+      "reportCount": 1,
+      "sources": [
+        "Slack"
+      ],
+      "score": 21,
+      "state": "complete",
+      "confidence": null
+    },
+    {
+      "id": 25,
+      "title": "Search older resolved tickets",
+      "reportCount": 1,
+      "sources": [
+        "Slack"
+      ],
+      "score": 21,
+      "state": "complete",
+      "confidence": null
+    },
+    {
+      "id": 43,
+      "title": "Add ticket assignment",
+      "reportCount": 1,
+      "sources": [
+        "App reviews"
+      ],
+      "score": 21,
+      "state": "review",
+      "confidence": null
+    },
+    {
+      "id": 28,
+      "title": "Submission success message is unclear",
+      "reportCount": 1,
+      "sources": [
+        "Forms"
+      ],
+      "score": 21,
+      "state": "complete",
+      "confidence": null
+    },
+    {
+      "id": 33,
+      "title": "Dashboard filters disappear after navigation",
+      "reportCount": 1,
+      "sources": [
+        "Support"
+      ],
+      "score": 21,
+      "state": "complete",
+      "confidence": null
+    },
+    {
+      "id": 11,
+      "title": "Search should include feedback descriptions",
+      "reportCount": 1,
+      "sources": [
+        "Email"
+      ],
+      "score": 21,
+      "state": "complete",
+      "confidence": null
+    },
+    {
+      "id": 41,
+      "title": "Would love resolution notifications",
+      "reportCount": 1,
+      "sources": [
+        "App reviews"
+      ],
+      "score": 21,
+      "state": "complete",
+      "confidence": null
+    },
+    {
+      "id": 1,
+      "title": "CSV export downloads an empty file",
+      "reportCount": 1,
+      "sources": [
+        "Email"
+      ],
+      "score": 20,
+      "state": "complete",
+      "confidence": null
+    },
+    {
+      "id": 18,
+      "title": "Allow bulk status changes",
+      "reportCount": 1,
+      "sources": [
+        "Slack"
+      ],
+      "score": 20,
+      "state": "complete",
+      "confidence": null
+    },
+    {
+      "id": 21,
+      "title": "Share a filtered feedback view",
+      "reportCount": 1,
+      "sources": [
+        "Slack"
+      ],
+      "score": 20,
+      "state": "complete",
+      "confidence": null
+    },
+    {
+      "id": 36,
+      "title": "Phone layout clips issue titles",
+      "reportCount": 1,
+      "sources": [
+        "Support"
+      ],
+      "score": 20,
+      "state": "review",
+      "confidence": null
+    },
+    {
+      "id": 16,
+      "title": "Let customers know when we fix their issue",
+      "reportCount": 1,
+      "sources": [
+        "Slack"
+      ],
+      "score": 20,
+      "state": "complete",
+      "confidence": null
+    },
+    {
+      "id": 38,
+      "title": "Expose clearer reconnect status",
+      "reportCount": 1,
+      "sources": [
+        "Support"
+      ],
+      "score": 19,
+      "state": "review",
+      "confidence": null
+    },
+    {
+      "id": 27,
+      "title": "Allow attaching screenshots to feedback",
+      "reportCount": 1,
+      "sources": [
+        "Forms"
+      ],
+      "score": 18,
+      "state": "complete",
+      "confidence": null
+    },
+    {
+      "id": 19,
+      "title": "Add keyboard shortcuts for triage",
+      "reportCount": 1,
+      "sources": [
+        "Slack"
+      ],
+      "score": 18,
+      "state": "complete",
+      "confidence": null
+    }
+  ],
+  "passed": true,
+  "completedAt": "2026-10-14T14:56:24.741239+00:00",
+  "browserChecks": [
+    "Standalone POC tab absent from the normal navigation",
+    "Your webhook key field and connector copy contain no Demo labels",
+    "Existing user connector state and Discord configuration preserved"
+  ],
+  "monitoring": {
+    "mainServiceLive": true,
+    "layaServiceLive": true,
+    "serverFailureOrRestartEvents": 0,
+    "expectedPermissionErrors": 2,
+    "unexpectedErrorsObserved": 0
+  }
+}

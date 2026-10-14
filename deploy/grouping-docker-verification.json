@@ -1,0 +1,32 @@
+{
+  "platform": "linux/amd64",
+  "checks": [
+    "Production startup without Linux capabilities, migrations, and database readiness",
+    "Flutter assets, runtime API URL, API proxy, and OAuth callback route",
+    "Email/password signup and login without OTP",
+    "Ticket creation, login gate, and tenant isolation",
+    "Public-origin invite links and Viewer read-only permissions",
+    "Five demo source configurations, delta sync, hidden disconnected rows, reconnect, deduplication, roles, and tenant isolation",
+    "Persistent grouped inbox retains reports when Laya is unavailable, without fabricated matches",
+    "Graceful restart, idempotent migrations, hidden disconnected source persistence, and reconnect",
+    "Non-root runtime and no bundled credential files"
+  ],
+  "laya": null,
+  "mockSources": {
+    "sources": {
+      "Email": 12,
+      "Slack": 20,
+      "Forms": 8,
+      "Support": 15,
+      "App reviews": 9
+    },
+    "importedReports": 64,
+    "disconnectHidesDatabaseRows": true,
+    "duplicateFree": true,
+    "tenantIsolation": true,
+    "viewerRestrictions": true
+  },
+  "appContainerStats": "66.67MiB / 512MiB / 0.02%",
+  "appImageId": "sha256:4e6036cfaa4ef8cf539f63e4142a2b8928b1e370ce1bf0274cb683a3cab8d88b",
+  "passed": true
+}

@@ -1,6 +1,22 @@
 # Render deployment
 
-The deployment packages the Flutter website, compiled Serverpod backend, and Caddy proxy in one Linux AMD64 image. PostgreSQL runs as a separate managed database. The Laya POC runs in a second CPU-only container with bearer authentication. Redis and Docker Compose are unnecessary. Local development continues using Serverpod-managed PostgreSQL.
+The deployment packages the Flutter website, compiled Serverpod backend, and Caddy proxy in one Linux AMD64 image. PostgreSQL runs as a separate managed database. Laya inference runs in a second CPU-only container with bearer authentication. Redis and Docker Compose are unnecessary. Local development continues using Serverpod-managed PostgreSQL.
+
+## Automatic grouped inbox — 14 October 2026
+
+Commit `a1e8701e37a2fe14a98e0e2ae7a9ce767f98e833` replaces the standalone Laya POC tab and endpoint with persistent automatic grouping in the normal workspace inbox. Connector fields say **Your webhook key**, connected cards say **Connected**, and the product no longer uses Demo badges. The five connectors continue to use the existing sample feeds; no real provider connection is claimed.
+
+Source imports, manual feedback, existing workspace reports, and Discord webhook submissions are queued for Laya through Serverpod's PostgreSQL-backed future-call scheduler. Reports remain in `app_workspace_ticket`, with links to `app_issue_group`; `app_grouping_job` stores an authorized actor, queue status, expiring worker lease, and retry state. The additive `20261014134312019-automatic-grouping` migration preserves existing accounts, connections, tickets, and authentication secrets.
+
+The inbox shows one row per grouped issue, all contributing platforms and original reports, shared team status, available match confidence, and a 0–100 priority score. Default ordering is **Priority score**. Disconnect removes that source's evidence, report count, and score contribution; an issue disappears when no active reports remain. Reconnect restores the original issue and team status without reimporting duplicates. Laya failures preserve pending reports and retry; uncertain matches remain separate for review.
+
+Verification passed 69 backend tests, 35 Flutter tests, clean analysis, the release web build, and the production container test. The latter verifies migration/startup, authentication, five-source imports, persistent grouped-inbox access, safe behavior with unavailable Laya, disconnect filtering across restart, and reconnect. See [container evidence](deploy/grouping-docker-verification.json) and the [implementation guide](feedback_aggregator/MOCK_SOURCES.md). Real inference is verified separately on the hosted service.
+
+Both web services are live on commit `a1e8701e37a2fe14a98e0e2ae7a9ce767f98e833`; the main deployment is `dep-db7p39ks728c73deuik0`. Real hosted verification processed 64 sample source reports plus one Discord webhook submission into **45 issues**, merging **20 reports** into **7 multi-platform issues**. One invitation issue contains seven reports from Email, Forms, Slack, and Support, with score **73/100** and minimum match probability **0.8029**. All 65 original reports remain traceable. **22 issues need review**; the Discord report was evaluated but remained separate because its match was uncertain. These results demonstrate the actual integration, not perfect duplicate recall.
+
+The sequential CPU run took approximately 17 minutes from initial queueing to completion. The verification script's ten-minute login token expired during polling; refreshing its credentials resumed checking the same workspace without reimporting data. Background grouping continued independently. Source disconnects removed their evidence and counts from every grouped response; reconnect restored stable issue identities without duplicates. Team status persisted, fresh login retained the groups, and the original separate verification workspace remained unchanged. See [hosted evidence](deploy/grouping-render-verification.json).
+
+Browser verification confirmed the POC tab is absent, the Configure field says **Your webhook key**, and connector copy contains no Demo labels. The user's existing disconnected sources and connected Discord configuration were left as found. No service plan, credential, SDK, or dependency upgrade was made.
 
 ## Five-source demo update — 14 October 2026
 
