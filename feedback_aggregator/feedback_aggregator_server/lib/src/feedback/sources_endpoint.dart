@@ -16,6 +16,20 @@ class SourcesEndpoint extends Endpoint {
     int workspaceId,
     String source,
   ) => _service.connect(session, workspaceId, source);
+  Future<SourceSyncResult> configure(
+    Session session,
+    int workspaceId,
+    String source,
+    String demoKey,
+  ) async {
+    if (!['Forms', 'Support', 'App reviews'].contains(source)) {
+      throw WorkspaceException(
+        message: 'Configure Forms, Support, or App reviews.',
+      );
+    }
+    return _service.connect(session, workspaceId, source, demoKey: demoKey);
+  }
+
   Future<SourceSyncResult> sync(
     Session session,
     int workspaceId,

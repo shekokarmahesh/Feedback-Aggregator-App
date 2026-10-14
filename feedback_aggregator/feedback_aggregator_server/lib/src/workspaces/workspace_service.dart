@@ -455,15 +455,24 @@ class WorkspaceService {
     });
   }
 
-  Future<List<WorkspaceTicket>> tickets(Session s, int id) async {
-    await _member(s, id);
-    return WorkspaceTicket.db.find(
-      s,
-      where: (t) => t.workspaceId.equals(id),
-      orderBy: (t) => t.createdAt.desc(),
-      limit: 500,
-    );
-  }
+  Future<List<WorkspaceTicket>> tickets(Session s, int id) =>
+      s.db.transaction((tx) async {
+        await _lock(s, id, tx);
+        await _member(s, id, tx: tx);
+        final disconnected = await MockSourceConnection.db.find(
+          s,
+          where: (t) => t.workspaceId.equals(id) & t.connected.equals(false),
+          transaction: tx,
+        );
+        final hidden = disconnected.map((c) => c.source).toSet();
+        return WorkspaceTicket.db.find(
+          s,
+          where: (t) => t.workspaceId.equals(id) & t.source.notInSet(hidden),
+          orderBy: (t) => t.createdAt.desc(),
+          limit: 500,
+          transaction: tx,
+        );
+      });
 
   Future<String?> discordGuild(Session s, int id) async {
     await _member(s, id);
@@ -588,6 +597,19 @@ class WorkspaceService {
     );
     if (ticket == null) {
       throw WorkspaceException(message: 'Ticket not found in this workspace.');
+    }
+    final disconnected = await MockSourceConnection.db.findFirstRow(
+      s,
+      where: (t) =>
+          t.workspaceId.equals(id) &
+          t.source.equals(ticket.source) &
+          t.connected.equals(false),
+      transaction: tx,
+    );
+    if (disconnected != null) {
+      throw WorkspaceException(
+        message: 'Reconnect this source to update its tickets.',
+      );
     }
     ticket.status = status;
     return WorkspaceTicket.db.updateRow(s, ticket, transaction: tx);

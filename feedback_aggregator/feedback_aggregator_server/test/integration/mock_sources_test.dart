@@ -226,7 +226,7 @@ void main() {
     );
 
     test(
-      'disconnect stops sync; reconnect resumes while preserving existing tickets',
+      'disconnect hides database and manual tickets; reconnect preserves triage',
       () async {
         await sources.connect(admin, workspace.id, 'Email');
         final first = (await workspaces.tickets(admin, workspace.id)).first;
@@ -244,7 +244,24 @@ void main() {
           sources.sync(admin, workspace.id, 'Email'),
           throwsA(isA<WorkspaceException>()),
         );
-        expect(await workspaces.tickets(admin, workspace.id), hasLength(5));
+        expect(await workspaces.tickets(admin, workspace.id), isEmpty);
+        expect(await WorkspaceService().tickets(admin, workspace.id), isEmpty);
+        expect(
+          await WorkspaceTicket.db.find(
+            admin,
+            where: (t) => t.workspaceId.equals(workspace.id),
+          ),
+          hasLength(5),
+        );
+        await expectLater(
+          workspaces.updateTicketStatus(
+            admin,
+            workspace.id,
+            first.id!,
+            'Resolved',
+          ),
+          throwsA(isA<WorkspaceException>()),
+        );
         expect(
           (await sources.connect(admin, workspace.id, 'Email')).addedCount,
           5,
@@ -252,6 +269,132 @@ void main() {
         final rows = await workspaces.tickets(admin, workspace.id);
         expect(rows, hasLength(10));
         expect(rows.singleWhere((t) => t.id == first.id).status, 'Planned');
+      },
+    );
+
+    test(
+      'all five sources import unequal feeds and disappear individually on disconnect',
+      () async {
+        const counts = {
+          'Email': 12,
+          'Slack': 20,
+          'Forms': 8,
+          'Support': 15,
+          'App reviews': 9,
+        };
+        for (final entry in counts.entries) {
+          final result = await sources.connect(
+            admin,
+            workspace.id,
+            entry.key,
+            demoKey: 'mock-demo-key',
+          );
+          expect(result.addedCount, 5);
+          expect(result.connection.availableCount, entry.value);
+          while ((await sources.sync(
+                admin,
+                workspace.id,
+                entry.key,
+              )).addedCount >
+              0) {}
+          final rows = await workspaces.tickets(admin, workspace.id);
+          expect(
+            rows.where((t) => t.source == entry.key),
+            hasLength(entry.value),
+          );
+        }
+        final before = await workspaces.tickets(admin, workspace.id);
+        expect(before, hasLength(64));
+        expect(
+          before.map((t) => '${t.source}:${t.externalId}').toSet(),
+          hasLength(64),
+        );
+        await workspaces.createTicket(
+          admin,
+          workspace.id,
+          'Manual Forms ticket',
+          'Existing database row',
+          'Forms',
+          'Medium',
+        );
+        for (final entry in counts.entries) {
+          final connection = await sources.disconnect(
+            admin,
+            workspace.id,
+            entry.key,
+          );
+          expect(connection.syncedCount, 0);
+          expect(connection.lastSyncedAt, isNull);
+          expect(
+            (await workspaces.tickets(
+              admin,
+              workspace.id,
+            )).where((t) => t.source == entry.key),
+            isEmpty,
+          );
+          await sources.connect(
+            admin,
+            workspace.id,
+            entry.key,
+            demoKey: 'any-demo-value',
+          );
+          expect(
+            (await workspaces.tickets(
+              admin,
+              workspace.id,
+            )).where((t) => t.source == entry.key),
+            hasLength(entry.value + (entry.key == 'Forms' ? 1 : 0)),
+          );
+        }
+        expect(await workspaces.tickets(admin, workspace.id), hasLength(65));
+      },
+    );
+
+    test(
+      'configuration requires a nonempty bounded demo key and never changes Discord',
+      () async {
+        for (final source in ['Forms', 'Support', 'App reviews']) {
+          for (final key in ['', '   ', 'x' * 129]) {
+            await expectLater(
+              sources.connect(admin, workspace.id, source, demoKey: key),
+              throwsA(isA<WorkspaceException>()),
+            );
+          }
+          expect(
+            (await sources.connect(
+              admin,
+              workspace.id,
+              source,
+              demoKey: 'demo',
+            )).addedCount,
+            5,
+          );
+        }
+        expect(await workspaces.discordGuild(admin, workspace.id), isNull);
+        expect(await workspaces.tickets(admin, workspace.id), hasLength(15));
+      },
+    );
+
+    test(
+      'existing Slack connections discover the expanded feed on list',
+      () async {
+        final result = await sources.connect(admin, workspace.id, 'Slack');
+        await MockSourceConnection.db.updateRow(
+          admin,
+          result.connection.copyWith(availableCount: 12),
+        );
+        expect(
+          (await sources.list(admin, workspace.id)).single.availableCount,
+          20,
+        );
+        expect(
+          (await sources.sync(
+            admin,
+            workspace.id,
+            'Slack',
+          )).connection.availableCount,
+          20,
+        );
       },
     );
 

@@ -1,10 +1,12 @@
-# Email and Slack demo integrations
+# Demo source integrations
 
-Open a workspace as an Admin, choose **Sources**, and click **Connect Email** or **Connect Slack**. Five generated reports appear immediately in the ordinary inbox. While the workspace remains open, automatic sync imports up to three more reports every 30 seconds. Each source contains 12 reports, for a maximum of 24 sample tickets per workspace. **Sync now** imports the next batch immediately.
+Open a workspace as an Admin and choose **Sources**. Email and Slack have **Connect** buttons. Forms, Support, and App reviews have **Configure** dialogs showing the webhook URL, `Content-Type` and `X-Feedback-Webhook-Key` headers, a sample JSON payload, and a demo-key field. Enter any nonempty sample value (such as `demo` or `mock`) and choose **Connect and import**. The field accepts up to 128 characters; the key is not saved or used to authenticate external requests.
 
-The samples include email subjects/senders, Slack channel/message context, feature requests, and repeated issue reports across the two sources. Tickets carry a **Demo** badge; their details identify them as generated feedback. Inbox search, source/priority/status filters, ticket details, and status changes work on these persisted tickets.
+Each initial connection imports five reports immediately. While the workspace remains open, automatic sync imports up to three more every 30 seconds. **Sync now** imports the next batch immediately. The completed feed sizes vary: Email **12**, Slack **20**, Forms **8**, Support **15**, and App reviews **9**, for **64** sample tickets per workspace. Existing Slack connections discover the expanded 20-report feed on refresh.
 
-No mailbox, Slack workspace, provider API key, or Resend configuration is needed. These connections do not read real conversations or send emails. Feedback is imported as individual tickets; the separate Laya POC tab remains its own synthetic grouping evaluation.
+The samples include email subjects/senders, Slack channels, website form submissions, help desk cases, store reviews, feature requests, and repeated issue reports across the two sources. Tickets carry a **Demo** badge; their details identify them as generated feedback. Inbox search, source/priority/status filters, ticket details, and status changes work on these persisted tickets.
+
+No mailbox, Slack workspace, provider API key, or Resend configuration is needed. The Configure dialogs preview a webhook format; demo keys do not authorize the existing live webhook. These connections do not read real conversations or send emails. Feedback is imported as individual tickets; the separate Laya POC tab remains its own synthetic grouping evaluation.
 
 ## Permissions and persistence
 
@@ -14,14 +16,14 @@ No mailbox, Slack workspace, provider API key, or Resend configuration is needed
 - Every endpoint verifies authentication and workspace membership. Writes lock the workspace row, using the same transaction boundary as role changes.
 - `app_mock_source_connection` stores each workspace's connection state, counters, and last sync time in PostgreSQL.
 - Mock reports have stable source IDs. A unique workspace/source/external-ID index and the tenant lock prevent duplicate imports, including concurrent requests.
-- Disconnect stops imports and preserves tickets. Reconnect resumes remaining reports without changing existing ticket statuses.
+- Disconnect stops imports, resets the card, and hides **all** tickets with that source label, including manually created or previously persisted tickets. The authenticated ticket query filters them before returning database rows. The UI immediately evicts local rows and guards against stale refreshes, so they stay absent after reload or workspace switching. Records are retained internally; reconnect restores them and resumes remaining reports without duplication or lost status changes. Hidden tickets cannot be updated until reconnect.
 - Background refresh keeps the selected tab and inbox filters. Old requests cannot replace data after switching workspaces. A sync failure is shown on the source card and retried on the next tick.
 
 The feed is bounded. Once all reports arrive, automatic polling refreshes workspace data without writing more samples. Automatic sync runs while the browser has this workspace open; it is not a continuously running server job.
 
 ## Existing integrations from main
 
-The Discord guild configuration and `/webhooks/feedback` implementation are preserved. Discord submissions create workspace tickets. Generic form/website/support webhooks use the existing team ingestion key and store `Feedback` rows separately; connecting that store to the workspace inbox is a separate follow-up. The source cards explain the existing webhook setup without claiming those submissions already appear in this inbox.
+The Discord guild configuration and `/webhooks/feedback` implementation are preserved. Discord submissions create workspace tickets. Generic form/website/support webhooks use the existing team ingestion key and store `Feedback` rows separately; connecting that store to the workspace inbox is a separate follow-up. The Forms, Support, and App reviews Configure dialogs connect the mock feed to this inbox. Their demo keys do not configure the separate real webhook.
 
 ## Running and deploying
 

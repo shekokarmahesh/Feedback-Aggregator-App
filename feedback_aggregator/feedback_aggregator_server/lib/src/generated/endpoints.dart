@@ -505,6 +505,37 @@ class Endpoints extends _is.EndpointDispatch {
                     params['source'],
                   ),
         ),
+        'configure': _is.MethodConnector(
+          name: 'configure',
+          params: {
+            'workspaceId': _is.ParameterDescription(
+              name: 'workspaceId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'source': _is.ParameterDescription(
+              name: 'source',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'demoKey': _is.ParameterDescription(
+              name: 'demoKey',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['sources'] as _ie902svq.SourcesEndpoint).configure(
+                    session,
+                    params['workspaceId'],
+                    params['source'],
+                    params['demoKey'],
+                  ),
+        ),
         'sync': _is.MethodConnector(
           name: 'sync',
           params: {

@@ -21,6 +21,7 @@ feedbackIngestion:
 sources:
   - list:
   - connect:
+  - configure:
   - sync:
   - disconnect:
 greeting:

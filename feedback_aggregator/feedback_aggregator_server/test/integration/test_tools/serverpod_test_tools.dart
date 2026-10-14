@@ -877,6 +877,43 @@ class _SourcesEndpoint {
     });
   }
 
+  _ida.Future<_ijlvbjcg.SourceSyncResult> configure(
+    _ist.TestSessionBuilder sessionBuilder,
+    int workspaceId,
+    String source,
+    String demoKey,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'sources',
+            method: 'configure',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'sources',
+          methodName: 'configure',
+          parameters: _ist.testObjectToJson({
+            'workspaceId': workspaceId,
+            'source': source,
+            'demoKey': demoKey,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_ijlvbjcg.SourceSyncResult>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
   _ida.Future<_ijlvbjcg.SourceSyncResult> sync(
     _ist.TestSessionBuilder sessionBuilder,
     int workspaceId,

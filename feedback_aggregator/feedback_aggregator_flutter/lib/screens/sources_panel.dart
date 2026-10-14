@@ -2,6 +2,15 @@ import 'package:feedback_aggregator_client/feedback_aggregator_client.dart';
 import 'package:flutter/material.dart';
 
 import '../models/demo_ticket.dart';
+import 'source_configuration_dialog.dart';
+
+const demoSourceCounts = {
+  'Email': 12,
+  'Slack': 20,
+  'Forms': 8,
+  'Support': 15,
+  'App reviews': 9,
+};
 
 class SourcesPanel extends StatefulWidget {
   final WorkspaceSummary? workspace;
@@ -12,6 +21,7 @@ class SourcesPanel extends StatefulWidget {
   final String? discordGuildId;
   final VoidCallback? onConfigureDiscord;
   final Future<SourceSyncResult> Function(String)? onConnect;
+  final Future<SourceSyncResult> Function(String, String)? onConfigure;
   final Future<SourceSyncResult> Function(String)? onSync;
   final Future<void> Function(String)? onDisconnect;
 
@@ -25,6 +35,7 @@ class SourcesPanel extends StatefulWidget {
     this.discordGuildId,
     this.onConfigureDiscord,
     this.onConnect,
+    this.onConfigure,
     this.onSync,
     this.onDisconnect,
   });
@@ -160,7 +171,7 @@ class _SourcesPanelState extends State<SourcesPanel> {
         ),
         const SizedBox(height: 12),
         Text(
-          '${widget.tickets.where((t) => t.source == source).length} feedback tickets in this inbox',
+          '${widget.connections.any((c) => c.source == source && !c.connected) ? 0 : widget.tickets.where((t) => t.source == source).length} feedback tickets in this inbox',
           style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
         ),
         ...children,
@@ -179,24 +190,41 @@ class _SourcesPanelState extends State<SourcesPanel> {
         widget.workspace!.role != WorkspaceRole.viewer;
     final busy = _busy.contains(source) || widget.syncing.contains(source);
     final error = _errors[source] ?? widget.syncErrors[source];
+    final available = demoSourceCounts[source]!;
+    final needsConfiguration = !['Email', 'Slack'].contains(source);
     final remaining = connection == null
-        ? 12
+        ? available
         : connection.availableCount - connection.syncedCount;
     return _card(
       source: source,
-      icon: source == 'Email' ? Icons.mail_outline : Icons.tag,
-      description: source == 'Email'
-          ? 'Bring sample support emails, feature requests, and issue reports into your workspace.'
-          : 'Sync sample conversations from #customer-feedback, #support-triage, and #product-ideas.',
+      icon: switch (source) {
+        'Email' => Icons.mail_outline,
+        'Slack' => Icons.tag,
+        'Forms' => Icons.article_outlined,
+        'Support' => Icons.support_agent,
+        _ => Icons.star_outline,
+      },
+      description: switch (source) {
+        'Email' =>
+          'Bring sample support emails, feature requests, and issue reports into your workspace.',
+        'Slack' =>
+          'Sync sample conversations from #customer-feedback, #support-triage, and #product-ideas.',
+        'Forms' =>
+          'Configure a website feedback form and import sample submissions.',
+        'Support' =>
+          'Bring sample help desk cases and customer escalations into your inbox.',
+        _ =>
+          'Collect sample Google Play and App Store reviews for your team to triage.',
+      },
       status: busy
           ? 'Syncing…'
           : connected
           ? 'Demo connected'
-          : 'Demo available',
+          : 'Not connected',
       active: connected,
       children: [
         const SizedBox(height: 16),
-        if (connection != null) ...[
+        if (connected && connection != null) ...[
           Text(
             '${connection.syncedCount} of ${connection.availableCount} sample reports imported',
             style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
@@ -222,9 +250,7 @@ class _SourcesPanelState extends State<SourcesPanel> {
               ? remaining > 0
                     ? 'Auto-sync every 30 seconds while this workspace is open.'
                     : 'Up to date. All sample reports are in your inbox.'
-              : connection == null
-              ? 'Connect to import the first 5 reports automatically.'
-              : 'Disconnected. Imported tickets stay in your workspace.',
+              : '${needsConfiguration ? 'Configure' : 'Connect'} to import the first 5 of $available sample reports. Tickets from this source stay hidden while disconnected.',
           style: const TextStyle(
             height: 1.5,
             fontSize: 12,
@@ -248,11 +274,17 @@ class _SourcesPanelState extends State<SourcesPanel> {
           spacing: 10,
           runSpacing: 10,
           children: [
-            if (!connected && admin && widget.onConnect != null)
+            if (!connected &&
+                admin &&
+                (needsConfiguration
+                    ? widget.onConfigure != null
+                    : widget.onConnect != null))
               FilledButton.icon(
                 key: ValueKey('connect-$source'),
                 onPressed: busy
                     ? null
+                    : needsConfiguration
+                    ? () => _configure(source)
                     : () => _act(
                         source,
                         () async => _syncMessage(
@@ -261,7 +293,9 @@ class _SourcesPanelState extends State<SourcesPanel> {
                         ),
                       ),
                 icon: const Icon(Icons.link, size: 18),
-                label: Text('Connect $source'),
+                label: Text(
+                  '${needsConfiguration ? 'Configure' : 'Connect'} $source',
+                ),
               ),
             if (connected && canWrite && widget.onSync != null)
               OutlinedButton.icon(
@@ -283,7 +317,7 @@ class _SourcesPanelState extends State<SourcesPanel> {
                     ? null
                     : () => _act(source, () async {
                         await widget.onDisconnect!(source);
-                        return '$source disconnected. Imported feedback is preserved.';
+                        return '$source disconnected. Its tickets are hidden until you reconnect.';
                       }),
                 child: const Text('Disconnect'),
               ),
@@ -303,27 +337,22 @@ class _SourcesPanelState extends State<SourcesPanel> {
     );
   }
 
-  void _webhookInfo() => showDialog<void>(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: const Text('Forms and website submissions'),
-      content: const SingleChildScrollView(
-        child: SelectableText(
-          'Your website backend can forward form or support submissions to /webhooks/feedback. '
-          'Use a team ingestion key in the X-Feedback-Webhook-Key header and send title, body, source, and userEmail. '
-          'Keep the key on your backend.\n\n'
-          'This existing webhook stores team Feedback rows; it does not yet feed the workspace inbox. '
-          'Email and Slack demo connections below populate this inbox immediately.',
-        ),
+  Future<void> _configure(String source) async {
+    final result = await showDialog<SourceSyncResult>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => SourceConfigurationDialog(
+        source: source,
+        availableCount: demoSourceCounts[source]!,
+        onSubmit: (key) => widget.onConfigure!(source, key),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Done'),
-        ),
-      ],
-    ),
-  );
+    );
+    if (result != null && mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(_syncMessage(source, result))));
+    }
+  }
 
   @override
   Widget build(BuildContext context) => Column(
@@ -352,7 +381,7 @@ class _SourcesPanelState extends State<SourcesPanel> {
             SizedBox(width: 12),
             Expanded(
               child: Text(
-                'Email and Slack are demo integrations using generated feedback. '
+                'Email, Slack, Forms, Support, and App reviews use generated demo feedback. '
                 'No account credentials are needed. Imported tickets are marked Demo and shared only with this workspace.',
                 style: TextStyle(height: 1.5),
               ),
@@ -397,43 +426,9 @@ class _SourcesPanelState extends State<SourcesPanel> {
                   ),
               ],
             ),
-            _card(
-              source: 'Forms',
-              icon: Icons.article_outlined,
-              description:
-                  'Collect website feedback with the existing form and support webhook.',
-              status: 'Webhook available',
-              children: [
-                const SizedBox(height: 16),
-                OutlinedButton.icon(
-                  onPressed: _webhookInfo,
-                  icon: const Icon(Icons.info_outline, size: 18),
-                  label: const Text('View webhook setup'),
-                ),
-              ],
-            ),
-            _card(
-              source: 'Support',
-              icon: Icons.support_agent,
-              description:
-                  'Forward support submissions through the existing webhook from your website backend.',
-              status: 'Webhook available',
-              children: [
-                const SizedBox(height: 16),
-                OutlinedButton.icon(
-                  onPressed: _webhookInfo,
-                  icon: const Icon(Icons.info_outline, size: 18),
-                  label: const Text('View webhook setup'),
-                ),
-              ],
-            ),
-            _card(
-              source: 'App reviews',
-              icon: Icons.star_outline,
-              description:
-                  'Bring store reviews into the same triage workflow in a future integration.',
-              status: 'Coming later',
-            ),
+            _mock('Forms'),
+            _mock('Support'),
+            _mock('App reviews'),
           ];
           return Wrap(
             spacing: 16,

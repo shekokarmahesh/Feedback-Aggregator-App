@@ -44,6 +44,7 @@ class DashboardScreen extends StatefulWidget {
   final Set<String> syncingSources;
   final Map<String, String> sourceSyncErrors;
   final Future<SourceSyncResult> Function(String)? onConnectSource;
+  final Future<SourceSyncResult> Function(String, String)? onConfigureSource;
   final Future<SourceSyncResult> Function(String)? onSyncSource;
   final Future<void> Function(String)? onDisconnectSource;
   final Future<void> Function(DemoTicket, String)? onUpdateStatus;
@@ -60,6 +61,7 @@ class DashboardScreen extends StatefulWidget {
     this.syncingSources = const {},
     this.sourceSyncErrors = const {},
     this.onConnectSource,
+    this.onConfigureSource,
     this.onSyncSource,
     this.onDisconnectSource,
     this.onUpdateStatus,
@@ -1161,6 +1163,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     discordGuildId: widget.discordGuildId,
     onConfigureDiscord: widget.onConfigureDiscord,
     onConnect: widget.onConnectSource,
+    onConfigure: widget.onConfigureSource,
     onSync: widget.onSyncSource,
     onDisconnect: widget.onDisconnectSource,
   );

@@ -25,6 +25,7 @@ Future<void> showPanel(
   List<MockSourceConnection> connections = const [],
   Set<String> syncing = const {},
   Future<SourceSyncResult> Function(String)? onConnect,
+  Future<SourceSyncResult> Function(String, String)? onConfigure,
   Future<SourceSyncResult> Function(String)? onSync,
   Future<void> Function(String)? onDisconnect,
 }) => tester.pumpWidget(
@@ -37,6 +38,7 @@ Future<void> showPanel(
           connections: connections,
           syncing: syncing,
           onConnect: onConnect,
+          onConfigure: onConfigure,
           onSync: onSync,
           onDisconnect: onDisconnect,
         ),
@@ -46,6 +48,167 @@ Future<void> showPanel(
 );
 
 void main() {
+  testWidgets(
+    'configuration fits a narrow screen and prevents duplicate submission',
+    (tester) async {
+      tester.view.physicalSize = const Size(320, 740);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final response = Completer<SourceSyncResult>();
+      var calls = 0;
+      await showPanel(
+        tester,
+        onConfigure: (_, __) {
+          calls++;
+          return response.future;
+        },
+      );
+      await tester.ensureVisible(find.byKey(const ValueKey('connect-Forms')));
+      await tester.tap(find.byKey(const ValueKey('connect-Forms')));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(
+        find.byKey(const ValueKey('demo-webhook-key')),
+      );
+      await tester.enterText(
+        find.byKey(const ValueKey('demo-webhook-key')),
+        'demo',
+      );
+      await tester.ensureVisible(
+        find.byKey(const ValueKey('submit-source-configuration')),
+      );
+      await tester.tap(
+        find.byKey(const ValueKey('submit-source-configuration')),
+      );
+      await tester.pump();
+      expect(calls, 1);
+      expect(
+        tester
+            .widget<FilledButton>(
+              find.byKey(const ValueKey('submit-source-configuration')),
+            )
+            .onPressed,
+        isNull,
+      );
+      expect(tester.takeException(), isNull);
+      response.complete(
+        SourceSyncResult(
+          connection: MockSourceConnection(
+            workspaceId: 1,
+            source: 'Forms',
+            connected: true,
+            syncedCount: 5,
+            availableCount: 8,
+          ),
+          addedCount: 5,
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    },
+  );
+  for (final source in ['Forms', 'Support', 'App reviews']) {
+    testWidgets(
+      '$source configuration previews webhook steps and imports with any demo key',
+      (tester) async {
+        final calls = <String>[];
+        await showPanel(
+          tester,
+          onConfigure: (name, key) async {
+            calls.add('$name:$key');
+            return SourceSyncResult(
+              connection: MockSourceConnection(
+                workspaceId: 1,
+                source: name,
+                connected: true,
+                syncedCount: 5,
+                availableCount: demoSourceCounts[name]!,
+              ),
+              addedCount: 5,
+            );
+          },
+        );
+        await tester.ensureVisible(find.byKey(ValueKey('connect-$source')));
+        await tester.tap(find.byKey(ValueKey('connect-$source')));
+        await tester.pumpAndSettle();
+        expect(find.text('Configure $source'), findsWidgets);
+        expect(find.textContaining('/webhooks/feedback'), findsOneWidget);
+        expect(find.textContaining('X-Feedback-Webhook-Key:'), findsOneWidget);
+        await tester.ensureVisible(
+          find.byKey(const ValueKey('submit-source-configuration')),
+        );
+        await tester.tap(
+          find.byKey(const ValueKey('submit-source-configuration')),
+        );
+        await tester.pumpAndSettle();
+        expect(calls, isEmpty);
+        expect(find.text('Enter a demo key to connect.'), findsOneWidget);
+        await tester.enterText(
+          find.byKey(const ValueKey('demo-webhook-key')),
+          'mock',
+        );
+        await tester.tap(
+          find.byKey(const ValueKey('submit-source-configuration')),
+        );
+        await tester.pumpAndSettle();
+        expect(calls, ['$source:mock']);
+        expect(find.byKey(const ValueKey('demo-webhook-key')), findsNothing);
+        expect(
+          find.text('5 sample reports from $source added to your inbox.'),
+          findsOneWidget,
+        );
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
+  testWidgets(
+    'configuration errors retain the demo key for retry and cancel writes nothing',
+    (tester) async {
+      var attempts = 0;
+      await showPanel(
+        tester,
+        onConfigure: (source, key) async {
+          attempts++;
+          throw WorkspaceException(
+            message: 'Configuration unavailable. Try again.',
+          );
+        },
+      );
+      await tester.ensureVisible(find.byKey(const ValueKey('connect-Forms')));
+      await tester.tap(find.byKey(const ValueKey('connect-Forms')));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byKey(const ValueKey('demo-webhook-key')),
+        'demo',
+      );
+      await tester.ensureVisible(
+        find.byKey(const ValueKey('submit-source-configuration')),
+      );
+      await tester.tap(
+        find.byKey(const ValueKey('submit-source-configuration')),
+      );
+      await tester.pumpAndSettle();
+      expect(
+        find.text('Configuration unavailable. Try again.'),
+        findsOneWidget,
+      );
+      expect(
+        tester
+            .widget<TextFormField>(
+              find.byKey(const ValueKey('demo-webhook-key')),
+            )
+            .controller!
+            .text,
+        'demo',
+      );
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+      expect(attempts, 1);
+      expect(find.byKey(const ValueKey('connect-Forms')), findsOneWidget);
+    },
+  );
+
   testWidgets(
     'Connect populates the inbox, retains Sources tab, and labels demo tickets',
     (tester) async {
@@ -224,7 +387,7 @@ void main() {
   );
 
   testWidgets(
-    'disconnect preserves source ticket counts and offers reconnect',
+    'disconnect clears source counters and offers Connect again',
     (tester) async {
       var row = connection();
       late StateSetter update;
@@ -269,12 +432,14 @@ void main() {
       );
       await tester.tap(find.byKey(const ValueKey('disconnect-Email')));
       await tester.pumpAndSettle();
-      expect(find.text('1 feedback tickets in this inbox'), findsOneWidget);
-      expect(find.text('5 of 12 sample reports imported'), findsOneWidget);
+      expect(find.text('1 feedback tickets in this inbox'), findsNothing);
+      expect(find.text('5 of 12 sample reports imported'), findsNothing);
       expect(find.byKey(const ValueKey('connect-Email')), findsOneWidget);
       expect(
-        find.text('Disconnected. Imported tickets stay in your workspace.'),
-        findsOneWidget,
+        find.textContaining(
+          'Tickets from this source stay hidden while disconnected.',
+        ),
+        findsNWidgets(5),
       );
     },
   );

@@ -396,6 +396,20 @@ class EndpointSources extends _isc.EndpointRef {
     },
   );
 
+  _ida.Future<_iz26az6v.SourceSyncResult> configure(
+    int workspaceId,
+    String source,
+    String demoKey,
+  ) => caller.callServerEndpoint<_iz26az6v.SourceSyncResult>(
+    'sources',
+    'configure',
+    {
+      'workspaceId': workspaceId,
+      'source': source,
+      'demoKey': demoKey,
+    },
+  );
+
   _ida.Future<_iz26az6v.SourceSyncResult> sync(
     int workspaceId,
     String source,

@@ -38,17 +38,34 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
   String? _refreshError;
   Timer? _syncTimer;
   bool _autoSyncing = false;
+  final _mutatingSources = <String>{};
   int _refreshRevision = 0;
   bool _loading = true;
   String? _error;
   int _loadRevision = 0;
+
+  List<WorkspaceTicket> _visibleTickets(
+    List<WorkspaceTicket> rows,
+    List<MockSourceConnection> connections,
+  ) {
+    final hidden = connections
+        .where((c) => !c.connected)
+        .map((c) => c.source)
+        .toSet();
+    return rows.where((ticket) => !hidden.contains(ticket.source)).toList();
+  }
 
   @override
   void initState() {
     super.initState();
     _load(preferred: widget.initialWorkspaceId);
     _syncTimer = Timer.periodic(const Duration(seconds: 30), (_) async {
-      if (_loading || _active == null || _autoSyncing) return;
+      if (_loading ||
+          _active == null ||
+          _autoSyncing ||
+          _mutatingSources.isNotEmpty) {
+        return;
+      }
       _autoSyncing = true;
       try {
         await _refreshActive(syncDemo: true);
@@ -95,7 +112,7 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
       setState(() {
         _workspaces = orgs;
         _active = active;
-        _tickets = tickets;
+        _tickets = _visibleTickets(tickets, connections);
         _discordGuild = guild;
         _sourceConnections = connections;
       });
@@ -158,7 +175,7 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
       setState(() {
         _workspaces = orgs;
         _active = active;
-        _tickets = tickets;
+        _tickets = _visibleTickets(tickets, connections);
         _discordGuild = guild;
         _sourceConnections = connections;
         _sourceSyncErrors = errors;
@@ -179,44 +196,79 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
   }
 
   Future<SourceSyncResult> _connectSource(String source) async {
+    return _changeSource(
+      source,
+      () => _client.sources.connect(_active!.id, source),
+    );
+  }
+
+  Future<SourceSyncResult> _configureSource(
+    String source,
+    String demoKey,
+  ) async {
+    return _changeSource(
+      source,
+      () => _client.sources.configure(_active!.id, source, demoKey),
+    );
+  }
+
+  Future<SourceSyncResult> _changeSource(
+    String source,
+    Future<SourceSyncResult> Function() action,
+  ) async {
     final org = _active!;
     final revision = _loadRevision;
-    final result = await _client.sources.connect(org.id, source);
-    if (mounted && revision == _loadRevision && org.id == _active?.id) {
-      _acceptConnection(result.connection);
-      await _refreshActive();
+    ++_refreshRevision;
+    _mutatingSources.add(source);
+    try {
+      final result = await action();
+      if (mounted && revision == _loadRevision && org.id == _active?.id) {
+        _acceptConnection(result.connection);
+        await _refreshActive();
+      }
+      return result;
+    } finally {
+      _mutatingSources.remove(source);
     }
-    return result;
   }
 
   Future<SourceSyncResult> _syncSource(String source) async {
-    final org = _active!;
-    final revision = _loadRevision;
-    final result = await _client.sources.sync(org.id, source);
-    if (mounted && revision == _loadRevision && org.id == _active?.id) {
-      _acceptConnection(result.connection);
-      await _refreshActive();
-    }
-    return result;
+    return _changeSource(
+      source,
+      () => _client.sources.sync(_active!.id, source),
+    );
   }
 
   Future<void> _disconnectSource(String source) async {
     final org = _active!;
     final revision = _loadRevision;
-    final connection = await _client.sources.disconnect(org.id, source);
-    if (mounted && revision == _loadRevision && org.id == _active?.id) {
-      _acceptConnection(connection);
-      await _refreshActive();
+    ++_refreshRevision;
+    _mutatingSources.add(source);
+    try {
+      final connection = await _client.sources.disconnect(org.id, source);
+      if (mounted && revision == _loadRevision && org.id == _active?.id) {
+        _acceptConnection(connection);
+        await _refreshActive();
+      }
+    } finally {
+      _mutatingSources.remove(source);
     }
   }
 
-  void _acceptConnection(MockSourceConnection connection) => setState(() {
-    _sourceConnections = [
-      ..._sourceConnections.where((c) => c.source != connection.source),
-      connection,
-    ];
-    _sourceSyncErrors.remove(connection.source);
-  });
+  void _acceptConnection(MockSourceConnection connection) {
+    ++_refreshRevision;
+    setState(() {
+      _sourceConnections = [
+        ..._sourceConnections.where((c) => c.source != connection.source),
+        connection,
+      ];
+      _sourceSyncErrors.remove(connection.source);
+      _syncingSources.remove(connection.source);
+      if (!connection.connected) {
+        _tickets.removeWhere((ticket) => ticket.source == connection.source);
+      }
+    });
+  }
 
   Future<T?> _showFormDialog<T>({
     required List<TextEditingController> controllers,
@@ -596,6 +648,9 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
                 sourceSyncErrors: _sourceSyncErrors,
                 onConnectSource: _active!.role == WorkspaceRole.admin
                     ? _connectSource
+                    : null,
+                onConfigureSource: _active!.role == WorkspaceRole.admin
+                    ? _configureSource
                     : null,
                 onSyncSource: _active!.role == WorkspaceRole.viewer
                     ? null

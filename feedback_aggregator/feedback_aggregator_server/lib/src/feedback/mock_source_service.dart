@@ -12,7 +12,9 @@ class MockSourceService {
   List<MockSourceFeedback> _reports(String source) {
     final reports = mockSourceFeedback[source];
     if (reports == null) {
-      throw WorkspaceException(message: 'Demo sync supports Email and Slack.');
+      throw WorkspaceException(
+        message: 'This source does not support demo sync.',
+      );
     }
     return reports;
   }
@@ -47,19 +49,30 @@ class MockSourceService {
     int workspaceId,
   ) async {
     await _workspaces.requireAccess(session, workspaceId);
-    return MockSourceConnection.db.find(
+    final connections = await MockSourceConnection.db.find(
       session,
       where: (t) => t.workspaceId.equals(workspaceId),
       orderBy: (t) => t.source,
     );
+    return [
+      for (final c in connections)
+        c.copyWith(availableCount: _reports(c.source).length),
+    ];
   }
 
   Future<SourceSyncResult> connect(
     Session session,
     int workspaceId,
-    String source,
-  ) async {
+    String source, {
+    String? demoKey,
+  }) async {
     final reports = _reports(source);
+    if (['Forms', 'Support', 'App reviews'].contains(source) &&
+        (demoKey == null || demoKey.trim().isEmpty || demoKey.length > 128)) {
+      throw WorkspaceException(
+        message: 'Enter a demo key of 1–128 characters.',
+      );
+    }
     return _write(session, workspaceId, (tx) async {
       var connection = await MockSourceConnection.db.findFirstRow(
         session,
@@ -122,6 +135,9 @@ class MockSourceService {
         );
       }
       connection.connected = false;
+      connection.connectedAt = null;
+      connection.lastSyncedAt = null;
+      connection.syncedCount = 0;
       return MockSourceConnection.db.updateRow(
         session,
         connection,

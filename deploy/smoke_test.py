@@ -179,29 +179,44 @@ def main():
             write_status, _ = http(base + '/api/workspace/createTicket', ticket_data, viewer)
             assert write_status in (400, 401, 403)
             passed('Public-origin invite links and Viewer read-only permissions')
-            for source in ('Email', 'Slack'):
-                result = rpc('sources', 'connect', {'workspaceId': wid, 'source': source}, admin)
+            counts = {'Email': 12, 'Slack': 20, 'Forms': 8, 'Support': 15, 'App reviews': 9}
+            def connect(source):
+                if source in ('Email', 'Slack'):
+                    return rpc('sources', 'connect', {'workspaceId': wid, 'source': source}, admin)
+                return rpc('sources', 'configure', {'workspaceId': wid, 'source': source, 'demoKey': 'mock'}, admin)
+            for source, total in counts.items():
+                result = connect(source)
                 assert result['addedCount'] == 5 and result['connection']['connected']
-                assert rpc('sources', 'connect', {'workspaceId': wid, 'source': source}, admin)['addedCount'] == 0
-                for expected in (3, 3, 1, 0):
+                assert connect(source)['addedCount'] == 0
+                remaining = total - 5
+                while remaining:
                     result = rpc('sources', 'sync', {'workspaceId': wid, 'source': source}, admin)
-                    assert result['addedCount'] == expected
-                assert result['connection']['syncedCount'] == 12
+                    assert result['addedCount'] == min(3, remaining)
+                    remaining -= result['addedCount']
+                assert rpc('sources', 'sync', {'workspaceId': wid, 'source': source}, admin)['addedCount'] == 0
+                assert result['connection']['syncedCount'] == total
                 for method in ('connect', 'sync', 'disconnect'):
                     assert http(base + '/api/sources/' + method, {'workspaceId': wid, 'source': source}, viewer)[0] in (400, 401, 403)
+                assert http(base + '/api/sources/configure', {'workspaceId': wid, 'source': source, 'demoKey': 'mock'}, viewer)[0] in (400,401,403)
             imported = rpc('workspace', 'tickets', {'workspaceId': wid}, admin)
             mock_rows = [row for row in imported if row['isMock']]
-            assert len(imported) == 25 and len(mock_rows) == 24
-            assert len({(row['source'], row['externalId']) for row in mock_rows}) == 24
-            assert len(rpc('sources', 'list', {'workspaceId': wid}, viewer)) == 2
-            rpc('sources', 'disconnect', {'workspaceId': wid, 'source': 'Email'}, admin)
-            assert http(base + '/api/sources/sync', {'workspaceId': wid, 'source': 'Email'}, admin)[0] in (400, 401, 403)
-            assert rpc('sources', 'connect', {'workspaceId': wid, 'source': 'Email'}, admin)['addedCount'] == 0
+            assert len(imported) == 65 and len(mock_rows) == 64
+            assert len({(row['source'], row['externalId']) for row in mock_rows}) == 64
+            assert len(rpc('sources', 'list', {'workspaceId': wid}, viewer)) == 5
+            for source in counts:
+                source_args = {'workspaceId': wid, 'source': source}
+                rpc('sources', 'disconnect', source_args, admin)
+                assert http(base + '/api/sources/sync', source_args, admin)[0] in (400, 401, 403)
+                hidden = rpc('workspace', 'tickets', {'workspaceId': wid}, admin)
+                assert not any(row['source'] == source for row in hidden)
+                assert len(hidden) == 65 - counts[source] - (1 if source == 'Forms' else 0)
+                assert connect(source)['addedCount'] == 0
+                assert len(rpc('workspace', 'tickets', {'workspaceId': wid}, admin)) == 65
             beta = rpc('workspace', 'create', {'name': 'Separate source workspace'}, admin)
             assert rpc('sources', 'list', {'workspaceId': beta['id']}, admin) == []
             assert rpc('workspace', 'tickets', {'workspaceId': beta['id']}, admin) == []
-            report['mockSources'] = {'sources': ['Email', 'Slack'], 'importedReports': 24, 'duplicateFree': True, 'tenantIsolation': True, 'viewerRestrictions': True}
-            passed('Email/Slack source connections, delta sync, deduplication, roles, and tenant isolation')
+            report['mockSources'] = {'sources': counts, 'importedReports': 64, 'disconnectHidesDatabaseRows': True, 'duplicateFree': True, 'tenantIsolation': True, 'viewerRestrictions': True}
+            passed('Five demo source configurations, delta sync, hidden disconnected rows, reconnect, deduplication, roles, and tenant isolation')
             if args.laya_image:
                 snapshot = json.loads(rpc('layaPoc', 'start', {'workspaceId': wid, 'sources': ['Discord', 'Slack', 'Email', 'Forms', 'Support']}, admin))
                 run = snapshot['run']
@@ -220,6 +235,7 @@ def main():
                 report['laya']['peakMemoryBytes'] = int(docker('exec', tag + '-laya', 'cat', '/sys/fs/cgroup/memory.peak'))
                 report['laya']['swapMemoryBytes'] = int(docker('exec', tag + '-laya', 'cat', '/sys/fs/cgroup/memory.swap.current'))
                 passed('All 34 real Laya inferences through authenticated Serverpod RPC')
+            rpc('sources', 'disconnect', {'workspaceId': wid, 'source': 'App reviews'}, admin)
             docker('stop', '--time', '20', tag + '-app')
             state = json.loads(docker('inspect', '--format', '{{json .State}}', tag + '-app'))
             assert state['ExitCode'] in (0, 143) and not state['OOMKilled'], 'App failed to shut down gracefully'
@@ -227,8 +243,12 @@ def main():
             wait_for(base + '/healthz')
             restored = rpc('workspace', 'tickets', {'workspaceId': wid}, admin)
             assert any(row['id'] == ticket['id'] for row in restored)
-            assert len(restored) == 25 and len(rpc('sources', 'list', {'workspaceId': wid}, admin)) == 2
-            passed('Graceful restart, idempotent migrations, and persisted tickets')
+            assert len(restored) == 56 and not any(row['source'] == 'App reviews' for row in restored)
+            connections = rpc('sources', 'list', {'workspaceId': wid}, admin)
+            assert len(connections) == 5 and not next(c for c in connections if c['source'] == 'App reviews')['connected']
+            assert connect('App reviews')['addedCount'] == 0
+            assert len(rpc('workspace', 'tickets', {'workspaceId': wid}, admin)) == 65
+            passed('Graceful restart, idempotent migrations, hidden disconnected source persistence, and reconnect')
             assert docker('exec', tag + '-app', 'id', '-u') == '10001'
             forbidden = docker('exec', tag + '-app', 'find', '/app', '-name', 'passwords.yaml', '-o', '-name', '.env', '-o', '-name', 'client_secret*.json')
             assert not forbidden
