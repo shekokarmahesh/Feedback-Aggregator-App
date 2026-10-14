@@ -4,6 +4,7 @@ import 'package:feedback_aggregator_client/feedback_aggregator_client.dart';
 import 'package:feedback_aggregator_flutter/models/demo_ticket.dart';
 import 'package:feedback_aggregator_flutter/screens/dashboard_screen.dart';
 import 'package:feedback_aggregator_flutter/screens/sources_panel.dart';
+import 'package:feedback_aggregator_flutter/screens/source_configuration_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -109,7 +110,7 @@ void main() {
   );
   for (final source in ['Forms', 'Support', 'App reviews']) {
     testWidgets(
-      '$source configuration previews webhook steps and imports with any demo key',
+      '$source configuration previews webhook steps and accepts the shared key',
       (tester) async {
         final calls = <String>[];
         await showPanel(
@@ -143,15 +144,18 @@ void main() {
         await tester.pumpAndSettle();
         expect(calls, isEmpty);
         expect(find.text('Enter a webhook key to connect.'), findsOneWidget);
-        await tester.enterText(
-          find.byKey(const ValueKey('webhook-key')),
-          'mock',
+        await tester.ensureVisible(
+          find.byKey(const ValueKey('use-webhook-key')),
+        );
+        await tester.tap(find.byKey(const ValueKey('use-webhook-key')));
+        await tester.ensureVisible(
+          find.byKey(const ValueKey('submit-source-configuration')),
         );
         await tester.tap(
           find.byKey(const ValueKey('submit-source-configuration')),
         );
         await tester.pumpAndSettle();
-        expect(calls, ['$source:mock']);
+        expect(calls, ['$source:$suggestedWebhookKey']);
         expect(find.byKey(const ValueKey('webhook-key')), findsNothing);
         expect(
           find.text('5 reports from $source added to your inbox.'),

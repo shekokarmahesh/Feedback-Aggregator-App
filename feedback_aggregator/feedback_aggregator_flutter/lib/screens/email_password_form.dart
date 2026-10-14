@@ -7,13 +7,19 @@ import '../client.dart';
 enum _Step { signIn, signUp, requestReset, verifyReset, newPassword }
 
 class EmailPasswordForm extends StatefulWidget {
-  const EmailPasswordForm({super.key, this.initialSignUp = false});
+  const EmailPasswordForm({
+    super.key,
+    this.initialSignUp = false,
+    this.apiClient,
+  });
   final bool initialSignUp;
+  final Client? apiClient;
   @override
   State<EmailPasswordForm> createState() => _EmailPasswordFormState();
 }
 
 class _EmailPasswordFormState extends State<EmailPasswordForm> {
+  Client get _client => widget.apiClient ?? client;
   final _form = GlobalKey<FormState>();
   final _email = TextEditingController();
   final _password = TextEditingController();
@@ -60,28 +66,28 @@ class _EmailPasswordFormState extends State<EmailPasswordForm> {
     try {
       switch (_step) {
         case _Step.signIn:
-          final result = await client.emailIdp.login(
+          final result = await _client.emailIdp.login(
             email: email,
             password: _password.text,
           );
-          await client.auth.updateSignedInUser(result);
+          await _client.auth.updateSignedInUser(result);
         case _Step.signUp:
-          final result = await client.emailIdp.register(
+          final result = await _client.emailIdp.register(
             email: email,
             password: _password.text,
           );
-          await client.auth.updateSignedInUser(result);
+          await _client.auth.updateSignedInUser(result);
         case _Step.requestReset:
-          _requestId = await client.emailIdp.startPasswordReset(email: email);
+          _requestId = await _client.emailIdp.startPasswordReset(email: email);
           if (mounted) _go(_Step.verifyReset);
         case _Step.verifyReset:
-          _resetToken = await client.emailIdp.verifyPasswordResetCode(
+          _resetToken = await _client.emailIdp.verifyPasswordResetCode(
             passwordResetRequestId: _requestId!,
             verificationCode: _code.text.trim(),
           );
           if (mounted) _go(_Step.newPassword);
         case _Step.newPassword:
-          await client.emailIdp.finishPasswordReset(
+          await _client.emailIdp.finishPasswordReset(
             finishPasswordResetToken: _resetToken!,
             newPassword: _password.text,
           );

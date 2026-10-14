@@ -1,6 +1,8 @@
 # Source integrations and automatic issue grouping
 
-Admins connect Email and Slack from **Sources**. Forms, Support, and App reviews have **Configure** dialogs containing the current website's `/webhooks/feedback` address, `Content-Type: application/json`, `X-Feedback-Webhook-Key: your-webhook-key`, a JSON example, and **Your webhook key**. Enter any nonempty key up to 128 characters to connect the current sample feed. The key is not saved or used to authorize real external webhook requests.
+Admins connect Email and Slack from **Sources**. Forms, Support, and App reviews have **Configure** dialogs containing the current website's `/webhooks/feedback` address, `Content-Type: application/json`, `X-Feedback-Webhook-Key`, a JSON example, and **Your webhook key**. **Use this key** fills `whk_fa_7e2d91b4c8a640f3b59e1d027c8f6a45` in any of these three dialogs; entering another nonempty key up to 128 characters also connects the current sample feed. This public example key is not saved or used to authorize real external webhook requests. Live Discord and generic ingestion retain their workspace-generated credentials.
+
+An invalid login session can fail before source configuration is reached. The app lets Serverpod refresh the session, retries a recoverable request, and clears the local session only when refresh credentials are rejected. It closes open dialogs and shows **Your session expired. Sign in again to continue.** Temporary refresh outages and workspace permission errors preserve the login. Regression tests exercise the actual client HTTP boundary, source dialog, storage, and sign-in transition.
 
 Initial connections import five reports. **Sync now** imports up to three additional reports, and the open workspace automatically syncs every 30 seconds. Feed sizes are Email 12, Slack 20, Forms 8, Support 15, and App reviews 9: 64 reports altogether. These providers use sample data; the existing Discord bot/guild flow remains live.
 

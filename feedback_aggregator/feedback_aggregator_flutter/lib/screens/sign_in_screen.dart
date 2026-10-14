@@ -1,7 +1,9 @@
+import 'package:feedback_aggregator_client/feedback_aggregator_client.dart';
 import 'package:flutter/material.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 
 import '../client.dart';
+import '../session_aware_client.dart';
 import 'email_password_form.dart';
 import 'landing_screen.dart';
 
@@ -10,12 +12,14 @@ class SignInScreen extends StatefulWidget {
   final bool showLanding;
   final bool initialSignUp;
   final bool invitation;
+  final Client? apiClient;
   const SignInScreen({
     super.key,
     required this.child,
     this.showLanding = true,
     this.initialSignUp = false,
     this.invitation = false,
+    this.apiClient,
   });
 
   @override
@@ -24,23 +28,35 @@ class SignInScreen extends StatefulWidget {
 
 class _SignInScreenState extends State<SignInScreen> {
   bool _isSignedIn = false;
+  Client get _client => widget.apiClient ?? client;
 
   @override
   void initState() {
     super.initState();
-    client.auth.authInfoListenable.addListener(_updateSignedInState);
-    _isSignedIn = client.auth.isAuthenticated;
+    _client.auth.authInfoListenable.addListener(_updateSignedInState);
+    _isSignedIn = _client.auth.isAuthenticated;
   }
 
   @override
   void dispose() {
-    client.auth.authInfoListenable.removeListener(_updateSignedInState);
+    _client.auth.authInfoListenable.removeListener(_updateSignedInState);
     super.dispose();
   }
 
   void _updateSignedInState() {
+    final signedIn = _client.auth.isAuthenticated;
+    if (_isSignedIn && !signedIn) {
+      // Close source/team dialogs so they cannot cover the sign-in screen.
+      final homeRoute = ModalRoute.of(context);
+      if (homeRoute != null) {
+        Navigator.of(context).popUntil((route) => route == homeRoute);
+      }
+    }
+    if (signedIn && _client is SessionAwareClient) {
+      (_client as SessionAwareClient).sessionExpired = false;
+    }
     setState(() {
-      _isSignedIn = client.auth.isAuthenticated;
+      _isSignedIn = signedIn;
     });
   }
 
@@ -50,7 +66,9 @@ class _SignInScreenState extends State<SignInScreen> {
 
     return _isSignedIn
         ? widget.child
-        : widget.showLanding
+        : widget.showLanding &&
+              !(_client is SessionAwareClient &&
+                  (_client as SessionAwareClient).sessionExpired)
         ? const LandingScreen()
         : Center(
             child: SingleChildScrollView(
@@ -83,6 +101,15 @@ class _SignInScreenState extends State<SignInScreen> {
                           style: Theme.of(context).textTheme.headlineSmall,
                         ),
                         const SizedBox(height: 8),
+                        if (_client is SessionAwareClient &&
+                            (_client as SessionAwareClient).sessionExpired)
+                          const Padding(
+                            padding: EdgeInsets.only(bottom: 12),
+                            child: Text(
+                              'Your session expired. Sign in again to continue.',
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
                         Text(
                           widget.invitation
                               ? 'Sign in or create an account using the email address your workspace invitation was sent to.'
@@ -90,7 +117,10 @@ class _SignInScreenState extends State<SignInScreen> {
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 24),
-                        EmailPasswordForm(initialSignUp: widget.initialSignUp),
+                        EmailPasswordForm(
+                          initialSignUp: widget.initialSignUp,
+                          apiClient: _client,
+                        ),
                         if (googleSignInEnabled) ...[
                           const SizedBox(height: 16),
                           const Row(
@@ -105,7 +135,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           ),
                           const SizedBox(height: 16),
                           GoogleSignInWidget(
-                            client: client,
+                            client: _client,
                             onAuthenticated: () {
                               context.showSnackBar(
                                 message: 'User authenticated.',

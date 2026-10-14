@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:feedback_aggregator_client/feedback_aggregator_client.dart';
 import 'package:flutter/material.dart';
 
+const suggestedWebhookKey = 'whk_fa_7e2d91b4c8a640f3b59e1d027c8f6a45';
+
 class SourceConfigurationDialog extends StatefulWidget {
   final String source;
   final int availableCount;
@@ -70,7 +72,7 @@ class _SourceConfigurationDialogState extends State<SourceConfigurationDialog> {
     final origin = ['http', 'https'].contains(Uri.base.scheme)
         ? Uri.base.origin
         : 'https://feedbackaggregatorai.online';
-    final sampleKey = 'your-webhook-key';
+    const sampleKey = suggestedWebhookKey;
     final payload = const JsonEncoder.withIndent('  ').convert({
       'title': 'CSV export is empty',
       'body': 'Filtered feedback exports contain only headers.',
@@ -110,6 +112,15 @@ class _SourceConfigurationDialogState extends State<SourceConfigurationDialog> {
                     '2. Request headers',
                     'Content-Type: application/json\nX-Feedback-Webhook-Key: $sampleKey',
                   ),
+                  TextButton.icon(
+                    key: const ValueKey('use-webhook-key'),
+                    onPressed: _busy
+                        ? null
+                        : () => _key.text = suggestedWebhookKey,
+                    icon: const Icon(Icons.key_outlined, size: 18),
+                    label: const Text('Use this key'),
+                  ),
+                  const SizedBox(height: 12),
                   _step('3. Example feedback payload', payload),
                   const Text(
                     'These connections currently import sample feedback. Laya processes the reports automatically in your workspace.',
@@ -129,7 +140,7 @@ class _SourceConfigurationDialogState extends State<SourceConfigurationDialog> {
                       labelText: 'Your webhook key',
                       hintText: sampleKey,
                       helperText:
-                          'Enter your webhook key. Sample connections accept any nonempty value.',
+                          'Use the key above or enter your webhook key.',
                     ),
                     validator: (value) => value == null || value.trim().isEmpty
                         ? 'Enter a webhook key to connect.'

@@ -38,6 +38,7 @@ dependencies:
   serverpod_auth_idp_client: 4.0.3
 
 dev_dependencies:
+  http: ^1.6.0
   # Used for agents to drive the app through the Dart MCP
   flutter_driver:
     sdk: flutter
