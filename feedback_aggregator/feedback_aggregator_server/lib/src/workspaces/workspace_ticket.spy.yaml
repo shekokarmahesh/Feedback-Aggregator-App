@@ -9,7 +9,12 @@ fields:
   priority: String
   supporters: int
   requester: String
+  isMock: bool, default=false
+  externalId: String?
   createdAt: DateTime, default=now
 indexes:
   workspace_ticket_lookup:
     fields: workspaceId
+  workspace_ticket_external_unique:
+    fields: workspaceId, source, externalId
+    unique: true

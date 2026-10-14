@@ -92,7 +92,7 @@ void main() {
     );
     await tester.tap(find.text('Manage sources'));
     await tester.pumpAndSettle();
-    expect(find.text('Discord setup'), findsOneWidget);
+    expect(find.text('Feedback sources'), findsOneWidget);
     await tester.ensureVisible(find.text('Configure Discord'));
     await tester.tap(find.text('Configure Discord'));
     expect(configured, isTrue);

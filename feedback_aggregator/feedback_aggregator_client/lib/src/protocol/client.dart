@@ -21,6 +21,10 @@ import 'package:feedback_aggregator_client/src/protocol/workspaces/invitation_in
     as _ib0gvgdq;
 import 'package:feedback_aggregator_client/src/protocol/workspaces/member_info.dart'
     as _irkpghaa;
+import 'package:feedback_aggregator_client/src/protocol/workspaces/mock_source_connection.dart'
+    as _io1hkon9;
+import 'package:feedback_aggregator_client/src/protocol/workspaces/source_sync_result.dart'
+    as _iz26az6v;
 import 'package:feedback_aggregator_client/src/protocol/workspaces/workspace_role.dart'
     as _i983omfg;
 import 'package:feedback_aggregator_client/src/protocol/workspaces/workspace_summary.dart'
@@ -366,6 +370,57 @@ class EndpointFeedbackIngestion extends _isc.EndpointRef {
   );
 }
 
+/// {@category Endpoint}
+class EndpointSources extends _isc.EndpointRef {
+  EndpointSources(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'sources';
+
+  _ida.Future<List<_io1hkon9.MockSourceConnection>> list(int workspaceId) =>
+      caller.callServerEndpoint<List<_io1hkon9.MockSourceConnection>>(
+        'sources',
+        'list',
+        {'workspaceId': workspaceId},
+      );
+
+  _ida.Future<_iz26az6v.SourceSyncResult> connect(
+    int workspaceId,
+    String source,
+  ) => caller.callServerEndpoint<_iz26az6v.SourceSyncResult>(
+    'sources',
+    'connect',
+    {
+      'workspaceId': workspaceId,
+      'source': source,
+    },
+  );
+
+  _ida.Future<_iz26az6v.SourceSyncResult> sync(
+    int workspaceId,
+    String source,
+  ) => caller.callServerEndpoint<_iz26az6v.SourceSyncResult>(
+    'sources',
+    'sync',
+    {
+      'workspaceId': workspaceId,
+      'source': source,
+    },
+  );
+
+  _ida.Future<_io1hkon9.MockSourceConnection> disconnect(
+    int workspaceId,
+    String source,
+  ) => caller.callServerEndpoint<_io1hkon9.MockSourceConnection>(
+    'sources',
+    'disconnect',
+    {
+      'workspaceId': workspaceId,
+      'source': source,
+    },
+  );
+}
+
 /// This is an example endpoint that returns a greeting message through
 /// its [hello] method.
 /// {@category Endpoint}
@@ -384,7 +439,6 @@ class EndpointGreeting extends _isc.EndpointRef {
       );
 }
 
-/// Workspace membership, tickets, and Discord guild configuration.
 /// {@category Endpoint}
 class EndpointLayaPoc extends _isc.EndpointRef {
   EndpointLayaPoc(_isc.EndpointCaller caller) : super(caller);
@@ -442,6 +496,7 @@ class EndpointLayaPoc extends _isc.EndpointRef {
   );
 }
 
+/// Workspace membership, tickets, and Discord guild configuration.
 /// {@category Endpoint}
 class EndpointWorkspace extends _isc.EndpointRef {
   EndpointWorkspace(_isc.EndpointCaller caller) : super(caller);
@@ -665,6 +720,7 @@ class Client extends _isc.ServerpodClientShared {
     googleIdp = EndpointGoogleIdp(this);
     jwtRefresh = EndpointJwtRefresh(this);
     feedbackIngestion = EndpointFeedbackIngestion(this);
+    sources = EndpointSources(this);
     greeting = EndpointGreeting(this);
     layaPoc = EndpointLayaPoc(this);
     workspace = EndpointWorkspace(this);
@@ -678,6 +734,8 @@ class Client extends _isc.ServerpodClientShared {
   late final EndpointJwtRefresh jwtRefresh;
 
   late final EndpointFeedbackIngestion feedbackIngestion;
+
+  late final EndpointSources sources;
 
   late final EndpointGreeting greeting;
 
@@ -693,6 +751,7 @@ class Client extends _isc.ServerpodClientShared {
     'googleIdp': googleIdp,
     'jwtRefresh': jwtRefresh,
     'feedbackIngestion': feedbackIngestion,
+    'sources': sources,
     'greeting': greeting,
     'layaPoc': layaPoc,
     'workspace': workspace,

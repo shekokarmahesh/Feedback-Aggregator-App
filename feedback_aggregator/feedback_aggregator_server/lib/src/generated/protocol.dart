@@ -15,6 +15,8 @@ import 'package:feedback_aggregator_server/src/generated/workspaces/invitation_i
     as _in9kijmm;
 import 'package:feedback_aggregator_server/src/generated/workspaces/member_info.dart'
     as _innlq9pp;
+import 'package:feedback_aggregator_server/src/generated/workspaces/mock_source_connection.dart'
+    as _iig9z06a;
 import 'package:feedback_aggregator_server/src/generated/workspaces/workspace_summary.dart'
     as _i9st2zmz;
 import 'package:feedback_aggregator_server/src/generated/workspaces/workspace_ticket.dart'
@@ -34,6 +36,8 @@ import 'workspaces/discord_guild.dart' as _i0swa0s1;
 import 'workspaces/invitation_delivery.dart' as _i5p49uup;
 import 'workspaces/invitation_info.dart' as _iquvyw6s;
 import 'workspaces/member_info.dart' as _itiylzhc;
+import 'workspaces/mock_source_connection.dart' as _i8sxq4gq;
+import 'workspaces/source_sync_result.dart' as _ixag6zju;
 import 'workspaces/workspace.dart' as _ipnno8uy;
 import 'workspaces/workspace_exception.dart' as _ih5av2eo;
 import 'workspaces/workspace_invitation.dart' as _i66b2tam;
@@ -50,6 +54,8 @@ export 'workspaces/discord_guild.dart';
 export 'workspaces/invitation_delivery.dart';
 export 'workspaces/invitation_info.dart';
 export 'workspaces/member_info.dart';
+export 'workspaces/mock_source_connection.dart';
+export 'workspaces/source_sync_result.dart';
 export 'workspaces/workspace.dart';
 export 'workspaces/workspace_exception.dart';
 export 'workspaces/workspace_invitation.dart';
@@ -125,6 +131,98 @@ class Protocol extends _is.DatabaseSerializationManager {
             _isp.IndexElementDefinition(
               type: _isp.IndexElementDefinitionType.column,
               definition: 'workspaceId',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _isp.TableDefinition(
+      name: 'app_mock_source_connection',
+      dartName: 'MockSourceConnection',
+      schema: 'public',
+      module: 'feedback_aggregator',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isp.ColumnDefinition(
+          name: 'workspaceId',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'source',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'connected',
+          columnType: _isp.ColumnType.boolean,
+          isNullable: false,
+          dartType: 'bool',
+          columnDefault: 'false',
+        ),
+        _isp.ColumnDefinition(
+          name: 'connectedAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: true,
+          dartType: 'DateTime?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'lastSyncedAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: true,
+          dartType: 'DateTime?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'syncedCount',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+          columnDefault: '0',
+        ),
+        _isp.ColumnDefinition(
+          name: 'availableCount',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+          columnDefault: '0',
+        ),
+      ],
+      foreignKeys: [
+        _isp.ForeignKeyDefinition(
+          constraintName: 'app_mock_source_connection_fk_0',
+          columns: ['workspaceId'],
+          referenceTable: 'app_workspace',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _isp.ForeignKeyAction.noAction,
+          onDelete: _isp.ForeignKeyAction.cascade,
+          matchType: null,
+        ),
+      ],
+      indexes: [
+        _isp.IndexDefinition(
+          indexName: 'mock_source_workspace_unique',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'workspaceId',
+            ),
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'source',
             ),
           ],
           type: 'btree',
@@ -435,6 +533,19 @@ class Protocol extends _is.DatabaseSerializationManager {
           dartType: 'String',
         ),
         _isp.ColumnDefinition(
+          name: 'isMock',
+          columnType: _isp.ColumnType.boolean,
+          isNullable: false,
+          dartType: 'bool',
+          columnDefault: 'false',
+        ),
+        _isp.ColumnDefinition(
+          name: 'externalId',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
           name: 'createdAt',
           columnType: _isp.ColumnType.timestampWithoutTimeZone,
           isNullable: false,
@@ -466,6 +577,27 @@ class Protocol extends _is.DatabaseSerializationManager {
           ],
           type: 'btree',
           isUnique: false,
+          isPrimary: false,
+        ),
+        _isp.IndexDefinition(
+          indexName: 'workspace_ticket_external_unique',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'workspaceId',
+            ),
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'source',
+            ),
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'externalId',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
           isPrimary: false,
         ),
       ],
@@ -752,6 +884,12 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _itiylzhc.MemberInfo) {
       return _itiylzhc.MemberInfo.fromJson(data) as T;
     }
+    if (t == _i8sxq4gq.MockSourceConnection) {
+      return _i8sxq4gq.MockSourceConnection.fromJson(data) as T;
+    }
+    if (t == _ixag6zju.SourceSyncResult) {
+      return _ixag6zju.SourceSyncResult.fromJson(data) as T;
+    }
     if (t == _ipnno8uy.Workspace) {
       return _ipnno8uy.Workspace.fromJson(data) as T;
     }
@@ -804,6 +942,16 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _is.getType<_itiylzhc.MemberInfo?>()) {
       return (data != null ? _itiylzhc.MemberInfo.fromJson(data) : null) as T;
     }
+    if (t == _is.getType<_i8sxq4gq.MockSourceConnection?>()) {
+      return (data != null
+              ? _i8sxq4gq.MockSourceConnection.fromJson(data)
+              : null)
+          as T;
+    }
+    if (t == _is.getType<_ixag6zju.SourceSyncResult?>()) {
+      return (data != null ? _ixag6zju.SourceSyncResult.fromJson(data) : null)
+          as T;
+    }
     if (t == _is.getType<_ipnno8uy.Workspace?>()) {
       return (data != null ? _ipnno8uy.Workspace.fromJson(data) : null) as T;
     }
@@ -831,6 +979,12 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (t == _is.getType<_ir8cxu8v.WorkspaceTicket?>()) {
       return (data != null ? _ir8cxu8v.WorkspaceTicket.fromJson(data) : null)
+          as T;
+    }
+    if (t == List<_iig9z06a.MockSourceConnection>) {
+      return (data as List)
+              .map((e) => deserialize<_iig9z06a.MockSourceConnection>(e))
+              .toList()
           as T;
     }
     if (t == List<String>) {
@@ -883,6 +1037,8 @@ class Protocol extends _is.DatabaseSerializationManager {
       _i5p49uup.InvitationDelivery => 'InvitationDelivery',
       _iquvyw6s.InvitationInfo => 'InvitationInfo',
       _itiylzhc.MemberInfo => 'MemberInfo',
+      _i8sxq4gq.MockSourceConnection => 'MockSourceConnection',
+      _ixag6zju.SourceSyncResult => 'SourceSyncResult',
       _ipnno8uy.Workspace => 'Workspace',
       _ih5av2eo.WorkspaceException => 'WorkspaceException',
       _i66b2tam.WorkspaceInvitation => 'WorkspaceInvitation',
@@ -925,6 +1081,10 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'InvitationInfo';
       case _itiylzhc.MemberInfo():
         return 'MemberInfo';
+      case _i8sxq4gq.MockSourceConnection():
+        return 'MockSourceConnection';
+      case _ixag6zju.SourceSyncResult():
+        return 'SourceSyncResult';
       case _ipnno8uy.Workspace():
         return 'Workspace';
       case _ih5av2eo.WorkspaceException():
@@ -991,6 +1151,12 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (dataClassName == 'MemberInfo') {
       return deserialize<_itiylzhc.MemberInfo>(data['data']);
+    }
+    if (dataClassName == 'MockSourceConnection') {
+      return deserialize<_i8sxq4gq.MockSourceConnection>(data['data']);
+    }
+    if (dataClassName == 'SourceSyncResult') {
+      return deserialize<_ixag6zju.SourceSyncResult>(data['data']);
     }
     if (dataClassName == 'Workspace') {
       return deserialize<_ipnno8uy.Workspace>(data['data']);
@@ -1062,6 +1228,8 @@ class Protocol extends _is.DatabaseSerializationManager {
         return _ixmckfyn.Team.t;
       case _i0swa0s1.DiscordGuild:
         return _i0swa0s1.DiscordGuild.t;
+      case _i8sxq4gq.MockSourceConnection:
+        return _i8sxq4gq.MockSourceConnection.t;
       case _ipnno8uy.Workspace:
         return _ipnno8uy.Workspace.t;
       case _i66b2tam.WorkspaceInvitation:

@@ -15,6 +15,8 @@ import 'package:feedback_aggregator_client/src/protocol/workspaces/invitation_in
     as _ib0gvgdq;
 import 'package:feedback_aggregator_client/src/protocol/workspaces/member_info.dart'
     as _irkpghaa;
+import 'package:feedback_aggregator_client/src/protocol/workspaces/mock_source_connection.dart'
+    as _io1hkon9;
 import 'package:feedback_aggregator_client/src/protocol/workspaces/workspace_summary.dart'
     as _in30w5p5;
 import 'package:feedback_aggregator_client/src/protocol/workspaces/workspace_ticket.dart'
@@ -31,6 +33,8 @@ import 'greetings/greeting.dart' as _izw8z7ou;
 import 'workspaces/invitation_delivery.dart' as _i5p49uup;
 import 'workspaces/invitation_info.dart' as _iquvyw6s;
 import 'workspaces/member_info.dart' as _itiylzhc;
+import 'workspaces/mock_source_connection.dart' as _i8sxq4gq;
+import 'workspaces/source_sync_result.dart' as _ixag6zju;
 import 'workspaces/workspace_exception.dart' as _ih5av2eo;
 import 'workspaces/workspace_role.dart' as _i6w1n5dc;
 import 'workspaces/workspace_summary.dart' as _i0zqiur8;
@@ -42,6 +46,8 @@ export 'greetings/greeting.dart';
 export 'workspaces/invitation_delivery.dart';
 export 'workspaces/invitation_info.dart';
 export 'workspaces/member_info.dart';
+export 'workspaces/mock_source_connection.dart';
+export 'workspaces/source_sync_result.dart';
 export 'workspaces/workspace_exception.dart';
 export 'workspaces/workspace_role.dart';
 export 'workspaces/workspace_summary.dart';
@@ -103,6 +109,12 @@ class Protocol extends _isc.SerializationManager {
     if (t == _itiylzhc.MemberInfo) {
       return _itiylzhc.MemberInfo.fromJson(data) as T;
     }
+    if (t == _i8sxq4gq.MockSourceConnection) {
+      return _i8sxq4gq.MockSourceConnection.fromJson(data) as T;
+    }
+    if (t == _ixag6zju.SourceSyncResult) {
+      return _ixag6zju.SourceSyncResult.fromJson(data) as T;
+    }
     if (t == _ih5av2eo.WorkspaceException) {
       return _ih5av2eo.WorkspaceException.fromJson(data) as T;
     }
@@ -139,6 +151,16 @@ class Protocol extends _isc.SerializationManager {
     if (t == _isc.getType<_itiylzhc.MemberInfo?>()) {
       return (data != null ? _itiylzhc.MemberInfo.fromJson(data) : null) as T;
     }
+    if (t == _isc.getType<_i8sxq4gq.MockSourceConnection?>()) {
+      return (data != null
+              ? _i8sxq4gq.MockSourceConnection.fromJson(data)
+              : null)
+          as T;
+    }
+    if (t == _isc.getType<_ixag6zju.SourceSyncResult?>()) {
+      return (data != null ? _ixag6zju.SourceSyncResult.fromJson(data) : null)
+          as T;
+    }
     if (t == _isc.getType<_ih5av2eo.WorkspaceException?>()) {
       return (data != null ? _ih5av2eo.WorkspaceException.fromJson(data) : null)
           as T;
@@ -153,6 +175,12 @@ class Protocol extends _isc.SerializationManager {
     }
     if (t == _isc.getType<_ir8cxu8v.WorkspaceTicket?>()) {
       return (data != null ? _ir8cxu8v.WorkspaceTicket.fromJson(data) : null)
+          as T;
+    }
+    if (t == List<_io1hkon9.MockSourceConnection>) {
+      return (data as List)
+              .map((e) => deserialize<_io1hkon9.MockSourceConnection>(e))
+              .toList()
           as T;
     }
     if (t == List<String>) {
@@ -200,6 +228,8 @@ class Protocol extends _isc.SerializationManager {
       _i5p49uup.InvitationDelivery => 'InvitationDelivery',
       _iquvyw6s.InvitationInfo => 'InvitationInfo',
       _itiylzhc.MemberInfo => 'MemberInfo',
+      _i8sxq4gq.MockSourceConnection => 'MockSourceConnection',
+      _ixag6zju.SourceSyncResult => 'SourceSyncResult',
       _ih5av2eo.WorkspaceException => 'WorkspaceException',
       _i6w1n5dc.WorkspaceRole => 'WorkspaceRole',
       _i0zqiur8.WorkspaceSummary => 'WorkspaceSummary',
@@ -235,6 +265,10 @@ class Protocol extends _isc.SerializationManager {
         return 'InvitationInfo';
       case _itiylzhc.MemberInfo():
         return 'MemberInfo';
+      case _i8sxq4gq.MockSourceConnection():
+        return 'MockSourceConnection';
+      case _ixag6zju.SourceSyncResult():
+        return 'SourceSyncResult';
       case _ih5av2eo.WorkspaceException():
         return 'WorkspaceException';
       case _i6w1n5dc.WorkspaceRole():
@@ -285,6 +319,12 @@ class Protocol extends _isc.SerializationManager {
     }
     if (dataClassName == 'MemberInfo') {
       return deserialize<_itiylzhc.MemberInfo>(data['data']);
+    }
+    if (dataClassName == 'MockSourceConnection') {
+      return deserialize<_i8sxq4gq.MockSourceConnection>(data['data']);
+    }
+    if (dataClassName == 'SourceSyncResult') {
+      return deserialize<_ixag6zju.SourceSyncResult>(data['data']);
     }
     if (dataClassName == 'WorkspaceException') {
       return deserialize<_ih5av2eo.WorkspaceException>(data['data']);

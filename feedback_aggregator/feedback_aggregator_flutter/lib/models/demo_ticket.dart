@@ -8,6 +8,7 @@ class DemoTicket {
   final int supporters;
   final int hoursAgo;
   final String requester;
+  final bool isMock;
 
   const DemoTicket(
     this.id,
@@ -18,8 +19,9 @@ class DemoTicket {
     this.priority,
     this.supporters,
     this.hoursAgo,
-    this.requester,
-  );
+    this.requester, {
+    this.isMock = false,
+  });
 }
 
 const demoTickets = [

@@ -34,6 +34,8 @@ After sign-in, the dashboard shows the selected workspace's persisted feedback w
 
 The public landing preview uses sample data. Discord submissions create workspace tickets through `POST /webhooks/feedback`; generic form and website submissions use team-scoped ingestion keys and the Feedback model. See [feedback webhook setup](feedback_aggregator/FEEDBACK_WEBHOOK_SETUP.md).
 
+In **Sources**, an Admin can connect the **Email** and **Slack** demo integrations without API keys. Each imports five sample reports immediately, then automatically syncs the remaining reports into the workspace inbox while it is open. Connections and imported tickets persist; repeated syncs do not duplicate feedback. See [mock source setup](feedback_aggregator/MOCK_SOURCES.md).
+
 The signed-in **Laya POC** tab tests real Laya grouping against generated reports from Discord, Slack, email, forms, and support; it runs against a self-hosted open-source model without a paid API key. Results include grouped issues, priority scores, original evidence, and duplicate-detection metrics. See [Laya POC setup](feedback_aggregator/LAYA_POC.md). POC results use temporary memory and do not modify live tickets.
 
 Workspaces isolate each organization's feedback and team. Create a workspace after signing in, invite teammates through **Team**, and assign **Admin**, **Editor**, or **Viewer** access. **Create share link** works without an email provider or purchased domain. See [workspace setup and permissions](feedback_aggregator/WORKSPACES.md) for Resend delivery and access rules.

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:feedback_aggregator_client/feedback_aggregator_client.dart';
 import 'package:flutter/material.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
@@ -18,16 +20,25 @@ String roleLabel(WorkspaceRole role) => switch (role) {
 
 class WorkspaceShell extends StatefulWidget {
   final int? initialWorkspaceId;
-  const WorkspaceShell({super.key, this.initialWorkspaceId});
+  final Client? apiClient;
+  const WorkspaceShell({super.key, this.initialWorkspaceId, this.apiClient});
   @override
   State<WorkspaceShell> createState() => _WorkspaceShellState();
 }
 
 class _WorkspaceShellState extends State<WorkspaceShell> {
+  Client get _client => widget.apiClient ?? client;
   List<WorkspaceSummary> _workspaces = [];
   List<WorkspaceTicket> _tickets = [];
   WorkspaceSummary? _active;
   String? _discordGuild;
+  List<MockSourceConnection> _sourceConnections = [];
+  Set<String> _syncingSources = {};
+  Map<String, String> _sourceSyncErrors = {};
+  String? _refreshError;
+  Timer? _syncTimer;
+  bool _autoSyncing = false;
+  int _refreshRevision = 0;
   bool _loading = true;
   String? _error;
   int _loadRevision = 0;
@@ -36,33 +47,57 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
   void initState() {
     super.initState();
     _load(preferred: widget.initialWorkspaceId);
+    _syncTimer = Timer.periodic(const Duration(seconds: 30), (_) async {
+      if (_loading || _active == null || _autoSyncing) return;
+      _autoSyncing = true;
+      try {
+        await _refreshActive(syncDemo: true);
+      } finally {
+        _autoSyncing = false;
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _syncTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _load({int? preferred}) async {
     final revision = ++_loadRevision;
+    ++_refreshRevision;
     setState(() {
       _loading = true;
       _error = null;
       _tickets = [];
       _discordGuild = null;
+      _sourceConnections = [];
+      _syncingSources = {};
+      _sourceSyncErrors = {};
+      _refreshError = null;
     });
     try {
-      final orgs = await client.workspace.list();
+      final orgs = await _client.workspace.list();
       final wanted = preferred ?? _active?.id;
       final active =
           orgs.where((o) => o.id == wanted).firstOrNull ?? orgs.firstOrNull;
       final tickets = active == null
           ? <WorkspaceTicket>[]
-          : await client.workspace.tickets(active.id);
+          : await _client.workspace.tickets(active.id);
       final guild = active == null
           ? null
-          : await client.workspace.discordGuild(active.id);
+          : await _client.workspace.discordGuild(active.id);
+      final connections = active == null
+          ? <MockSourceConnection>[]
+          : await _client.sources.list(active.id);
       if (!mounted || revision != _loadRevision) return;
       setState(() {
         _workspaces = orgs;
         _active = active;
         _tickets = tickets;
         _discordGuild = guild;
+        _sourceConnections = connections;
       });
     } catch (e) {
       if (mounted && revision == _loadRevision) {
@@ -77,6 +112,111 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
       }
     }
   }
+
+  /// Background refresh keeps the current tab, filters, and scroll position.
+  /// A request started in one workspace can never replace a different tenant.
+  Future<void> _refreshActive({bool syncDemo = false}) async {
+    final org = _active;
+    if (org == null || _loading) return;
+    final loadRevision = _loadRevision;
+    final revision = ++_refreshRevision;
+    bool current() =>
+        mounted &&
+        loadRevision == _loadRevision &&
+        revision == _refreshRevision &&
+        org.id == _active?.id;
+    try {
+      final orgs = await _client.workspace.list();
+      if (!current()) return;
+      final active = orgs.where((o) => o.id == org.id).firstOrNull;
+      if (active == null) {
+        await _load();
+        return;
+      }
+      var connections = await _client.sources.list(org.id);
+      if (!current()) return;
+      final errors = <String, String>{};
+      if (syncDemo && active.role != WorkspaceRole.viewer) {
+        final pending = connections
+            .where((c) => c.connected && c.syncedCount < c.availableCount)
+            .toList();
+        setState(() => _syncingSources = pending.map((c) => c.source).toSet());
+        for (final connection in pending) {
+          if (!current()) return;
+          try {
+            await _client.sources.sync(org.id, connection.source);
+          } catch (error) {
+            errors[connection.source] = workspaceError(error);
+          }
+        }
+        connections = await _client.sources.list(org.id);
+      }
+      if (!current()) return;
+      final tickets = await _client.workspace.tickets(org.id);
+      final guild = await _client.workspace.discordGuild(org.id);
+      if (!current()) return;
+      setState(() {
+        _workspaces = orgs;
+        _active = active;
+        _tickets = tickets;
+        _discordGuild = guild;
+        _sourceConnections = connections;
+        _sourceSyncErrors = errors;
+        _refreshError = null;
+      });
+    } catch (error) {
+      if (current()) {
+        if (error is WorkspaceException &&
+            error.message == 'Workspace access denied.') {
+          await _load();
+        } else {
+          setState(() => _refreshError = workspaceError(error));
+        }
+      }
+    } finally {
+      if (current()) setState(() => _syncingSources = {});
+    }
+  }
+
+  Future<SourceSyncResult> _connectSource(String source) async {
+    final org = _active!;
+    final revision = _loadRevision;
+    final result = await _client.sources.connect(org.id, source);
+    if (mounted && revision == _loadRevision && org.id == _active?.id) {
+      _acceptConnection(result.connection);
+      await _refreshActive();
+    }
+    return result;
+  }
+
+  Future<SourceSyncResult> _syncSource(String source) async {
+    final org = _active!;
+    final revision = _loadRevision;
+    final result = await _client.sources.sync(org.id, source);
+    if (mounted && revision == _loadRevision && org.id == _active?.id) {
+      _acceptConnection(result.connection);
+      await _refreshActive();
+    }
+    return result;
+  }
+
+  Future<void> _disconnectSource(String source) async {
+    final org = _active!;
+    final revision = _loadRevision;
+    final connection = await _client.sources.disconnect(org.id, source);
+    if (mounted && revision == _loadRevision && org.id == _active?.id) {
+      _acceptConnection(connection);
+      await _refreshActive();
+    }
+  }
+
+  void _acceptConnection(MockSourceConnection connection) => setState(() {
+    _sourceConnections = [
+      ..._sourceConnections.where((c) => c.source != connection.source),
+      connection,
+    ];
+    _sourceSyncErrors.remove(connection.source);
+  });
 
   Future<T?> _showFormDialog<T>({
     required List<TextEditingController> controllers,
@@ -136,7 +276,7 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
                         error = null;
                       });
                       try {
-                        final org = await client.workspace.create(
+                        final org = await _client.workspace.create(
                           controller.text,
                         );
                         if (ctx.mounted) Navigator.pop(ctx, org);
@@ -263,7 +403,7 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
                         error = null;
                       });
                       try {
-                        await client.workspace.createTicket(
+                        await _client.workspace.createTicket(
                           org.id,
                           title.text,
                           description.text,
@@ -292,7 +432,7 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
   Future<void> _updateStatus(DemoTicket ticket, String status) async {
     final org = _active!;
     try {
-      await client.workspace.updateTicketStatus(
+      await _client.workspace.updateTicketStatus(
         org.id,
         int.parse(ticket.id.substring(3)),
         status,
@@ -371,13 +511,20 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
                   label: const Text('Team'),
                 ),
               IconButton(
-                onPressed: _loading ? null : () => _load(),
+                onPressed: _loading
+                    ? null
+                    : () => _active == null ? _load() : _refreshActive(),
                 tooltip: 'Refresh workspace',
                 icon: const Icon(Icons.refresh),
               ),
+              if (_refreshError != null)
+                Text(
+                  _refreshError!,
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
               if (_active == null)
                 TextButton(
-                  onPressed: () => client.auth.signOutDevice(),
+                  onPressed: () => _client.auth.signOutDevice(),
                   child: const Text('Sign out'),
                 ),
             ],
@@ -442,7 +589,20 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
             : DashboardScreen(
                 key: ValueKey(_active!.id),
                 workspace: _active,
+                loadProfile: () => loadAccountProfileForClient(_client),
                 discordGuildId: _discordGuild,
+                sourceConnections: _sourceConnections,
+                syncingSources: _syncingSources,
+                sourceSyncErrors: _sourceSyncErrors,
+                onConnectSource: _active!.role == WorkspaceRole.admin
+                    ? _connectSource
+                    : null,
+                onSyncSource: _active!.role == WorkspaceRole.viewer
+                    ? null
+                    : _syncSource,
+                onDisconnectSource: _active!.role == WorkspaceRole.admin
+                    ? _disconnectSource
+                    : null,
                 onConfigureDiscord: _active!.role == WorkspaceRole.admin
                     ? _discord
                     : null,
@@ -458,6 +618,7 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
                         t.supporters,
                         DateTime.now().toUtc().difference(t.createdAt).inHours,
                         t.requester,
+                        isMock: t.isMock,
                       ),
                     )
                     .toList(),
@@ -467,7 +628,7 @@ class _WorkspaceShellState extends State<WorkspaceShell> {
                 onUpdateStatus: _active!.role == WorkspaceRole.viewer
                     ? null
                     : _updateStatus,
-                onSignOut: () => client.auth.signOutDevice(),
+                onSignOut: () => _client.auth.signOutDevice(),
               ),
       ),
     ],

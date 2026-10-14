@@ -1,0 +1,4 @@
+class: SourceSyncResult
+fields:
+  connection: MockSourceConnection
+  addedCount: int

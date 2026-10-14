@@ -21,6 +21,7 @@ import '../auth/email_idp_endpoint.dart' as _iuc1hd5t;
 import '../auth/google_idp_endpoint.dart' as _i71axiz0;
 import '../auth/jwt_refresh_endpoint.dart' as _inwq3ztq;
 import '../feedback/feedback_ingestion_endpoint.dart' as _ixgrydek;
+import '../feedback/sources_endpoint.dart' as _ie902svq;
 import '../greetings/greeting_endpoint.dart' as _il624ik7;
 import '../laya_poc/laya_poc_endpoint.dart' as _ilph5eyz;
 import '../workspaces/workspace_endpoint.dart' as _iannd3dw;
@@ -51,6 +52,12 @@ class Endpoints extends _is.EndpointDispatch {
         ..initialize(
           server,
           'feedbackIngestion',
+          null,
+        ),
+      'sources': _ie902svq.SourcesEndpoint()
+        ..initialize(
+          server,
+          'sources',
           null,
         ),
       'greeting': _il624ik7.GreetingEndpoint()
@@ -447,6 +454,106 @@ class Endpoints extends _is.EndpointDispatch {
                         params['teamId'],
                         params['key'],
                       ),
+        ),
+      },
+    );
+    connectors['sources'] = _is.EndpointConnector(
+      name: 'sources',
+      endpoint: endpoints['sources']!,
+      methodConnectors: {
+        'list': _is.MethodConnector(
+          name: 'list',
+          params: {
+            'workspaceId': _is.ParameterDescription(
+              name: 'workspaceId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['sources'] as _ie902svq.SourcesEndpoint).list(
+                    session,
+                    params['workspaceId'],
+                  ),
+        ),
+        'connect': _is.MethodConnector(
+          name: 'connect',
+          params: {
+            'workspaceId': _is.ParameterDescription(
+              name: 'workspaceId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'source': _is.ParameterDescription(
+              name: 'source',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['sources'] as _ie902svq.SourcesEndpoint).connect(
+                    session,
+                    params['workspaceId'],
+                    params['source'],
+                  ),
+        ),
+        'sync': _is.MethodConnector(
+          name: 'sync',
+          params: {
+            'workspaceId': _is.ParameterDescription(
+              name: 'workspaceId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'source': _is.ParameterDescription(
+              name: 'source',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['sources'] as _ie902svq.SourcesEndpoint).sync(
+                    session,
+                    params['workspaceId'],
+                    params['source'],
+                  ),
+        ),
+        'disconnect': _is.MethodConnector(
+          name: 'disconnect',
+          params: {
+            'workspaceId': _is.ParameterDescription(
+              name: 'workspaceId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'source': _is.ParameterDescription(
+              name: 'source',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['sources'] as _ie902svq.SourcesEndpoint)
+                  .disconnect(
+                    session,
+                    params['workspaceId'],
+                    params['source'],
+                  ),
         ),
       },
     );

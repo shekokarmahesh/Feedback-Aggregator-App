@@ -3,6 +3,7 @@ import 'package:feedback_aggregator_client/feedback_aggregator_client.dart';
 import '../client.dart';
 import '../models/demo_ticket.dart';
 import 'laya_poc_panel.dart';
+import 'sources_panel.dart';
 
 class AccountProfile {
   final String name;
@@ -15,8 +16,11 @@ class AccountProfile {
   });
 }
 
-Future<AccountProfile> loadAccountProfile() async {
-  final profile = await client.modules.serverpod_auth_core.userProfileInfo
+Future<AccountProfile> loadAccountProfile() =>
+    loadAccountProfileForClient(client);
+
+Future<AccountProfile> loadAccountProfileForClient(Client apiClient) async {
+  final profile = await apiClient.modules.serverpod_auth_core.userProfileInfo
       .get();
   return AccountProfile(
     name:
@@ -36,6 +40,12 @@ class DashboardScreen extends StatefulWidget {
   final VoidCallback? onCreateTicket;
   final VoidCallback? onConfigureDiscord;
   final String? discordGuildId;
+  final List<MockSourceConnection> sourceConnections;
+  final Set<String> syncingSources;
+  final Map<String, String> sourceSyncErrors;
+  final Future<SourceSyncResult> Function(String)? onConnectSource;
+  final Future<SourceSyncResult> Function(String)? onSyncSource;
+  final Future<void> Function(String)? onDisconnectSource;
   final Future<void> Function(DemoTicket, String)? onUpdateStatus;
   final Future<AccountProfile> Function() loadProfile;
   const DashboardScreen({
@@ -46,6 +56,12 @@ class DashboardScreen extends StatefulWidget {
     this.onCreateTicket,
     this.onConfigureDiscord,
     this.discordGuildId,
+    this.sourceConnections = const [],
+    this.syncingSources = const {},
+    this.sourceSyncErrors = const {},
+    this.onConnectSource,
+    this.onSyncSource,
+    this.onDisconnectSource,
     this.onUpdateStatus,
     this.loadProfile = loadAccountProfile,
   });
@@ -567,8 +583,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 _metric(
                   'Sources represented',
-                  '${ticketSources.length}',
-                  'Across your sample inbox',
+                  '${widget.tickets.map((t) => t.source).toSet().length}',
+                  widget.workspace == null
+                      ? 'Across your sample inbox'
+                      : 'Across this workspace',
                   Icons.hub_outlined,
                   const Color(0xFF059669),
                   width,
@@ -1004,6 +1022,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         '${ticket.id} · ${ticket.requester}',
         style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11),
       ),
+      if (ticket.isMock) ...[
+        const SizedBox(height: 7),
+        _pill('Demo', const Color(0xFF6154A4)),
+      ],
     ],
   );
   String _updated(DemoTicket ticket) => ticket.hoursAgo < 24
@@ -1031,7 +1053,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                   const Spacer(),
                   _pill(
-                    widget.workspace == null
+                    ticket.isMock
+                        ? 'Demo ticket'
+                        : widget.workspace == null
                         ? 'Sample ticket'
                         : 'Workspace ticket',
                     const Color(0xFF7C3AED),
@@ -1082,7 +1106,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               _detail('Added', _updated(ticket)),
               Text(
-                widget.workspace == null
+                ticket.isMock
+                    ? 'Generated demo feedback imported by a sample source. Your team can triage it like any other workspace ticket.'
+                    : widget.workspace == null
                     ? 'This is a preview of a grouped support ticket. Live feedback ingestion and status changes will be connected later.'
                     : 'This feedback is saved in your workspace. Admins and Editors can update its status.',
                 style: TextStyle(
@@ -1126,117 +1152,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
     ),
   );
 
-  Widget _sources(bool wide) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      _heading(
-        'Feedback sources',
-        'A shared inbox for every place your customers talk to you.',
-      ),
-      const SizedBox(height: 24),
-      if (widget.workspace != null) ...[
-        _surface(
-          Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Discord setup',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-                ),
-                const SizedBox(height: 12),
-                const Text(
-                  'Install the bot, run /feedback setup in your Discord server, then paste the guild ID to link it to this workspace.',
-                ),
-                const SizedBox(height: 16),
-                if (widget.onConfigureDiscord != null)
-                  FilledButton.icon(
-                    onPressed: widget.onConfigureDiscord,
-                    icon: const Icon(Icons.settings_outlined),
-                    label: Text(
-                      widget.discordGuildId == null
-                          ? 'Set up Discord'
-                          : 'Configure Discord',
-                    ),
-                  )
-                else
-                  const Text('Ask a workspace Admin to set up Discord.'),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 20),
-      ],
-      _surface(
-        Padding(
-          padding: const EdgeInsets.all(20),
-          child: Row(
-            children: [
-              const Icon(Icons.info_outline, color: Color(0xFF4F46E5)),
-              const SizedBox(width: 12),
-              const Expanded(
-                child: Text(
-                  'Link Discord to receive feedback from your bot. Other integrations are planned; you can also add feedback manually.',
-                  style: TextStyle(height: 1.5),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      const SizedBox(height: 20),
-      for (final source in ticketSources)
-        Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: _surface(
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF1F5F9),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      _sourceIcon(source),
-                      color: const Color(0xFF475569),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          source,
-                          style: const TextStyle(fontWeight: FontWeight.w700),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          '${widget.tickets.where((t) => t.source == source).length} ${widget.workspace == null ? 'sample ' : ''}feedback groups',
-                          style: const TextStyle(
-                            color: Color(0xFF64748B),
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  _pill(
-                    source == 'Discord' && widget.discordGuildId != null
-                        ? 'Connected'
-                        : 'Not connected',
-                    const Color(0xFF64748B),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-    ],
+  Widget _sources(bool _) => SourcesPanel(
+    workspace: widget.workspace,
+    tickets: widget.tickets,
+    connections: widget.sourceConnections,
+    syncing: widget.syncingSources,
+    syncErrors: widget.sourceSyncErrors,
+    discordGuildId: widget.discordGuildId,
+    onConfigureDiscord: widget.onConfigureDiscord,
+    onConnect: widget.onConnectSource,
+    onSync: widget.onSyncSource,
+    onDisconnect: widget.onDisconnectSource,
   );
 
   Widget _activity() => Column(

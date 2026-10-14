@@ -18,6 +18,11 @@ feedbackIngestion:
   - createTeam:
   - generateKey:
   - revokeKey:
+sources:
+  - list:
+  - connect:
+  - sync:
+  - disconnect:
 greeting:
   - hello:
 layaPoc:

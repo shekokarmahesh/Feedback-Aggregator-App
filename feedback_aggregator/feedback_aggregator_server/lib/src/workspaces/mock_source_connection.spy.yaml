@@ -1,0 +1,14 @@
+class: MockSourceConnection
+table: app_mock_source_connection
+fields:
+  workspaceId: int, relation(parent=app_workspace, onDelete=Cascade)
+  source: String
+  connected: bool, default=false
+  connectedAt: DateTime?
+  lastSyncedAt: DateTime?
+  syncedCount: int, default=0
+  availableCount: int, default=0
+indexes:
+  mock_source_workspace_unique:
+    fields: workspaceId, source
+    unique: true

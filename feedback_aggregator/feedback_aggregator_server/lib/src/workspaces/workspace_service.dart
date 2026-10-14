@@ -55,8 +55,15 @@ class WorkspaceService {
     Session session,
     int workspaceId, {
     bool write = false,
+    bool admin = false,
+    Transaction? transaction,
   }) async {
-    final member = await _member(session, workspaceId);
+    final member = await _member(session, workspaceId, tx: transaction);
+    if (admin && member.role != WorkspaceRole.admin) {
+      throw WorkspaceException(
+        message: 'Only an Admin can manage source connections.',
+      );
+    }
     if (write && member.role == WorkspaceRole.viewer) {
       throw WorkspaceException(
         message: 'Only an Admin or Editor can change workspace feedback.',

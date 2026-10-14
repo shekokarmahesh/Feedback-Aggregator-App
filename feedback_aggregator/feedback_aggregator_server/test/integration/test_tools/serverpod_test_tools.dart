@@ -23,6 +23,10 @@ import 'package:feedback_aggregator_server/src/generated/workspaces/invitation_i
     as _in9kijmm;
 import 'package:feedback_aggregator_server/src/generated/workspaces/member_info.dart'
     as _innlq9pp;
+import 'package:feedback_aggregator_server/src/generated/workspaces/mock_source_connection.dart'
+    as _iig9z06a;
+import 'package:feedback_aggregator_server/src/generated/workspaces/source_sync_result.dart'
+    as _ijlvbjcg;
 import 'package:feedback_aggregator_server/src/generated/workspaces/workspace_role.dart'
     as _ixvotuht;
 import 'package:feedback_aggregator_server/src/generated/workspaces/workspace_summary.dart'
@@ -174,6 +178,8 @@ class TestEndpoints {
 
   late final _FeedbackIngestionEndpoint feedbackIngestion;
 
+  late final _SourcesEndpoint sources;
+
   late final _GreetingEndpoint greeting;
 
   late final _LayaPocEndpoint layaPoc;
@@ -201,6 +207,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     feedbackIngestion = _FeedbackIngestionEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    sources = _SourcesEndpoint(
       endpoints,
       serializationManager,
     );
@@ -783,6 +793,153 @@ class _FeedbackIngestionEndpoint {
                   _localCallContext.arguments,
                 )
                 as _ida.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _SourcesEndpoint {
+  _SourcesEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _is.EndpointDispatch _endpointDispatch;
+
+  final _is.SerializationManager _serializationManager;
+
+  _ida.Future<List<_iig9z06a.MockSourceConnection>> list(
+    _ist.TestSessionBuilder sessionBuilder,
+    int workspaceId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'sources',
+            method: 'list',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'sources',
+          methodName: 'list',
+          parameters: _ist.testObjectToJson({'workspaceId': workspaceId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<List<_iig9z06a.MockSourceConnection>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_ijlvbjcg.SourceSyncResult> connect(
+    _ist.TestSessionBuilder sessionBuilder,
+    int workspaceId,
+    String source,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'sources',
+            method: 'connect',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'sources',
+          methodName: 'connect',
+          parameters: _ist.testObjectToJson({
+            'workspaceId': workspaceId,
+            'source': source,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_ijlvbjcg.SourceSyncResult>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_ijlvbjcg.SourceSyncResult> sync(
+    _ist.TestSessionBuilder sessionBuilder,
+    int workspaceId,
+    String source,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'sources',
+            method: 'sync',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'sources',
+          methodName: 'sync',
+          parameters: _ist.testObjectToJson({
+            'workspaceId': workspaceId,
+            'source': source,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_ijlvbjcg.SourceSyncResult>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_iig9z06a.MockSourceConnection> disconnect(
+    _ist.TestSessionBuilder sessionBuilder,
+    int workspaceId,
+    String source,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'sources',
+            method: 'disconnect',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'sources',
+          methodName: 'disconnect',
+          parameters: _ist.testObjectToJson({
+            'workspaceId': workspaceId,
+            'source': source,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_iig9z06a.MockSourceConnection>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

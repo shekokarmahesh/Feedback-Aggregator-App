@@ -24,8 +24,11 @@ abstract class WorkspaceTicket
     required this.priority,
     required this.supporters,
     required this.requester,
+    bool? isMock,
+    this.externalId,
     DateTime? createdAt,
-  }) : createdAt = createdAt ?? DateTime.now();
+  }) : isMock = isMock ?? false,
+       createdAt = createdAt ?? DateTime.now();
 
   factory WorkspaceTicket({
     int? id,
@@ -37,6 +40,8 @@ abstract class WorkspaceTicket
     required String priority,
     required int supporters,
     required String requester,
+    bool? isMock,
+    String? externalId,
     DateTime? createdAt,
   }) = _WorkspaceTicketImpl;
 
@@ -51,6 +56,10 @@ abstract class WorkspaceTicket
       priority: jsonSerialization['priority'] as String,
       supporters: jsonSerialization['supporters'] as int,
       requester: jsonSerialization['requester'] as String,
+      isMock: jsonSerialization['isMock'] == null
+          ? null
+          : _isc.BoolJsonExtension.fromJson(jsonSerialization['isMock']),
+      externalId: jsonSerialization['externalId'] as String?,
       createdAt: jsonSerialization['createdAt'] == null
           ? null
           : _isc.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
@@ -78,6 +87,10 @@ abstract class WorkspaceTicket
 
   String requester;
 
+  bool isMock;
+
+  String? externalId;
+
   DateTime createdAt;
 
   /// Returns a shallow copy of this [WorkspaceTicket]
@@ -93,6 +106,8 @@ abstract class WorkspaceTicket
     String? priority,
     int? supporters,
     String? requester,
+    bool? isMock,
+    String? externalId,
     DateTime? createdAt,
   });
   @override
@@ -108,6 +123,8 @@ abstract class WorkspaceTicket
       'priority': priority,
       'supporters': supporters,
       'requester': requester,
+      'isMock': isMock,
+      if (externalId != null) 'externalId': externalId,
       'createdAt': createdAt.toJson(),
     };
   }
@@ -125,6 +142,8 @@ abstract class WorkspaceTicket
       'priority': priority,
       'supporters': supporters,
       'requester': requester,
+      'isMock': isMock,
+      if (externalId != null) 'externalId': externalId,
       'createdAt': createdAt.toJson(),
     };
   }
@@ -148,6 +167,8 @@ class _WorkspaceTicketImpl extends WorkspaceTicket {
     required String priority,
     required int supporters,
     required String requester,
+    bool? isMock,
+    String? externalId,
     DateTime? createdAt,
   }) : super._(
          id: id,
@@ -159,6 +180,8 @@ class _WorkspaceTicketImpl extends WorkspaceTicket {
          priority: priority,
          supporters: supporters,
          requester: requester,
+         isMock: isMock,
+         externalId: externalId,
          createdAt: createdAt,
        );
 
@@ -176,6 +199,8 @@ class _WorkspaceTicketImpl extends WorkspaceTicket {
     String? priority,
     int? supporters,
     String? requester,
+    bool? isMock,
+    Object? externalId = _Undefined,
     DateTime? createdAt,
   }) {
     return WorkspaceTicket(
@@ -188,6 +213,8 @@ class _WorkspaceTicketImpl extends WorkspaceTicket {
       priority: priority ?? this.priority,
       supporters: supporters ?? this.supporters,
       requester: requester ?? this.requester,
+      isMock: isMock ?? this.isMock,
+      externalId: externalId is String? ? externalId : this.externalId,
       createdAt: createdAt ?? this.createdAt,
     );
   }

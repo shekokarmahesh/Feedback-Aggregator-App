@@ -24,8 +24,11 @@ abstract class WorkspaceTicket
     required this.priority,
     required this.supporters,
     required this.requester,
+    bool? isMock,
+    this.externalId,
     DateTime? createdAt,
-  }) : createdAt = createdAt ?? DateTime.now();
+  }) : isMock = isMock ?? false,
+       createdAt = createdAt ?? DateTime.now();
 
   factory WorkspaceTicket({
     int? id,
@@ -37,6 +40,8 @@ abstract class WorkspaceTicket
     required String priority,
     required int supporters,
     required String requester,
+    bool? isMock,
+    String? externalId,
     DateTime? createdAt,
   }) = _WorkspaceTicketImpl;
 
@@ -51,6 +56,10 @@ abstract class WorkspaceTicket
       priority: jsonSerialization['priority'] as String,
       supporters: jsonSerialization['supporters'] as int,
       requester: jsonSerialization['requester'] as String,
+      isMock: jsonSerialization['isMock'] == null
+          ? null
+          : _is.BoolJsonExtension.fromJson(jsonSerialization['isMock']),
+      externalId: jsonSerialization['externalId'] as String?,
       createdAt: jsonSerialization['createdAt'] == null
           ? null
           : _is.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
@@ -80,6 +89,10 @@ abstract class WorkspaceTicket
 
   String requester;
 
+  bool isMock;
+
+  String? externalId;
+
   DateTime createdAt;
 
   @override
@@ -98,6 +111,8 @@ abstract class WorkspaceTicket
     String? priority,
     int? supporters,
     String? requester,
+    bool? isMock,
+    String? externalId,
     DateTime? createdAt,
   });
   @override
@@ -113,6 +128,8 @@ abstract class WorkspaceTicket
       'priority': priority,
       'supporters': supporters,
       'requester': requester,
+      'isMock': isMock,
+      if (externalId != null) 'externalId': externalId,
       'createdAt': createdAt.toJson(),
     };
   }
@@ -130,6 +147,8 @@ abstract class WorkspaceTicket
       'priority': priority,
       'supporters': supporters,
       'requester': requester,
+      'isMock': isMock,
+      if (externalId != null) 'externalId': externalId,
       'createdAt': createdAt.toJson(),
     };
   }
@@ -175,6 +194,8 @@ class _WorkspaceTicketImpl extends WorkspaceTicket {
     required String priority,
     required int supporters,
     required String requester,
+    bool? isMock,
+    String? externalId,
     DateTime? createdAt,
   }) : super._(
          id: id,
@@ -186,6 +207,8 @@ class _WorkspaceTicketImpl extends WorkspaceTicket {
          priority: priority,
          supporters: supporters,
          requester: requester,
+         isMock: isMock,
+         externalId: externalId,
          createdAt: createdAt,
        );
 
@@ -203,6 +226,8 @@ class _WorkspaceTicketImpl extends WorkspaceTicket {
     String? priority,
     int? supporters,
     String? requester,
+    bool? isMock,
+    Object? externalId = _Undefined,
     DateTime? createdAt,
   }) {
     return WorkspaceTicket(
@@ -215,6 +240,8 @@ class _WorkspaceTicketImpl extends WorkspaceTicket {
       priority: priority ?? this.priority,
       supporters: supporters ?? this.supporters,
       requester: requester ?? this.requester,
+      isMock: isMock ?? this.isMock,
+      externalId: externalId is String? ? externalId : this.externalId,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -263,6 +290,16 @@ class WorkspaceTicketUpdateTable extends _is.UpdateTable<WorkspaceTicketTable> {
     value,
   );
 
+  _is.ColumnValue<bool, bool> isMock(bool value) => _is.ColumnValue(
+    table.isMock,
+    value,
+  );
+
+  _is.ColumnValue<String, String> externalId(String? value) => _is.ColumnValue(
+    table.externalId,
+    value,
+  );
+
   _is.ColumnValue<DateTime, DateTime> createdAt(DateTime value) =>
       _is.ColumnValue(
         table.createdAt,
@@ -306,6 +343,15 @@ class WorkspaceTicketTable extends _is.Table<int?> {
       'requester',
       this,
     );
+    isMock = _is.ColumnBool(
+      'isMock',
+      this,
+      hasDefault: true,
+    );
+    externalId = _is.ColumnString(
+      'externalId',
+      this,
+    );
     createdAt = _is.ColumnDateTime(
       'createdAt',
       this,
@@ -331,6 +377,10 @@ class WorkspaceTicketTable extends _is.Table<int?> {
 
   late final _is.ColumnString requester;
 
+  late final _is.ColumnBool isMock;
+
+  late final _is.ColumnString externalId;
+
   late final _is.ColumnDateTime createdAt;
 
   @override
@@ -344,6 +394,8 @@ class WorkspaceTicketTable extends _is.Table<int?> {
     priority,
     supporters,
     requester,
+    isMock,
+    externalId,
     createdAt,
   ];
 }
